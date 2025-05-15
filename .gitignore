@@ -1,0 +1,6 @@
+# ignora la cartella Debug
+Debug/
+
+# Ignora i file temporanei
+*.log
+*.tmp
