@@ -2,6 +2,7 @@
 #include "PolygonalMesh.hpp"
 #include "Utils.hpp"
 #include "UCDUtilities.hpp"
+#include <string>
 
 using namespace std;
 using namespace Eigen;
@@ -16,9 +17,14 @@ int main(){
     // creo un oggetto mesh
     PolygonalMesh mesh;
 
+    unsigned int p=3;
+    unsigned int q=3;
+    string Poliedro= RiconosciPoliedro(q);
+
+    cout << Poliedro << endl;
 
     // importo la mesh e verifico che avvenga correttamente
-    if(!ImportMesh(mesh))
+    if(!ImportMesh(mesh, Poliedro))
     {
         cerr << "file not found" << endl;
         return 1;
