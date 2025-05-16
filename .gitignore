@@ -1,6 +1,9 @@
 # ignora la cartella Debug
 Debug/
 
+# ignoro ds store
+.DS_Store
+
 # Ignora i file temporanei
 *.log
 *.tmp

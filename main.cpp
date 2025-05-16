@@ -17,9 +17,9 @@ int main(){
     // creo un oggetto mesh
     PolygonalMesh mesh;
 
-    unsigned int p=3;
-    unsigned int q=3;
-    string Poliedro= RiconosciPoliedro(q);
+    unsigned int p = 3;
+    unsigned int q = 5;
+    string Poliedro = RiconosciPoliedro(q);
 
     cout << Poliedro << endl;
 
@@ -31,11 +31,14 @@ int main(){
     }
 
     
+    string ParaviewPunti = "./Cell0D" + Poliedro + ".inp";
+    string ParaviewSegmenti = "./Cell1D" + Poliedro + ".inp"; 
+
     UCDUtilities utilities;
-    utilities.ExportPoints("./Cell0Ds.inp",
+    utilities.ExportPoints(ParaviewPunti,
                            mesh.Cell0DsCoordinates);
 
-    utilities.ExportSegments("./Cell1Ds.inp",
+    utilities.ExportSegments(ParaviewSegmenti,
                              mesh.Cell0DsCoordinates,
                              mesh.Cell1DsExtrema);
 

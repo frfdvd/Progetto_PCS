@@ -62,10 +62,19 @@ add_executable(${PROJECT_NAME}
       ${ProgettoPCS_HEADERS})
 
 # QUESTI VANNO INCLUSI QUANDO INSERIAMO I FILE DENTRO PolygonalMesh 
-# file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/PolygonalMesh/Cell0Ds.csv
-# ${CMAKE_CURRENT_SOURCE_DIR}/PolygonalMesh/Cell1Ds.csv
-# ${CMAKE_CURRENT_SOURCE_DIR}/PolygonalMesh/Cell2Ds.csv
-#      DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/PolygonalMesh/Cell0DTetraedro.csv
+${CMAKE_CURRENT_SOURCE_DIR}/PolygonalMesh/Cell0DIcosaedro.csv
+${CMAKE_CURRENT_SOURCE_DIR}/PolygonalMesh/Cell0DOttaedro.csv
+${CMAKE_CURRENT_SOURCE_DIR}/PolygonalMesh/Cell1DTetraedro.csv
+${CMAKE_CURRENT_SOURCE_DIR}/PolygonalMesh/Cell1DIcosaedro.csv
+${CMAKE_CURRENT_SOURCE_DIR}/PolygonalMesh/Cell1DOttaedro.csv
+${CMAKE_CURRENT_SOURCE_DIR}/PolygonalMesh/Cell2DTetraedro.csv
+${CMAKE_CURRENT_SOURCE_DIR}/PolygonalMesh/Cell2DIcosaedro.csv
+${CMAKE_CURRENT_SOURCE_DIR}/PolygonalMesh/Cell2DOttaedro.csv
+${CMAKE_CURRENT_SOURCE_DIR}/PolygonalMesh/Cell3DTetraedro.csv
+${CMAKE_CURRENT_SOURCE_DIR}/PolygonalMesh/Cell3DIcosaedro.csv
+${CMAKE_CURRENT_SOURCE_DIR}/PolygonalMesh/Cell3DOttaedro.csv
+      DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 
 target_link_libraries(${PROJECT_NAME} ${ProgettoPCS_LINKED_LIBRARIES})
 target_include_directories(${PROJECT_NAME} PRIVATE ${ProgettoPCS_INCLUDE})

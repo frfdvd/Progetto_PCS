@@ -15,9 +15,7 @@ namespace PolygonalLibrary{
 
     if(!ImportCell1Ds(mesh, Poliedro))
         return false;
-
-
-
+        
     return true;
 
 }
