@@ -166,4 +166,82 @@ bool ImportCell1Ds(PolygonalMesh& mesh, const string& Poliedro)
     }
     return true;
 }
+/**********************************/
+
+bool TriangolazioneUno(const PolygonalMesh& mesh1, PolygonalMesh& mesh2, const unsigned int& b, const unsigned int& q){
+    
+    unsigned int T = pow(b,2);
+    cout << T << endl;
+
+    if(q==3){
+        mesh2.NumCell0Ds = 2*T + 2;
+        mesh2.NumCell1Ds = 6*T;
+        mesh2.NumCell2Ds = 4*T;
+    }
+    else if(q==4){
+        mesh2.NumCell0Ds = 4*T + 2;
+        mesh2.NumCell1Ds = 12*T;
+        mesh2.NumCell2Ds = 8*T;
+    }
+    else if(q==5){
+        mesh2.NumCell0Ds = 10*T + 2;
+        mesh2.NumCell1Ds = 30*T;
+        mesh2.NumCell2Ds = 20*T;
+    }
+
+    mesh2.Cell0DsCoordinates = MatrixXd::Zero(3, mesh2.NumCell0Ds);
+    cout << mesh2.NumCell0Ds << endl;
+    mesh2.Cell0DsId.reserve(mesh2.NumCell0Ds);
+    unsigned int contIdPunti = mesh1.NumCell0Ds - 1;
+
+    // aggiungo a mesh2 le coordinate dei punti di mesh1
+    for(unsigned int id : mesh1.Cell0DsId){
+        cout << id << endl;
+        mesh2.Cell0DsId.push_back(id);
+        mesh2.Cell0DsCoordinates(0, id) = mesh1.Cell0DsCoordinates(0, id);
+        mesh2.Cell0DsCoordinates(1, id) = mesh1.Cell0DsCoordinates(1, id);
+        mesh2.Cell0DsCoordinates(2, id) = mesh1.Cell0DsCoordinates(2, id);
+    }
+    
+    // aggiungo le coordinate nuove (triangolazione) dei punti che stanno sui lati
+    for(unsigned int id : mesh1.Cell1DsId){
+        cout << "id lato "<< id << endl;
+
+        // memorizzo gli estremi del lato e li metto dentro dei vettori
+        unsigned int idEstremo1 = mesh1.Cell1DsExtrema(0,id);
+        unsigned int idEstremo2 = mesh1.Cell1DsExtrema(1,id);
+
+
+
+        Vector3d Estremo1(mesh1.Cell0DsCoordinates(0,idEstremo1),mesh1.Cell0DsCoordinates(1,idEstremo1),mesh1.Cell0DsCoordinates(2,idEstremo1));
+        Vector3d Estremo2(mesh1.Cell0DsCoordinates(0,idEstremo2),mesh1.Cell0DsCoordinates(1,idEstremo2),mesh1.Cell0DsCoordinates(2,idEstremo2));
+        
+        // vettore con la direzione del lato
+        Vector3d VettoreDirezione = Estremo2 - Estremo1;
+        
+        // trovo i punti in mezzo ai lati e li memorizzo
+        for(unsigned int i = 0; i < b-1; i++){
+            Vector3d punto = Estremo1 + VettoreDirezione * (i+1)/(double)(b - 1); 
+            
+            
+            // metto il punto sulla sfera di raggio 1
+            double normaPunto = punto.norm();
+            Vector3d puntoNormalizzato = punto/normaPunto;
+
+            cout << puntoNormalizzato(0) << " " << puntoNormalizzato(1) << " " << puntoNormalizzato(2) << " " << endl;
+
+            contIdPunti = contIdPunti + 1;
+
+            cout << contIdPunti << endl;
+
+            // salvo i punti sulle strutture dati 
+            mesh2.Cell0DsId.push_back(contIdPunti);
+            mesh2.Cell0DsCoordinates(0, contIdPunti) = puntoNormalizzato(0);
+            mesh2.Cell0DsCoordinates(1, contIdPunti) = puntoNormalizzato(1);
+            mesh2.Cell0DsCoordinates(2, contIdPunti) = puntoNormalizzato(2);
+        }
+    }
+    return true;
+}
+
 }

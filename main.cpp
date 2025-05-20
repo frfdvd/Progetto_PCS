@@ -16,9 +16,11 @@ int main(){
     
     // creo un oggetto mesh
     PolygonalMesh mesh;
+    PolygonalMesh meshTriangolata;
 
+    unsigned int b = 2;
     unsigned int p = 3;
-    unsigned int q = 5;
+    unsigned int q = 3;
     string Poliedro = RiconosciPoliedro(q);
 
     cout << Poliedro << endl;
@@ -41,6 +43,12 @@ int main(){
     utilities.ExportSegments(ParaviewSegmenti,
                              mesh.Cell0DsCoordinates,
                              mesh.Cell1DsExtrema);
+
+
+    TriangolazioneUno(mesh, meshTriangolata, b, q);
+
+    string ParaviewPuntiTriangolati = "./Cell0D" + Poliedro + "Triang" + ".inp";
+    utilities.ExportPoints(ParaviewPuntiTriangolati, meshTriangolata.Cell0DsCoordinates);
 
     return 0;
 }

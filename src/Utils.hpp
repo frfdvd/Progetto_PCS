@@ -5,6 +5,7 @@
 #include <string>
 
 using namespace std;
+using namespace Eigen;
 
 namespace PolygonalLibrary{
     
@@ -19,5 +20,8 @@ namespace PolygonalLibrary{
 
     // riconosce il poliedro che viene inserito
     string RiconosciPoliedro(const unsigned int& q);
+
+    // trova la triangolazione di tipo uno di un poligono
+    bool TriangolazioneUno(const PolygonalMesh& mesh1, PolygonalMesh& mesh2, const unsigned int& b, const unsigned int& q);
 
 }
