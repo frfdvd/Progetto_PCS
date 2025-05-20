@@ -190,13 +190,11 @@ bool TriangolazioneUno(const PolygonalMesh& mesh1, PolygonalMesh& mesh2, const u
     }
 
     mesh2.Cell0DsCoordinates = MatrixXd::Zero(3, mesh2.NumCell0Ds);
-    cout << mesh2.NumCell0Ds << endl;
     mesh2.Cell0DsId.reserve(mesh2.NumCell0Ds);
     unsigned int contIdPunti = mesh1.NumCell0Ds - 1;
 
     // aggiungo a mesh2 le coordinate dei punti di mesh1
     for(unsigned int id : mesh1.Cell0DsId){
-        cout << id << endl;
         mesh2.Cell0DsId.push_back(id);
         mesh2.Cell0DsCoordinates(0, id) = mesh1.Cell0DsCoordinates(0, id);
         mesh2.Cell0DsCoordinates(1, id) = mesh1.Cell0DsCoordinates(1, id);
@@ -215,24 +213,25 @@ bool TriangolazioneUno(const PolygonalMesh& mesh1, PolygonalMesh& mesh2, const u
 
         Vector3d Estremo1(mesh1.Cell0DsCoordinates(0,idEstremo1),mesh1.Cell0DsCoordinates(1,idEstremo1),mesh1.Cell0DsCoordinates(2,idEstremo1));
         Vector3d Estremo2(mesh1.Cell0DsCoordinates(0,idEstremo2),mesh1.Cell0DsCoordinates(1,idEstremo2),mesh1.Cell0DsCoordinates(2,idEstremo2));
+        cout << "estremo 1 " <<Estremo1(0) << Estremo1(1) << Estremo1(2) << endl;
+        cout << "estremo 2 " <<Estremo2(0) << Estremo2(1) << Estremo2(2) << endl;
         
         // vettore con la direzione del lato
         Vector3d VettoreDirezione = Estremo2 - Estremo1;
+        cout << "Vettore direzione " << VettoreDirezione(0) <<VettoreDirezione(1) <<VettoreDirezione(2) << endl;
         
         // trovo i punti in mezzo ai lati e li memorizzo
         for(unsigned int i = 0; i < b-1; i++){
             Vector3d punto = Estremo1 + VettoreDirezione * (i+1)/(double)(b - 1); 
-            
+            cout << "nuovo punto" <<punto << endl;
             
             // metto il punto sulla sfera di raggio 1
             double normaPunto = punto.norm();
             Vector3d puntoNormalizzato = punto/normaPunto;
-
-            cout << puntoNormalizzato(0) << " " << puntoNormalizzato(1) << " " << puntoNormalizzato(2) << " " << endl;
+            cout << "nuovo punto normalizzato "<< puntoNormalizzato(0) << " " << puntoNormalizzato(1) << " " << puntoNormalizzato(2) << " " << endl;
 
             contIdPunti = contIdPunti + 1;
-
-            cout << contIdPunti << endl;
+            cout << "id del nuovo punto "<<contIdPunti << endl;
 
             // salvo i punti sulle strutture dati 
             mesh2.Cell0DsId.push_back(contIdPunti);
@@ -240,6 +239,15 @@ bool TriangolazioneUno(const PolygonalMesh& mesh1, PolygonalMesh& mesh2, const u
             mesh2.Cell0DsCoordinates(1, contIdPunti) = puntoNormalizzato(1);
             mesh2.Cell0DsCoordinates(2, contIdPunti) = puntoNormalizzato(2);
         }
+
+
+    }
+    
+    for (int i = 0; i < mesh2.Cell0DsCoordinates.rows(); ++i) {
+        for (int j = 0; j < mesh2.Cell0DsCoordinates.cols(); ++j) {
+            std::cout << mesh2.Cell0DsCoordinates(i,j) << " ";
+        }
+        cout << endl;
     }
     return true;
 }
