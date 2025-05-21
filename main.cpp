@@ -18,7 +18,7 @@ int main(){
     PolygonalMesh mesh;
     PolygonalMesh meshTriangolata;
 
-    unsigned int b = 6;
+    unsigned int b = 3;
     unsigned int p = 3;
     unsigned int q = 3;
     string Poliedro = RiconosciPoliedro(q);
@@ -45,10 +45,20 @@ int main(){
                              mesh.Cell1DsExtrema);
 
                         
-    TriangolazioneUno(mesh, meshTriangolata, b, q);
+    if(!ImportTriangolazioneUno(mesh, meshTriangolata, b, q))
+    {
+        cerr << "error during triangolation" << endl;
+        return 1;
+    }
 
     string ParaviewPuntiTriangolati = "./Cell0D" + Poliedro + "Triang" + ".inp";
-    utilities.ExportPoints(ParaviewPuntiTriangolati, meshTriangolata.Cell0DsCoordinates);
+    string ParaviewPuntiTriangolati = "./Cell1D" + Poliedro + "Triang" + ".inp";
+
+    utilities.ExportPoints(ParaviewPuntiTriangolati, 
+                            meshTriangolata.Cell0DsCoordinates);
+    utilities.ExportSegments(ParaviewSegmenti,
+                             meshTriangolata.Cell0DsCoordinates,
+                             meshTriangolata.Cell1DsExtrema);
 
     return 0;
 }

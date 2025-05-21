@@ -261,7 +261,21 @@ bool ImportCell2Ds(PolygonalMesh& mesh, const string& Poliedro){
 
 /**********************************/
 
-bool TriangolazioneUno(const PolygonalMesh& mesh1, PolygonalMesh& mesh2, const unsigned int& b, const unsigned int& q){
+
+bool ImportTriangolazioneUno(const PolygonalMesh& mesh1, PolygonalMesh& mesh2, const unsigned int& b, const unsigned int& q){
+
+    if(!Cell0DTriangolazioneUno(mesh1, mesh2, b, q))
+        return false;
+
+    if(!Cell1DTriangolazioneUno(mesh1, mesh2, b))
+        return false;
+
+    return true;
+}
+
+/**********************************/
+
+bool Cell0DTriangolazioneUno(const PolygonalMesh& mesh1, PolygonalMesh& mesh2, const unsigned int& b, const unsigned int& q){
     
     unsigned int T = pow(b,2);
 
@@ -320,23 +334,16 @@ bool TriangolazioneUno(const PolygonalMesh& mesh1, PolygonalMesh& mesh2, const u
         for(unsigned int i = 0; i < b-1; i++){
             Vector3d punto = Estremo1 + VettoreDirezione * (i+1)/(double)(b); 
             //cout << "nuovo punto" <<punto << endl;
-            
-            // metto il punto sulla sfera di raggio 1
-            double normaPunto = punto.norm();
-            Vector3d puntoNormalizzato =  punto;//punto/normaPunto;
-            //cout << "nuovo punto normalizzato "<< puntoNormalizzato(0) << " " << puntoNormalizzato(1) << " " << puntoNormalizzato(2) << " " << endl;
 
             contIdPunti = contIdPunti + 1;
             //cout << "id del nuovo punto "<<contIdPunti << endl;
 
             // salvo i punti sulle strutture dati 
             mesh2.Cell0DsId.push_back(contIdPunti);
-            mesh2.Cell0DsCoordinates(0, contIdPunti) = puntoNormalizzato(0);
-            mesh2.Cell0DsCoordinates(1, contIdPunti) = puntoNormalizzato(1);
-            mesh2.Cell0DsCoordinates(2, contIdPunti) = puntoNormalizzato(2);
+            mesh2.Cell0DsCoordinates(0, contIdPunti) = punto(0);
+            mesh2.Cell0DsCoordinates(1, contIdPunti) = punto(1);
+            mesh2.Cell0DsCoordinates(2, contIdPunti) = punto(2);
         }
-
-
     }
     
     /*for (int i = 0; i < mesh2.Cell0DsCoordinates.rows(); ++i) {
@@ -387,28 +394,58 @@ bool TriangolazioneUno(const PolygonalMesh& mesh1, PolygonalMesh& mesh2, const u
                 // trovo i punti della triangolazione interna
                 Vector3d punto = puntoDir1 + VettoreDirezione3 * (k+1)/(double)(b-i-1);
                 
-                // metto il punto sulla sfera di raggio 1
-                double normaPunto = punto.norm();
-                Vector3d puntoNormalizzato = punto; //punto/normaPunto;
 
                 // trovo l'id dei punti continuando il conteggio di prima
                 contIdPunti = contIdPunti + 1;
 
                 // inseriamo il punto nuovo nelle strutture dati
                 mesh2.Cell0DsId.push_back(contIdPunti);
-                mesh2.Cell0DsCoordinates(0, contIdPunti) = puntoNormalizzato(0);
-                mesh2.Cell0DsCoordinates(1, contIdPunti) = puntoNormalizzato(1);
-                mesh2.Cell0DsCoordinates(2, contIdPunti) = puntoNormalizzato(2);
+                mesh2.Cell0DsCoordinates(0, contIdPunti) = punto(0);
+                mesh2.Cell0DsCoordinates(1, contIdPunti) = punto(1);
+                mesh2.Cell0DsCoordinates(2, contIdPunti) = punto(2);
             }
-        }
-
-
-
-        
+        }      
     }
-
-
     return true;
+}
+
+bool Cell1DTriangolazioneUno(const PolygonalMesh& mesh1, PolygonalMesh& mesh2, const unsigned int& b){
+    
+    //calcolo la lunghezza di un lato del poligono e poi di un lato della triangolazione
+    Vector3d coord1(mesh1.Cell0DsCoordinates(0,0), mesh1.Cell0DsCoordinates(1,0), mesh1.Cell0DsCoordinates(2,0));
+    Vector3d coord2(mesh1.Cell0DsCoordinates(0,1), mesh1.Cell0DsCoordinates(1,1), mesh1.Cell0DsCoordinates(2,1));
+    double d = norm(coord2 - coord1);
+    double latotri = d / b ;
+
+    // faccio una copia della matrice con le coordinate
+    MatrixXd temp = mesh2.Cell0DsCoordinates;
+
+    //collego i punti che si trovano a distanza latotri
+    
+    mesh2.Cell1DsId.reserve(mesh2.NumCell1Ds);
+    // inizializzo il contatore per l'id dei lati 
+    unsigned int contaIdLati = 0;
+
+    // itero sulla matrice che contiene i punti 
+    for(unsigned int id : mesh2.Cell0DsId) {
+        Vector3d puntocfr(mesh2.Cell0DsCoordinates(0,id), mesh2.Cell0DsCoordinates(1,id), mesh2.Cell0DsCoordinates(2,id));
+        // confronto le distanze tra i punti facendo in modo che non esistano duplicati 
+        for(unsigned int idTemp = id; idTemp < temp.cols; idTemp ++) {
+            Vector3d puntotemp(mesh2.Cell0DsCoordinates(0,idTemp), mesh2.Cell0DsCoordinates(1,idTemp), mesh2.Cell0DsCoordinates(2,idTemp));
+            double distanza = norm(puntocfr - puntotemp);
+            // se la distanza è pari a latotri aggiungo il lato a cell1dextrema
+            if (abs(distanza - latotri) < numeric_limits<double>::epsilon()){  //non posso confrontare con 0!!!
+                mesh2.Cell1DsId.push_back(contaIdLati);
+                mesh2.Cell1DsExtrema(0,contaIdLati) = id;
+                mesh2.Cell1DsExtrema(1,contaIdLati) = idTemp;
+                contaIdLati = contaIdLati + 1;
+
+            }     
+            
+        }
+    }
+    return true;
+
 }
 
 }

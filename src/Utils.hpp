@@ -10,7 +10,7 @@ using namespace Eigen;
 
 namespace PolygonalLibrary{
     
-    // chiama a cascata le altre funzioni che importano Cell0Ds, Cell1Ds, Cell2Ds e
+    // chiama a cascata le altre funzioni che importano Cell0Ds, Cell1Ds, Cell2Ds 
     bool ImportMesh(PolygonalMesh& mesh, const string& Poliedro);
 
     // importa i punti e salva tutto nelle strutture dati migliori
@@ -25,7 +25,13 @@ namespace PolygonalLibrary{
     // riconosce il poliedro che viene inserito
     string RiconosciPoliedro(const unsigned int& q);
 
-    // trova la triangolazione di tipo uno di un poligono
+    // chiama a cascata le altre funzioni che importano la triangolazione di tipo uno di punti e lati
+    bool ImportTriangolazioneUno(const PolygonalMesh& mesh1, PolygonalMesh& mesh2, const unsigned int& b, const unsigned int& q);
+
+    // trova la triangolazione di tipo uno dei punti di un poligono
     bool TriangolazioneUno(const PolygonalMesh& mesh1, PolygonalMesh& mesh2, const unsigned int& b, const unsigned int& q);
+
+    // trova la triangolazione di tipo uno dei lati di un poligono  
+    bool Cell1DTriangolazioneUno(const PolygonalMesh& mesh1, PolygonalMesh& mesh2, const unsigned int& b);
 
 }
