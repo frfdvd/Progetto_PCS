@@ -18,7 +18,7 @@ int main(){
     PolygonalMesh mesh;
     PolygonalMesh meshTriangolata;
 
-    unsigned int b = 2;
+    unsigned int b = 6;
     unsigned int p = 3;
     unsigned int q = 3;
     string Poliedro = RiconosciPoliedro(q);
@@ -44,7 +44,7 @@ int main(){
                              mesh.Cell0DsCoordinates,
                              mesh.Cell1DsExtrema);
 
-
+                        
     TriangolazioneUno(mesh, meshTriangolata, b, q);
 
     string ParaviewPuntiTriangolati = "./Cell0D" + Poliedro + "Triang" + ".inp";

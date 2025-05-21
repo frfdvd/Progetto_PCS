@@ -3,6 +3,7 @@
 #include <iostream>
 #include "PolygonalMesh.hpp"
 #include <string>
+#include <map>
 
 using namespace std;
 using namespace Eigen;
@@ -17,6 +18,9 @@ namespace PolygonalLibrary{
 
     // importa i segmenti e salva tutto nelle strutture dati migliori
     bool ImportCell1Ds(PolygonalMesh& mesh, const string& Poliedro);
+
+    // importa le facce e salva tutto in dei dizionari comodi comodi 
+    bool ImportCell2Ds(PolygonalMesh& mesh, const string& Poliedro);
 
     // riconosce il poliedro che viene inserito
     string RiconosciPoliedro(const unsigned int& q);

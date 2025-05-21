@@ -22,10 +22,8 @@ namespace PolygonalLibrary{
         MatrixXd Cell0DsCoordinates;
         MatrixXi Cell1DsExtrema;
 
-        // vediamo se tenerli
-        vector<vector<unsigned int>> Cell2DsVertices;
-        vector<vector<unsigned int>> Cell2DsEdges;
+        map<unsigned int, Vector3i> mapVertici;
+        map<unsigned int, Vector3i> mapLati;
     };
-
 }
 
