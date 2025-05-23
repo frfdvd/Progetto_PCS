@@ -448,4 +448,106 @@ bool Cell1DTriangolazioneUno(const PolygonalMesh& mesh1, PolygonalMesh& mesh2, c
 
 }
 
+/**********************************/
+
+bool TriangolazioneUno(const PolygonalMesh& mesh1, PolygonalMesh& mesh2, const unsigned int& b, const unsigned int& q){
+    
+    unsigned int T = pow(b,2);
+
+    // salvo il numero di vertici, lati e facce usando le formule
+    if(q==3){
+        mesh2.NumCell0Ds = 2*T + 2;
+        mesh2.NumCell1Ds = 6*T;
+        mesh2.NumCell2Ds = 4*T;
+    }
+    else if(q==4){
+        mesh2.NumCell0Ds = 4*T + 2;
+        mesh2.NumCell1Ds = 12*T;
+        mesh2.NumCell2Ds = 8*T;
+    }
+    else if(q==5){
+        mesh2.NumCell0Ds = 10*T + 2;
+        mesh2.NumCell1Ds = 30*T;
+        mesh2.NumCell2Ds = 20*T;
+    }
+
+    // alloco lo spazio necessario per inserire le coordinte e gli id dei vertici
+    mesh2.Cell0DsCoordinates = MatrixXd::Zero(3, mesh2.NumCell0Ds);
+    mesh2.Cell0DsId.reserve(mesh2.NumCell0Ds);
+    
+    // inizializzo un contatore per avere gli id dei nuovi vertici
+    unsigned int contIdPunti = mesh1.NumCell0Ds - 1;
+
+    // aggiungo a mesh2 le coordinate dei punti di mesh1
+    for(unsigned int id : mesh1.Cell0DsId){
+        mesh2.Cell0DsId.push_back(id);
+        mesh2.Cell0DsCoordinates(0, id) = mesh1.Cell0DsCoordinates(0, id);
+        mesh2.Cell0DsCoordinates(1, id) = mesh1.Cell0DsCoordinates(1, id);
+        mesh2.Cell0DsCoordinates(2, id) = mesh1.Cell0DsCoordinates(2, id);
+    }
+
+    // contiene dei vettori fatti così [idEstremoTetraedro, ...idPuntiInterni..., idEstremoTetraedro2]
+    vector<vector<unsigned int>> latiCompleti; 
+
+    // aggiungo le coordinate nuove (triangolazione) dei punti che stanno sui lati
+    for(unsigned int id : mesh1.Cell1DsId){
+        //cout << "id lato "<< id << endl;
+
+        // vettore così [idEstremoTetraedro, ...idPuntiInterni..., idEstremoTetraedro2]
+        vector<unsigned int> latoCompleto;
+        
+        // memorizzo gli estremi del lato e li metto dentro dei vettori
+        unsigned int idEstremo1 = mesh1.Cell1DsExtrema(0,id);
+        unsigned int idEstremo2 = mesh1.Cell1DsExtrema(1,id);
+
+
+        latoCompleto.push_back(idEstremo1);
+
+
+        Vector3d Estremo1(mesh1.Cell0DsCoordinates(0,idEstremo1),mesh1.Cell0DsCoordinates(1,idEstremo1),mesh1.Cell0DsCoordinates(2,idEstremo1));
+        Vector3d Estremo2(mesh1.Cell0DsCoordinates(0,idEstremo2),mesh1.Cell0DsCoordinates(1,idEstremo2),mesh1.Cell0DsCoordinates(2,idEstremo2));
+        //cout << "estremo 1 " <<Estremo1(0) << Estremo1(1) << Estremo1(2) << endl;
+        //cout << "estremo 2 " <<Estremo2(0) << Estremo2(1) << Estremo2(2) << endl;
+        
+        // vettore con la direzione del lato
+        Vector3d VettoreDirezione = Estremo2 - Estremo1;
+        //cout << "Vettore direzione " << VettoreDirezione(0) <<VettoreDirezione(1) <<VettoreDirezione(2) << endl;
+        
+        // trovo i punti in mezzo ai lati e li memorizzo
+        for(unsigned int i = 0; i < b-1; i++){
+            Vector3d punto = Estremo1 + VettoreDirezione * (i+1)/(double)(b); 
+            //cout << "nuovo punto" <<punto << endl;
+
+            contIdPunti = contIdPunti + 1;
+            //cout << "id del nuovo punto "<<contIdPunti << endl;
+
+            // salvo i punti sulle strutture dati 
+            mesh2.Cell0DsId.push_back(contIdPunti);
+            mesh2.Cell0DsCoordinates(0, contIdPunti) = punto(0);
+            mesh2.Cell0DsCoordinates(1, contIdPunti) = punto(1);
+            mesh2.Cell0DsCoordinates(2, contIdPunti) = punto(2);
+
+            latoCompleto.push_back(contIdPunti);
+        }
+
+        latoCompleto.push_back(idEstremo2);
+        latiCompleti.push_back(latoCompleto);
+
+    }
+
+    // creo il dizionario che ha come chiave l'id della faccia del poligono iniziale e come valore i lati copleti di quella faccia
+
+
+    /*iniziamo a triangolare: prendiamo ogni faccia del poligono e i suoi vettori relativi ai lati completi. prendiamo due lati 
+    (uno sarà la base e l'altro sarà quello su cui iteriamo) e iniziamo ad aggiungere i punti interni relativi a questi due lati (sfruttando il terzo lato
+    per trovare il vettore direzione consono). dopo aver aggiunto i punti interni e aver salvato i segmenti e le facce, saliamo su nell'altezza e usiamo come 
+    base quello che era il tetto del passaggio precedente. andiamo avanti così fino a che il tetto non è lungo due a quel punto uniamo i punti con l'estremo superiore*/
+
+
+
+}
+
+
+
+
 }
