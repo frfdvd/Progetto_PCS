@@ -22,6 +22,8 @@ namespace PolygonalLibrary{
         MatrixXd Cell0DsCoordinates;
         MatrixXi Cell1DsExtrema;
 
+
+        // per ogni faccia ci sono gli id dei vertici e dei lati
         map<unsigned int, Vector3i> mapVertici;
         map<unsigned int, Vector3i> mapLati;
     };

@@ -22,6 +22,9 @@ namespace PolygonalLibrary{
     // importa le facce e salva tutto in dei dizionari comodi comodi 
     bool ImportCell2Ds(PolygonalMesh& mesh, const string& Poliedro);
 
+    //verifica la presenza di duplicati, altrimenti ritorna l'id del nuovo lato
+    unsigned int TestDuplicati(const MatrixXi& MatriceLati, const unsigned int& id1, const unsigned int& id2);
+
     // riconosce il poliedro che viene inserito
     string RiconosciPoliedro(const unsigned int& q);
 
@@ -33,5 +36,7 @@ namespace PolygonalLibrary{
 
     // trova la triangolazione di tipo uno dei lati di un poligono  
     bool Cell1DTriangolazioneUno(const PolygonalMesh& mesh1, PolygonalMesh& mesh2, const unsigned int& b);
+
+    bool Cell0DTriangolazioneUno(const PolygonalMesh& mesh1, PolygonalMesh& mesh2, const unsigned int& b,const unsigned int& q);
 
 }

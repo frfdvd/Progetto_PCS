@@ -261,6 +261,21 @@ bool ImportCell2Ds(PolygonalMesh& mesh, const string& Poliedro){
 
 /**********************************/
 
+unsigned int TestDuplicati(const MatrixXi& MatriceLati, const unsigned int& id1, const unsigned int& id2){
+    
+    for(unsigned int i = 0; i < MatriceLati.cols(); i++){
+        if( (MatriceLati(0,i) == id1 || MatriceLati(1,i) == id1) & (MatriceLati(0,i) == id2 || MatriceLati(1,i) == id2) ){
+            return i;
+            break;
+        }
+    }
+    unsigned int nuovoId = MatriceLati.cols();
+    return nuovoId;
+    
+}
+
+/**********************************/
+
 
 bool ImportTriangolazioneUno(const PolygonalMesh& mesh1, PolygonalMesh& mesh2, const unsigned int& b, const unsigned int& q){
 
@@ -414,7 +429,7 @@ bool Cell1DTriangolazioneUno(const PolygonalMesh& mesh1, PolygonalMesh& mesh2, c
     //calcolo la lunghezza di un lato del poligono e poi di un lato della triangolazione
     Vector3d coord1(mesh1.Cell0DsCoordinates(0,0), mesh1.Cell0DsCoordinates(1,0), mesh1.Cell0DsCoordinates(2,0));
     Vector3d coord2(mesh1.Cell0DsCoordinates(0,1), mesh1.Cell0DsCoordinates(1,1), mesh1.Cell0DsCoordinates(2,1));
-    double d = norm(coord2 - coord1);
+    double d = (coord2 - coord1).norm();
     double latotri = d / b ;
 
     // faccio una copia della matrice con le coordinate
@@ -430,9 +445,9 @@ bool Cell1DTriangolazioneUno(const PolygonalMesh& mesh1, PolygonalMesh& mesh2, c
     for(unsigned int id : mesh2.Cell0DsId) {
         Vector3d puntocfr(mesh2.Cell0DsCoordinates(0,id), mesh2.Cell0DsCoordinates(1,id), mesh2.Cell0DsCoordinates(2,id));
         // confronto le distanze tra i punti facendo in modo che non esistano duplicati 
-        for(unsigned int idTemp = id; idTemp < temp.cols; idTemp ++) {
+        for(unsigned int idTemp = id; idTemp < temp.cols(); idTemp ++) {
             Vector3d puntotemp(mesh2.Cell0DsCoordinates(0,idTemp), mesh2.Cell0DsCoordinates(1,idTemp), mesh2.Cell0DsCoordinates(2,idTemp));
-            double distanza = norm(puntocfr - puntotemp);
+            double distanza = (puntocfr - puntotemp).norm();
             // se la distanza è pari a latotri aggiungo il lato a cell1dextrema
             if (abs(distanza - latotri) < numeric_limits<double>::epsilon()){  //non posso confrontare con 0!!!
                 mesh2.Cell1DsId.push_back(contaIdLati);
@@ -535,18 +550,89 @@ bool TriangolazioneUno(const PolygonalMesh& mesh1, PolygonalMesh& mesh2, const u
 
     }
 
-    // creo il dizionario che ha come chiave l'id della faccia del poligono iniziale e come valore i lati copleti di quella faccia
+    for(unsigned int s = 0; s<latiCompleti.size(); s++){
+            for(unsigned int y = 0;y<latiCompleti[s].size();y++){
+                cout << latiCompleti[s][y] << " ";
+            }
+        cout << endl;
+        }
 
+
+
+    // creo il dizionario che ha come chiave l'id della faccia del poligono iniziale e come valore i lati copleti di quella faccia
+    
+    map<unsigned int, vector<vector<unsigned int>>> mapFacce;
+
+    for(unsigned int i = 0; i < mesh1.NumCell2Ds; i++){
+        unsigned int id1 = mesh1.mapVertici.at(i)(0);
+        unsigned int id2 = mesh1.mapVertici.at(i)(1);
+        unsigned int id3 = mesh1.mapVertici.at(i)(2);
+
+        vector<vector<unsigned int>> lati;
+        for(unsigned int k = 0; k<latiCompleti.size(); k++){
+            if( (find(latiCompleti[k].begin(), latiCompleti[k].end(), id1) != latiCompleti[k].end()) & (find(latiCompleti[k].begin(), latiCompleti[k].end(), id2) != latiCompleti[k].end()) ){
+                lati.push_back(latiCompleti[k]);
+            } 
+
+            if( (find(latiCompleti[k].begin(), latiCompleti[k].end(), id1) != latiCompleti[k].end()) & (find(latiCompleti[k].begin(), latiCompleti[k].end(), id3) != latiCompleti[k].end()) ){
+                lati.push_back(latiCompleti[k]);
+            }
+
+            if( (find(latiCompleti[k].begin(), latiCompleti[k].end(), id2) != latiCompleti[k].end()) & (find(latiCompleti[k].begin(), latiCompleti[k].end(), id3) != latiCompleti[k].end()) ){
+                lati.push_back(latiCompleti[k]);
+            }
+        }
+
+        mapFacce[i] = lati;
+        cout << "id faccia" << i << endl;
+
+        for(unsigned int s = 0; s<lati.size(); s++){
+            for(unsigned int y = 0;y<lati[s].size();y++){
+                cout << lati[s][y] << " ";
+            }
+            cout << endl;
+        }
+        cout << endl;
+
+        lati = {};
+
+    }
 
     /*iniziamo a triangolare: prendiamo ogni faccia del poligono e i suoi vettori relativi ai lati completi. prendiamo due lati 
     (uno sarà la base e l'altro sarà quello su cui iteriamo) e iniziamo ad aggiungere i punti interni relativi a questi due lati (sfruttando il terzo lato
     per trovare il vettore direzione consono). dopo aver aggiunto i punti interni e aver salvato i segmenti e le facce, saliamo su nell'altezza e usiamo come 
     base quello che era il tetto del passaggio precedente. andiamo avanti così fino a che il tetto non è lungo due a quel punto uniamo i punti con l'estremo superiore*/
 
+    for(unsigned int idFaccia = 0; idFaccia < mesh1.NumCell2Ds; idFaccia++) {
+
+        vector<unsigned int> base = mapFacce.at(idFaccia)[0];
+        vector<unsigned int>& altezza1 = mapFacce.at(idFaccia)[1];  //lo passo per riferimento cosi se lo modifico si modifica anche il vettore nel dizionario
+        vector<unsigned int>& altezza2 = mapFacce.at(idFaccia)[2];
+
+        if (altezza1[0] == base[0] || altezza1[0]== base[base.size()-1]){
+            break;
+        }
+        else{
+              reverse( altezza1.begin(),  altezza1.end());
+              return 0;
+        }
+        if (altezza2[0] == base[0] || altezza2[0] == base[base.size()-1]){
+            break;
+        }
+        else{
+              reverse( altezza2.begin(),  altezza2.end());
+              return 0;
+        }
+        
+
+        return 0;
+    }
+
+                    
 
 
+return true;
 }
-
 
 
 
