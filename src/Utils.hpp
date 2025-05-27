@@ -23,7 +23,7 @@ namespace PolygonalLibrary{
     bool ImportCell2Ds(PolygonalMesh& mesh, const string& Poliedro);
 
     //verifica la presenza di duplicati, altrimenti ritorna l'id del nuovo lato
-    unsigned int TestDuplicati(const MatrixXi& MatriceLati, const unsigned int& id1, const unsigned int& id2);
+    bool TestDuplicati(const MatrixXi& MatriceLati, const unsigned int& id1, const unsigned int& id2);
 
     // riconosce il poliedro che viene inserito
     string RiconosciPoliedro(const unsigned int& q);

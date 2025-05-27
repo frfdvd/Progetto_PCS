@@ -261,16 +261,17 @@ bool ImportCell2Ds(PolygonalMesh& mesh, const string& Poliedro){
 
 /**********************************/
 
-unsigned int TestDuplicati(const MatrixXi& MatriceLati, const unsigned int& id1, const unsigned int& id2){
+bool TestDuplicati(const MatrixXi& MatriceLati, const unsigned int& id1, const unsigned int& id2){
     
+    int id1intero = id1;
+    int id2intero = id2;
     for(unsigned int i = 0; i < MatriceLati.cols(); i++){
-        if( (MatriceLati(0,i) == id1 || MatriceLati(1,i) == id1) & (MatriceLati(0,i) == id2 || MatriceLati(1,i) == id2) ){
-            return i;
+        if( (MatriceLati(0,i) == id1intero || MatriceLati(1,i) == id1intero) & (MatriceLati(0,i) == id2intero || MatriceLati(1,i) == id2intero) ){
+            return true;
             break;
         }
     }
-    unsigned int nuovoId = MatriceLati.cols();
-    return nuovoId;
+    return false;
     
 }
 
@@ -603,37 +604,195 @@ bool TriangolazioneUno(const PolygonalMesh& mesh1, PolygonalMesh& mesh2, const u
     per trovare il vettore direzione consono). dopo aver aggiunto i punti interni e aver salvato i segmenti e le facce, saliamo su nell'altezza e usiamo come 
     base quello che era il tetto del passaggio precedente. andiamo avanti così fino a che il tetto non è lungo due a quel punto uniamo i punti con l'estremo superiore*/
 
+    // alloco lo spazio necessario per Cell1DsExtrema
+    mesh2.Cell1DsExtrema = MatrixXi::Zero(2, mesh2.NumCell1Ds);
+    mesh2.Cell1DsId.reserve(mesh2.NumCell1Ds);
+
+    
     for(unsigned int idFaccia = 0; idFaccia < mesh1.NumCell2Ds; idFaccia++) {
 
-        vector<unsigned int> base = mapFacce.at(idFaccia)[0];
-        vector<unsigned int>& altezza1 = mapFacce.at(idFaccia)[1];  //lo passo per riferimento cosi se lo modifico si modifica anche il vettore nel dizionario
-        vector<unsigned int>& altezza2 = mapFacce.at(idFaccia)[2];
+        // creo il contatore per contare l'id dei lati di mesh2
+        unsigned int ContaIdPuntiMesh2 = contIdPunti;
+        unsigned int contaIdLatiMesh2 = 0;
+        
+        //unsigned int contaIdFacceMesh2 = 0;
 
-        if (altezza1[0] == base[0] || altezza1[0]== base[base.size()-1]){
-            break;
+        // trovo la base e le altezze su cui salire
+        vector<unsigned int> base = mapFacce.at(idFaccia)[0];
+        vector<unsigned int> altezza1 = mapFacce.at(idFaccia)[1];  
+        vector<unsigned int> altezza2 = mapFacce.at(idFaccia)[2];
+
+
+        // inverto i vettori per avere compatibilità
+        for(unsigned int i = 0; i < base.size(); i++){
+            cout << "base " << base[i] << " ";
         }
-        else{
+        cout << endl;
+
+        for(unsigned int i = 0; i < base.size(); i++){
+         
+            cout << "altezza1 " << altezza1[i] << " ";
+            
+        }
+        cout << endl;
+
+        for(unsigned int i = 0; i < base.size(); i++){
+            cout << "altezza2 " << altezza2[i] << " ";
+        }
+        cout << endl;
+
+        
+        
+        
+        if ( (altezza1[0] != base[0]) & (altezza1[0] != base[base.size()-1])){
               reverse( altezza1.begin(),  altezza1.end());
-              return 0;
         }
-        if (altezza2[0] == base[0] || altezza2[0] == base[base.size()-1]){
-            break;
+
+        for(unsigned int i = 0; i < base.size(); i++){
+         
+           cout << "altezza1l " << altezza1[i] << " ";
+            
         }
-        else{
+
+        if ( (altezza2[0] != base[0]) & (altezza2[0] != base[base.size()-1])){
               reverse( altezza2.begin(),  altezza2.end());
-              return 0;
         }
+
+
+        for(unsigned int i = 0; i < base.size(); i++){
+            cout << "altezza2l " << altezza2[i] << " ";
+        }
+        cout << endl;
+
+        for(unsigned int h = 1; h < altezza1.size()-1; h++){
+            // trovo il vettore direzione del tetto
+            unsigned int idEstremo1 = altezza1[h];
+            unsigned int idEstremo2 = altezza2[h];
+            cout << "idEstremo1 " << idEstremo1 << " idEstremo2 " << idEstremo2 << endl;
+
+
+            // prendiamo le coordinate degli estremi
+            Vector3d Estremo1(mesh2.Cell0DsCoordinates(0,idEstremo1),mesh2.Cell0DsCoordinates(1,idEstremo1),mesh2.Cell0DsCoordinates(2,idEstremo1));
+            Vector3d Estremo2(mesh2.Cell0DsCoordinates(0,idEstremo2),mesh2.Cell0DsCoordinates(1,idEstremo2),mesh2.Cell0DsCoordinates(2,idEstremo2));
+            cout << "estremo 1 " <<Estremo1(0) << " " << Estremo1(1) << " " << Estremo1(2) << endl;
+            cout << "estremo 2 " <<Estremo2(0) << " " << Estremo2(1) << " " << Estremo2(2) << endl;
+        
+            // vettore con la direzione del tetto
+            Vector3d VettoreDirezione = Estremo2 - Estremo1;
+            cout << "Vettore direzione " << VettoreDirezione(0) <<VettoreDirezione(1) <<VettoreDirezione(2) << endl;
+
+
+            vector<unsigned int> tetto = {altezza1[h]};
+            cout << "tetto ";
+            for(unsigned int indice = 0; indice < tetto.size(); indice++){
+                cout << tetto[indice] << " "; 
+            }
+            cout << endl;
+            
+            for(unsigned int scorri = 0; scorri < 2*base.size()-2; scorri ++){
+                 
+                cout << "scorri " << scorri << endl;
+                
+                if(scorri % 2 == 0){
+                    //stiamo scorrendo sulla base 
+                    
+                    // inseriamo il primo lato
+                    if(!TestDuplicati(mesh2.Cell1DsExtrema, tetto[tetto.size()-1], base[scorri])){
+                        
+                        cout << "primo lato base " << endl;
+                        mesh2.Cell1DsExtrema(0, contaIdLatiMesh2) = tetto[tetto.size()-1];
+                        mesh2.Cell1DsExtrema(1, contaIdLatiMesh2) = base[scorri];
+                        mesh2.Cell1DsId.push_back(contaIdLatiMesh2);
+                    
+                        contaIdLatiMesh2 += 1;
+                        cout << "primo lato base fatto " << endl;
+                    }
+
+                    // inseriamo il secondo lato
+                    if(!TestDuplicati(mesh2.Cell1DsExtrema, base[scorri], base[scorri+1])){
+                        cout << "secondo lato base " << endl;
+                    
+                        mesh2.Cell1DsExtrema(0, contaIdLatiMesh2) = base[scorri];
+                        mesh2.Cell1DsExtrema(1, contaIdLatiMesh2) = base[scorri+1];
+                        mesh2.Cell1DsId.push_back(contaIdLatiMesh2);
+
+                        contaIdLatiMesh2 += 1;
+
+                        cout << "secondo lato base fatto" << endl;
+                    }
+
+                }else{
+                    // stiamo scorrendo sul tetto
+
+                    // troviamo il nuovo punto di tetto, divido per b-h perchè il tetto è sempre diviso in meno parti, e lo inserisco 
+                    if(scorri < 2*base.size()-5){
+                        
+                        Vector3d NuovoPuntoTetto = Estremo1 + VettoreDirezione * (scorri-1)/2*(double)(b-h);
+                        mesh2.Cell0DsCoordinates(0,ContaIdPuntiMesh2) = NuovoPuntoTetto(0);
+                        mesh2.Cell0DsCoordinates(1,ContaIdPuntiMesh2) = NuovoPuntoTetto(1);
+                        mesh2.Cell0DsCoordinates(2,ContaIdPuntiMesh2) = NuovoPuntoTetto(2);
+                        mesh2.Cell0DsId.push_back(ContaIdPuntiMesh2);
+
+                        ContaIdPuntiMesh2 += 1;
+                        cout << "idNuovoPunto " << ContaIdPuntiMesh2 << endl;
+                        // iserisco l'id di questo punto in tetto
+                        tetto.push_back(ContaIdPuntiMesh2);
+
+                        cout << "tetto ";
+                        for(unsigned int indice = 0; indice < tetto.size(); indice++){
+                            cout << tetto[indice] << " "; 
+                        }
+                        cout << endl;
+
+                    }else{
+                        tetto.push_back(altezza2[h]);
+                        
+                        cout << "arrivo all'ultimo punto di tetto" << endl;
+                        cout << "tetto ";
+                        for(unsigned int indice = 0; indice < tetto.size(); indice++){
+                            cout << tetto[indice] << " "; 
+                        }
+                        cout << endl;
+                    }
+
+                    // inseriamo il primo lato (tetto con la base)
+                    if(!TestDuplicati(mesh2.Cell1DsExtrema, base[scorri], tetto[tetto.size()-2])){
+                        cout << "primo lato tetto " << endl;    
+
+                        mesh2.Cell1DsExtrema(0, contaIdLatiMesh2) = tetto[tetto.size()-2];
+                        mesh2.Cell1DsExtrema(1, contaIdLatiMesh2) = base[scorri];
+                        mesh2.Cell1DsId.push_back(contaIdLatiMesh2);
+
+                        contaIdLatiMesh2 += 1;
+
+                        cout << "primo lato tetto fatto " << endl;
+                    }
+
+                    // inseriamo il secondo lato (tetto con il tetto) controllando che nell'ultima iterazione non metta tetto-tetto
+                    if(!TestDuplicati(mesh2.Cell1DsExtrema, tetto[tetto.size()-1], tetto[tetto.size()-2])){
+                        if(scorri < 2*base.size()-3){
+                            cout << "secondo lato tetto " << endl;
+                            
+                            mesh2.Cell1DsExtrema(0, contaIdLatiMesh2) = tetto[tetto.size()-2];
+                            mesh2.Cell1DsExtrema(1, contaIdLatiMesh2) = tetto[tetto.size()-1];
+                            mesh2.Cell1DsId.push_back(contaIdLatiMesh2);
+
+                            contaIdLatiMesh2 += 1;
+
+                            cout << "secondo lato tetto fatto" << endl;
+                        }
+                    }
+
+                }
+            }       
         
 
-        return 0;
+
+            base = tetto;
     }
+    return true;
+    }   
 
-                    
-
-
-return true;
 }
-
-
 
 }
