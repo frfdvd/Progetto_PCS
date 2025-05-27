@@ -610,10 +610,13 @@ bool TriangolazioneUno(const PolygonalMesh& mesh1, PolygonalMesh& mesh2, const u
 
     
     for(unsigned int idFaccia = 0; idFaccia < mesh1.NumCell2Ds; idFaccia++) {
+        cout << endl;
+        cout << "FACCCIA NUMERO " << idFaccia << endl;
 
         // creo il contatore per contare l'id dei lati di mesh2
-        unsigned int ContaIdPuntiMesh2 = contIdPunti;
+        unsigned int ContaIdPuntiMesh2 = contIdPunti + 1;
         unsigned int contaIdLatiMesh2 = 0;
+        cout << "il conta lati è arrivato a (ho già aggiunto uno in più) " << ContaIdPuntiMesh2 << endl;;
         
         //unsigned int contaIdFacceMesh2 = 0;
 
@@ -650,9 +653,10 @@ bool TriangolazioneUno(const PolygonalMesh& mesh1, PolygonalMesh& mesh2, const u
 
         for(unsigned int i = 0; i < base.size(); i++){
          
-           cout << "altezza1l " << altezza1[i] << " ";
+           cout << "altezza1 Nuova " << altezza1[i] << " ";
             
         }
+        cout << endl;
 
         if ( (altezza2[0] != base[0]) & (altezza2[0] != base[base.size()-1])){
               reverse( altezza2.begin(),  altezza2.end());
@@ -660,12 +664,14 @@ bool TriangolazioneUno(const PolygonalMesh& mesh1, PolygonalMesh& mesh2, const u
 
 
         for(unsigned int i = 0; i < base.size(); i++){
-            cout << "altezza2l " << altezza2[i] << " ";
+            cout << "altezza2 Nuova " << altezza2[i] << " ";
         }
         cout << endl;
 
+        cout << endl;
         for(unsigned int h = 1; h < altezza1.size()-1; h++){
             // trovo il vettore direzione del tetto
+            cout << "mi muovo sulle altezze e h = " << h << endl;
             unsigned int idEstremo1 = altezza1[h];
             unsigned int idEstremo2 = altezza2[h];
             cout << "idEstremo1 " << idEstremo1 << " idEstremo2 " << idEstremo2 << endl;
@@ -679,7 +685,7 @@ bool TriangolazioneUno(const PolygonalMesh& mesh1, PolygonalMesh& mesh2, const u
         
             // vettore con la direzione del tetto
             Vector3d VettoreDirezione = Estremo2 - Estremo1;
-            cout << "Vettore direzione " << VettoreDirezione(0) <<VettoreDirezione(1) <<VettoreDirezione(2) << endl;
+            cout << "Vettore direzione " << " " << VettoreDirezione(0) << " " <<VettoreDirezione(1) << " " <<VettoreDirezione(2) << endl;
 
 
             vector<unsigned int> tetto = {altezza1[h]};
@@ -701,21 +707,23 @@ bool TriangolazioneUno(const PolygonalMesh& mesh1, PolygonalMesh& mesh2, const u
                         
                         cout << "primo lato base " << endl;
                         mesh2.Cell1DsExtrema(0, contaIdLatiMesh2) = tetto[tetto.size()-1];
-                        mesh2.Cell1DsExtrema(1, contaIdLatiMesh2) = base[scorri];
+                        mesh2.Cell1DsExtrema(1, contaIdLatiMesh2) = base[scorri/2];
                         mesh2.Cell1DsId.push_back(contaIdLatiMesh2);
-                    
+                        
+                        cout << "lato " << contaIdLatiMesh2 << " con estremi " << tetto[tetto.size()-1] << ", " << base[scorri/2] << endl;
                         contaIdLatiMesh2 += 1;
                         cout << "primo lato base fatto " << endl;
                     }
 
                     // inseriamo il secondo lato
-                    if(!TestDuplicati(mesh2.Cell1DsExtrema, base[scorri], base[scorri+1])){
+                    if(!TestDuplicati(mesh2.Cell1DsExtrema, base[scorri/2], base[scorri/2+1])){
                         cout << "secondo lato base " << endl;
                     
-                        mesh2.Cell1DsExtrema(0, contaIdLatiMesh2) = base[scorri];
-                        mesh2.Cell1DsExtrema(1, contaIdLatiMesh2) = base[scorri+1];
+                        mesh2.Cell1DsExtrema(0, contaIdLatiMesh2) = base[scorri/2];
+                        mesh2.Cell1DsExtrema(1, contaIdLatiMesh2) = base[scorri/2 + 1];
                         mesh2.Cell1DsId.push_back(contaIdLatiMesh2);
 
+                        cout << "lato " << contaIdLatiMesh2 << " con estremi " << base[scorri/2] << ", " << base[scorri/2 +1] << endl;
                         contaIdLatiMesh2 += 1;
 
                         cout << "secondo lato base fatto" << endl;
@@ -732,12 +740,12 @@ bool TriangolazioneUno(const PolygonalMesh& mesh1, PolygonalMesh& mesh2, const u
                         mesh2.Cell0DsCoordinates(1,ContaIdPuntiMesh2) = NuovoPuntoTetto(1);
                         mesh2.Cell0DsCoordinates(2,ContaIdPuntiMesh2) = NuovoPuntoTetto(2);
                         mesh2.Cell0DsId.push_back(ContaIdPuntiMesh2);
-
-                        ContaIdPuntiMesh2 += 1;
+                        
                         cout << "idNuovoPunto " << ContaIdPuntiMesh2 << endl;
-                        // iserisco l'id di questo punto in tetto
                         tetto.push_back(ContaIdPuntiMesh2);
-
+                        ContaIdPuntiMesh2 += 1;
+                        // inserisco l'id di questo punto in tetto
+                        
                         cout << "tetto ";
                         for(unsigned int indice = 0; indice < tetto.size(); indice++){
                             cout << tetto[indice] << " "; 
@@ -763,6 +771,7 @@ bool TriangolazioneUno(const PolygonalMesh& mesh1, PolygonalMesh& mesh2, const u
                         mesh2.Cell1DsExtrema(1, contaIdLatiMesh2) = base[scorri];
                         mesh2.Cell1DsId.push_back(contaIdLatiMesh2);
 
+                        cout << "lato " << contaIdLatiMesh2 << " con estremi " << tetto[tetto.size()-2] << ", " << base[scorri] << endl;
                         contaIdLatiMesh2 += 1;
 
                         cout << "primo lato tetto fatto " << endl;
@@ -777,6 +786,7 @@ bool TriangolazioneUno(const PolygonalMesh& mesh1, PolygonalMesh& mesh2, const u
                             mesh2.Cell1DsExtrema(1, contaIdLatiMesh2) = tetto[tetto.size()-1];
                             mesh2.Cell1DsId.push_back(contaIdLatiMesh2);
 
+                            cout << "lato " << contaIdLatiMesh2 << " con estremi " << tetto[tetto.size()-2] << ", " << tetto[tetto.size()-1] << endl;
                             contaIdLatiMesh2 += 1;
 
                             cout << "secondo lato tetto fatto" << endl;
@@ -790,9 +800,9 @@ bool TriangolazioneUno(const PolygonalMesh& mesh1, PolygonalMesh& mesh2, const u
 
             base = tetto;
     }
-    return true;
+    
     }   
-
+return true;
 }
 
 }
