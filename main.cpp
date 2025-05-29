@@ -20,7 +20,7 @@ int main(){
 
     unsigned int b = 3;
     //unsigned int p = 3;
-    unsigned int q = 3;
+    unsigned int q = 4;
     string Poliedro = RiconosciPoliedro(q);
 
     cout << Poliedro << endl;

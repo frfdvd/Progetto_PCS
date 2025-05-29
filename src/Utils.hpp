@@ -22,8 +22,11 @@ namespace PolygonalLibrary{
     // importa le facce e salva tutto in dei dizionari comodi comodi 
     bool ImportCell2Ds(PolygonalMesh& mesh, const string& Poliedro);
 
-    //verifica la presenza di duplicati, altrimenti ritorna l'id del nuovo lato
+    // verifica la presenza di duplicati, altrimenti ritorna l'id del nuovo lato
     bool TestDuplicati(const MatrixXi& MatriceLati, const unsigned int& id1, const unsigned int& id2);
+
+    // inserisce i lati all'interno della matrice Cell1DsExtrema verificando tramite test duplicati che tale lato non esista
+    bool inserisciLati(MatrixXi& MatriceLati, vector<unsigned int> VettoreIdLati, unsigned int& contaIdLati, const unsigned int& id1, const unsigned int& id2);
 
     // riconosce il poliedro che viene inserito
     string RiconosciPoliedro(const unsigned int& q);
