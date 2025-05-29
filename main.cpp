@@ -18,9 +18,9 @@ int main(){
     PolygonalMesh mesh;
     PolygonalMesh meshTriangolata;
 
-    unsigned int b = 5;
+    unsigned int b = 3;
     //unsigned int p = 3;
-    unsigned int q = 4;
+    unsigned int q = 3;
     string Poliedro = RiconosciPoliedro(q);
 
     cout << Poliedro << endl;

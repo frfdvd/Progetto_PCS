@@ -607,11 +607,13 @@ bool TriangolazioneUno(const PolygonalMesh& mesh1, PolygonalMesh& mesh2, const u
     // alloco lo spazio necessario per Cell1DsExtrema
     mesh2.Cell1DsExtrema = MatrixXi::Zero(2, mesh2.NumCell1Ds);
     mesh2.Cell1DsId.reserve(mesh2.NumCell1Ds);
+    mesh2.VettoreVertici.reserve(mesh2.NumCell2Ds);
+    mesh2.VettoreLati.reserve(mesh2.NumCell2Ds);
 
     // creo il contatore per contare l'id dei lati di mesh2
     unsigned int ContaIdPuntiMesh2 = contIdPunti + 1;
     unsigned int contaIdLatiMesh2 = 0;
-    //unsigned int contaIdFacceMesh2 = 0;
+    unsigned int contaIdFacceMesh2 = 0;
 
     for(unsigned int idFaccia = 0; idFaccia < mesh1.NumCell2Ds; idFaccia++) {
         cout << endl;
@@ -738,6 +740,13 @@ bool TriangolazioneUno(const PolygonalMesh& mesh1, PolygonalMesh& mesh2, const u
 
                         cout << "secondo lato base fatto" << endl;
                     }
+                    
+
+                    // inserisco i vertici della faccia dentro a vettore vertici
+                    vector<unsigned int> vecpunti = {base[scorri/2], tetto[tetto.size()-1],base[scorri/2+1]};
+                    mesh2.VettoreVertici.push_back(vecpunti);
+
+
 
                 }else{
                     // stiamo scorrendo sul tetto
@@ -804,6 +813,14 @@ bool TriangolazioneUno(const PolygonalMesh& mesh1, PolygonalMesh& mesh2, const u
                         }
                     }
 
+                    // inseriscoi vertici della faccia dentro al vettore vertici
+                    if(scorri < 2*lunghezzaBase-3){
+                        vector<unsigned int> vecpunti = {tetto[tetto.size()-2],base[scorri+2-tetto.size()],tetto[tetto.size()-1]};
+                        mesh2.VettoreVertici.push_back(vecpunti);
+                    
+                    }
+
+
                 }
             }       
         
@@ -838,6 +855,9 @@ bool TriangolazioneUno(const PolygonalMesh& mesh1, PolygonalMesh& mesh2, const u
         contaIdLatiMesh2 += 1;
     }
 
+    vector<unsigned int> vecpunti = {base[0],altezza1[altezza1.size()-1],base[1]};
+    mesh2.VettoreVertici.push_back(vecpunti);
+
     
     }
 
@@ -858,7 +878,83 @@ bool TriangolazioneUno(const PolygonalMesh& mesh1, PolygonalMesh& mesh2, const u
         std::cout << std::endl;
     }
 
+    cout << "stampo il vettore dei vertici" << endl;
+    for (const auto& riga : mesh2.VettoreVertici) {
+        for (const auto& elemento :riga) {
+            cout << elemento << " ";
+        }
+        cout << endl;
+    }
+
+
+    for(vector<unsigned int> vertici : mesh2.VettoreVertici){
+        int id1 = vertici[0];
+        int id2 = vertici[1];
+        int id3 = vertici[2];
+
+        vector<unsigned int> vettoreAggiuntivo;
+        //vettoreAggiuntivo.reserve(vertici.size());
+        vettoreAggiuntivo = {0,0,0};
+        
+        
+        for(unsigned int idl = 0; idl < mesh2.Cell1DsExtrema.cols(); idl++){
+            if( ( mesh2.Cell1DsExtrema(0,idl) == id1 ||  mesh2.Cell1DsExtrema(1,idl) == id1) & ( mesh2.Cell1DsExtrema(0,idl) == id2 ||  mesh2.Cell1DsExtrema(1,idl) == id2) ){
+                vettoreAggiuntivo[0] = idl;
+            }else if( ( mesh2.Cell1DsExtrema(0,idl) == id2 ||  mesh2.Cell1DsExtrema(1,idl) == id2) & ( mesh2.Cell1DsExtrema(0,idl) == id3 ||  mesh2.Cell1DsExtrema(1,idl) == id3) ){
+                vettoreAggiuntivo[1] = idl;
+
+            }else if(( mesh2.Cell1DsExtrema(0,idl) == id1 ||  mesh2.Cell1DsExtrema(1,idl) == id1) & ( mesh2.Cell1DsExtrema(0,idl) == id3 ||  mesh2.Cell1DsExtrema(1,idl) == id3)){
+                vettoreAggiuntivo[2] = idl; 
+            }
+                
+                
+        }
+        mesh2.VettoreLati.push_back(vettoreAggiuntivo);
+    }
+    
+      
+    cout << "stampo il vettore dei vertici" << endl;
+    for (const auto& riga : mesh2.VettoreLati) {
+        for (const auto& elemento :riga) {
+            cout << elemento << " ";
+        }
+        cout << endl;
+    }
+
+
+
 return true;
 }
+
+
+
+bool CreaDuale(const PolygonalMesh& mesh1, const PolygonalMesh& mesh2){
+
+    // creo un vector di vector con dentro l'id delle facce adiacenti per ogni id di un vertice
+    vector<vector<unsigned int>> facceAdiacenti;
+    facceAdiacenti.reserve(mesh1.NumCell0Ds);
+
+    // cerco, per ogni vertice, chi sono le facce andiacenti 
+    for(unsigned int idV; idV < mesh1.NumCell0Ds; idV++){
+        // per ogni vertice itero sulle facce per scoprire se sono adiacenti    
+        vector<unsigned int> faccePerVertice;
+        
+        // FAI IL RESERVE FATTO BENE
+        faccePerVertice.reserve()
+        for(unsigned int idF; idF < mesh1.NumCell2Ds; idF++){
+            if (find(mesh1.VettoreVertici[idF].begin(), mesh1.VettoreVertici[idF].end(), idV){
+                // se c'è il vertice dentro la faccia inserisco la faccia nel vettore
+                faccePerVertice.push_back(idF);
+
+            }
+        facceAdiacenti.push_back(faccePerVertice);
+
+        }
+        
+
+    }
+
+}
+
 
 }
