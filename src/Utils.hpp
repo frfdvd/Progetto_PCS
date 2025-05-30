@@ -22,8 +22,11 @@ namespace PolygonalLibrary{
     // importa le facce e salva tutto in dei dizionari comodi comodi 
     bool ImportCell2Ds(PolygonalMesh& mesh, const string& Poliedro);
 
-    // verifica la presenza di duplicati, altrimenti ritorna l'id del nuovo lato
+    // verifica la presenza di duplicati nei lati, se c'è già ritorna true altrimenti false
     bool TestDuplicati(const MatrixXi& MatriceLati, const unsigned int& id1, const unsigned int& id2);
+
+    // verifica la presenza di duplicati nei punti, se c'è già ritorna true altrimenti false
+    bool TestDuplicatiPunti(const MatrixXi& MatricePunti, const Vector3d& coordinate);
 
     // inserisce i lati all'interno della matrice Cell1DsExtrema verificando tramite test duplicati che tale lato non esista
     bool inserisciLati(MatrixXi& MatriceLati, vector<unsigned int> VettoreIdLati, unsigned int& contaIdLati, const unsigned int& id1, const unsigned int& id2);
@@ -41,5 +44,8 @@ namespace PolygonalLibrary{
     bool Cell1DTriangolazioneUno(const PolygonalMesh& mesh1, PolygonalMesh& mesh2, const unsigned int& b);
 
     bool Cell0DTriangolazioneUno(const PolygonalMesh& mesh1, PolygonalMesh& mesh2, const unsigned int& b,const unsigned int& q);
+
+    // crea il duale
+    bool CreaDuale(const PolygonalMesh& mesh1, const PolygonalMesh& mesh2);
 
 }

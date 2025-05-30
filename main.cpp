@@ -17,10 +17,11 @@ int main(){
     // creo un oggetto mesh
     PolygonalMesh mesh;
     PolygonalMesh meshTriangolata;
+    PolygonalMesh meshDuale;
 
     unsigned int b = 3;
     //unsigned int p = 3;
-    unsigned int q = 4;
+    unsigned int q = 3;
     string Poliedro = RiconosciPoliedro(q);
 
     cout << Poliedro << endl;
@@ -61,7 +62,12 @@ int main(){
                              meshTriangolata.Cell0DsCoordinates,
                              meshTriangolata.Cell1DsExtrema);
 
-  
+
+    if(!CreaDuale(meshTriangolata, meshDuale))
+    {
+        cerr << "error during triangolation" << endl;
+        return 1;
+    }
 
 
 
