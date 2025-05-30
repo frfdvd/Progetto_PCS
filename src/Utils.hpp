@@ -46,6 +46,6 @@ namespace PolygonalLibrary{
     bool Cell0DTriangolazioneUno(const PolygonalMesh& mesh1, PolygonalMesh& mesh2, const unsigned int& b,const unsigned int& q);
 
     // crea il duale
-    bool CreaDuale(const PolygonalMesh& mesh1, const PolygonalMesh& mesh2);
+    bool CreaDuale(const PolygonalMesh& mesh1, PolygonalMesh& mesh2);
 
 }

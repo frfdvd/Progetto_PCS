@@ -70,7 +70,11 @@ int main(){
     }
 
 
-
+    string ParaviewPuntiDuale = "./Cell0D" + Poliedro + "Duale" + ".inp";
+    utilities.ExportPoints(ParaviewPuntiDuale, 
+                            meshDuale.Cell0DsCoordinates);
+    
+    
     return 0;
 
 
