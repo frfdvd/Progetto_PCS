@@ -206,6 +206,8 @@ bool ImportCell2Ds(PolygonalMesh& mesh, const string& Poliedro){
     }
 
     mesh.Cell2DsId.reserve(mesh.NumCell2Ds);
+    mesh.VettoreVertici.reserve(mesh.NumCell2Ds);
+    mesh.VettoreLati.reserve(mesh.NumCell2Ds);
 
     // itero su ogni riga del csv
     for (const string& line : listLines)
@@ -215,8 +217,8 @@ bool ImportCell2Ds(PolygonalMesh& mesh, const string& Poliedro){
         unsigned int id;
         unsigned int contaVert;
         unsigned int contaLati;
-        Vector3i vecVert;
-        Vector3i vecLati;
+        vector<unsigned int> vecVert;
+        vector<unsigned int> vecLati;
         
         // separo in base al ; e salvo i valori 
         getline(converter, field, ';');
@@ -225,26 +227,28 @@ bool ImportCell2Ds(PolygonalMesh& mesh, const string& Poliedro){
         // mi segno quanto vale il numero di vertici
         getline(converter, field, ';');
         contaVert = stoi(field);
+        vecVert.reserve(contaVert);
 
         // salvo gli id dei vertici dentro un vettore
         for(unsigned int k = 0; k<contaVert;k++){
             getline(converter, field, ';');
-            vecVert(k) = stoi(field);
+            vecVert.push_back(stoi(field));
         }
 
-        mesh.mapVertici[id] = vecVert;
+        mesh.VettoreVertici.push_back(vecVert);
 
         // mi segno quanto vale il numero di lati
         getline(converter, field, ';');
         contaLati = stoi(field);
+        vecLati.reserve(contaLati);
 
         // salvo gli id dei lati dentro un vettore
         for(unsigned int k = 0; k<contaLati;k++){
             getline(converter, field, ';');
-            vecLati(k) = stoi(field);
+            vecLati.push_back(stoi(field));
         }
         
-        mesh.mapLati[id] = vecLati;
+        mesh.VettoreLati.push_back(vecLati);
         mesh.Cell2DsId.push_back(id);
     }
     
@@ -280,7 +284,7 @@ bool TestDuplicati(const MatrixXi& MatriceLati, const unsigned int& id1, const u
 bool TestDuplicatiPunti(const MatrixXd& MatricePunti, const Vector3d& coordinate){
     
     for(unsigned int i = 0; i < MatricePunti.cols(); i++){
-        if( (abs(MatricePunti(0,i) - coordinate(0)) <= numeric_limits<double>::epsilon()) & (abs(MatricePunti(1,i) - coordinate(1)) <= numeric_limits<double>::epsilon()) & (abs(MatricePunti(2,i) - coordinate(2)) <= numeric_limits<double>::epsilon())){
+        if( (abs(MatricePunti(0,i) - coordinate(0)) <= numeric_limits<double>::epsilon()) & (abs(MatricePunti(1,i) - coordinate(1)) <=  numeric_limits<double>::epsilon()) & (abs(MatricePunti(2,i) - coordinate(2)) <=  numeric_limits<double>::epsilon())){
             return true;
             break;
         }
@@ -587,15 +591,21 @@ bool TriangolazioneUno(const PolygonalMesh& mesh1, PolygonalMesh& mesh2, const u
         }
 
 
+    for(unsigned int s = 0; s<mesh1.VettoreVertici.size(); s++){
+            for(unsigned int y = 0;y<mesh1.VettoreVertici[s].size();y++){
+                cout << mesh1.VettoreVertici[s][y] << " ";
+            }
+        cout << endl;
+        }    
 
     // creo il dizionario che ha come chiave l'id della faccia del poligono iniziale e come valore i lati copleti di quella faccia
     
     map<unsigned int, vector<vector<unsigned int>>> mapFacce;
 
     for(unsigned int i = 0; i < mesh1.NumCell2Ds; i++){
-        unsigned int id1 = mesh1.mapVertici.at(i)(0);
-        unsigned int id2 = mesh1.mapVertici.at(i)(1);
-        unsigned int id3 = mesh1.mapVertici.at(i)(2);
+        unsigned int id1 = mesh1.VettoreVertici[i][0];
+        unsigned int id2 = mesh1.VettoreVertici[i][1];
+        unsigned int id3 = mesh1.VettoreVertici[i][2];
 
         vector<vector<unsigned int>> lati;
         for(unsigned int k = 0; k<latiCompleti.size(); k++){
@@ -767,6 +777,7 @@ bool TriangolazioneUno(const PolygonalMesh& mesh1, PolygonalMesh& mesh2, const u
                         
                         cout << "SCORRI" <<scorri << "BASE"<< 2*lunghezzaBase-5<< endl;
                         Vector3d NuovoPuntoTetto = Estremo1 + VettoreDirezione * (scorri+1)/(2*(double)(b-h));
+
                         mesh2.Cell0DsCoordinates(0,ContaIdPuntiMesh2) = NuovoPuntoTetto(0);
                         mesh2.Cell0DsCoordinates(1,ContaIdPuntiMesh2) = NuovoPuntoTetto(1);
                         mesh2.Cell0DsCoordinates(2,ContaIdPuntiMesh2) = NuovoPuntoTetto(2);
@@ -878,7 +889,6 @@ bool TriangolazioneUno(const PolygonalMesh& mesh1, PolygonalMesh& mesh2, const u
         int id3 = vertici[2];
 
         vector<unsigned int> vettoreAggiuntivo;
-        //vettoreAggiuntivo.reserve(vertici.size());
         vettoreAggiuntivo = {0,0,0};
         
         // con questi if faccio in modo da mettere i lati in posizione corretta
@@ -906,6 +916,17 @@ bool TriangolazioneUno(const PolygonalMesh& mesh1, PolygonalMesh& mesh2, const u
     }
 
 
+    // metto i punti di cell0dscoordinates su una sfera
+
+    for(unsigned int i = 0; i < mesh2.Cell0DsCoordinates.cols(); i++){
+        Vector3d punto(mesh2.Cell0DsCoordinates(0,i),mesh2.Cell0DsCoordinates(1,i),mesh2.Cell0DsCoordinates(2,i));
+
+        Vector3d puntoNormalizzato = punto/punto.norm();
+
+        mesh2.Cell0DsCoordinates(0,i) = puntoNormalizzato(0);
+        mesh2.Cell0DsCoordinates(1,i) = puntoNormalizzato(1);
+        mesh2.Cell0DsCoordinates(2,i) = puntoNormalizzato(2);
+    }
 
 return true;
 }
