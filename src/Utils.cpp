@@ -281,10 +281,11 @@ bool TestDuplicati(const MatrixXi& MatriceLati, const unsigned int& id1, const u
 
 /**********************************/
 
-bool TestDuplicatiPunti(const MatrixXd& MatricePunti, const Vector3d& coordinate){
+bool TestDuplicatiPunti(const MatrixXd& MatricePunti, const Vector3d& coordinate, unsigned int& idTrovato){
     
     for(unsigned int i = 0; i < MatricePunti.cols(); i++){
         if( (abs(MatricePunti(0,i) - coordinate(0)) <= numeric_limits<double>::epsilon()) & (abs(MatricePunti(1,i) - coordinate(1)) <=  numeric_limits<double>::epsilon()) & (abs(MatricePunti(2,i) - coordinate(2)) <=  numeric_limits<double>::epsilon())){
+            idTrovato = i;
             return true;
             break;
         }
@@ -406,7 +407,7 @@ bool Cell0DTriangolazioneUno(const PolygonalMesh& mesh1, PolygonalMesh& mesh2, c
     for(unsigned int idFaccia : mesh1.Cell2DsId){
         // prendo l'id del primo lato della faccia idFaccia
          
-        unsigned int idLato = mesh1.mapLati.at(idFaccia)(0);
+        unsigned int idLato = mesh1.VettoreLati[idFaccia][0];
         cout << idLato << endl;
 
         // prendo gli id degli estremi del primo lato della faccia idFaccia
@@ -414,7 +415,7 @@ bool Cell0DTriangolazioneUno(const PolygonalMesh& mesh1, PolygonalMesh& mesh2, c
         unsigned int idEstremo2 = mesh1.Cell1DsExtrema(1,idLato);
 
         // prendo l'id dell'estremo mancante 
-        unsigned int idEstremo3 = mesh1.mapVertici.at(idFaccia)(2);
+        unsigned int idEstremo3 = mesh1.VettoreVertici[idFaccia][2];
 
         // FARE CONTROLLO/TEST CHE GLI ID SIANO DIVERSI
 
@@ -907,8 +908,11 @@ bool TriangolazioneUno(const PolygonalMesh& mesh1, PolygonalMesh& mesh2, const u
     }
     
       
-    cout << "stampo il vettore dei vertici" << endl;
+    cout << "stampo il vettore dei lati" << endl;
+    unsigned int contatore = 0;
     for (const auto& riga : mesh2.VettoreLati) {
+        cout << "faccia " << contatore << " ";
+        contatore += 1;
         for (const auto& elemento :riga) {
             cout << elemento << " ";
         }
@@ -931,7 +935,7 @@ bool TriangolazioneUno(const PolygonalMesh& mesh1, PolygonalMesh& mesh2, const u
 return true;
 }
 
-
+/**********************************/
 
 bool CreaDuale(const PolygonalMesh& mesh1, PolygonalMesh& mesh2){
 
@@ -939,7 +943,6 @@ bool CreaDuale(const PolygonalMesh& mesh1, PolygonalMesh& mesh2){
     vector<vector<unsigned int>> facceAdiacenti;
     facceAdiacenti.reserve(mesh1.NumCell0Ds);
 
-    cout << "aooooo "<< mesh1.NumCell0Ds << endl;
     // cerco, per ogni vertice, chi sono le facce adiacenti 
     for(unsigned int idV = 0; idV < mesh1.NumCell0Ds; idV++){
         // per ogni vertice itero sulle facce per scoprire se sono adiacenti    
@@ -949,19 +952,59 @@ bool CreaDuale(const PolygonalMesh& mesh1, PolygonalMesh& mesh2){
         // il massimo è sempre sei così siamo sicuri
         faccePerVertice.reserve(6);
         for(unsigned int idF = 0; idF < mesh1.NumCell2Ds; idF++){
-
             //cout << "entro nel secondo for" << endl;
             if ( find(mesh1.VettoreVertici[idF].begin(), mesh1.VettoreVertici[idF].end(), idV) != mesh1.VettoreVertici[idF].end()){
                 // se c'è il vertice dentro la faccia inserisco la faccia nel vettore
                 faccePerVertice.push_back(idF);
                 //cout << "entro nell'if" << endl;
-            }
-        
+            } 
         }
-        facceAdiacenti.push_back(faccePerVertice);
 
+
+        // metto in ordine le facce per vertice affinchè siano tutte confinanti
+        vector<unsigned int> faccePerVerticeOrdinate;
+        unsigned int NumeroFacceXVertice = faccePerVertice.size();
+        faccePerVerticeOrdinate.reserve(NumeroFacceXVertice);
+        faccePerVerticeOrdinate.push_back(faccePerVertice[0]);
+
+
+        for(unsigned int i = 0; i < NumeroFacceXVertice-1; i++){
+            // i è l'elemento 1 da confrontare
+            unsigned int id1 = faccePerVerticeOrdinate[i];
+
+            faccePerVertice.erase(remove(faccePerVertice.begin(), faccePerVertice.end(), id1), faccePerVertice.end());
+            cout << "faccia 1 " << id1 << endl;
+            for(unsigned int j = 0; j<faccePerVertice.size(); j++){
+                // j è l'elemento 2 da confrontare
+                unsigned int id2 = faccePerVertice[j];
+                cout << "faccia da confrontare " << id2 << endl;
+                // trovo i lati delle due facce id1 e id2
+                vector<unsigned int> latiId1 = mesh1.VettoreLati[id1];
+                vector<unsigned int> latiId2 = mesh1.VettoreLati[id2];
+
+                // scorro sui lati della prima faccia e vedo se trovo elementi in comune
+                bool Trovato = false;
+                for(unsigned int Lato : latiId1){
+                    if( find(latiId2.begin(), latiId2.end(), Lato) != latiId2.end()){
+                        Trovato = true;
+                    }
+                }
+
+                if(Trovato){
+                    faccePerVerticeOrdinate.push_back(id2);
+                    cout << "facce per vertice ordinate ";
+                    for(unsigned int s = 0; s < faccePerVerticeOrdinate.size(); s++){
+                        cout << faccePerVerticeOrdinate[s] << " ";
+                    }
+                    cout << endl;
+                    break;
+                } 
+            }
+            
+        }
         
-
+        
+        facceAdiacenti.push_back(faccePerVerticeOrdinate);
     }
 
     cout << "stampo il vettore delle facce adiacenti " << endl;
@@ -988,14 +1031,22 @@ bool CreaDuale(const PolygonalMesh& mesh1, PolygonalMesh& mesh2){
 
     // itero sui vettori di facce adiacenti
     for(unsigned int idV = 0; idV < facceAdiacenti.size(); idV++){
+        cout << "id Vertice" << idV << endl;
+        // inizializzo un vettore dove inserire, per ogni faccia del duale, i suoi vertici
+        vector<unsigned int> vecVert;
+        // tale vettore deve essere lungo quanto il numero di facce andiacenti a ogni vertice
+        vecVert.reserve(facceAdiacenti[idV].size());
+
         // ora itero sulle facce dentro i vettori
-        for(unsigned int idF = 0; idF < facceAdiacenti[idV].size(); idF++){
+        for(unsigned int idF : facceAdiacenti[idV]){
+            cout << "id Faccia " << idF << endl;
             // vettore contenente i vertici della faccia
             vector<unsigned int> verticiPerFaccia = mesh1.VettoreVertici[idF];
             unsigned int idPunto1 = verticiPerFaccia[0];
             unsigned int idPunto2 = verticiPerFaccia[1];
             unsigned int idPunto3 = verticiPerFaccia[2];
 
+            cout << "id punti della faccia " << idPunto1 << " " << idPunto2 << " " <<  idPunto3 << " " << endl;
 
             Vector3d punto1(mesh1.Cell0DsCoordinates(0,idPunto1),mesh1.Cell0DsCoordinates(1,idPunto1),mesh1.Cell0DsCoordinates(2,idPunto1));
             Vector3d punto2(mesh1.Cell0DsCoordinates(0,idPunto2),mesh1.Cell0DsCoordinates(1,idPunto2),mesh1.Cell0DsCoordinates(2,idPunto2));
@@ -1004,19 +1055,54 @@ bool CreaDuale(const PolygonalMesh& mesh1, PolygonalMesh& mesh2){
             // calcolo il punto della figura duale
             Vector3d Baricentro = (punto1 + punto2 + punto3)/3;
             // se il punto non c'è già lo aggiungo
-            if(!TestDuplicatiPunti(mesh2.Cell0DsCoordinates, Baricentro)){    
+            unsigned int idPuntoDuale;
+            if(!TestDuplicatiPunti(mesh2.Cell0DsCoordinates, Baricentro, idPuntoDuale)){    
+                // inserisco il nuovo punto nella matrice con le coordinate
                 mesh2.Cell0DsCoordinates(0, contaIdPunti) = Baricentro(0);
                 mesh2.Cell0DsCoordinates(1, contaIdPunti) = Baricentro(1);
                 mesh2.Cell0DsCoordinates(2, contaIdPunti) = Baricentro(2);
+                mesh2.Cell0DsId.push_back(contaIdPunti);
+                // inserisco nel VettoreVertici l'id del nuovo punto
+                vecVert.push_back(contaIdPunti);
+
                 contaIdPunti += 1;
+                cout << "entrato nell'if" << endl;
+            }else{
+                // nel caso in cui il punto era già stato messo aggiungo il suo id
+                vecVert.push_back(idPuntoDuale);
+            }
+        }
+
+        // aggiungo al vettore della mesh il vettore che contiene i vertici di ogni faccia
+        mesh2.VettoreVertici.push_back(vecVert);
+        mesh2.Cell2DsId.push_back(idV);
+    }
+
+
+    // adesso riempio le strutture dati che contengono informazioni sui lati 
+
+    for(vector<unsigned int> vertici : mesh2.VettoreVertici){
+        // prendo la lista dei vertici di ogni faccia
+        // scorro sui vertici di ogni faccia
+        // i vertici di ogni faccia sono ordinati in modo che il successivo sia il vicino di quello prima
+        for(unsigned int i = 0; i < vertici.size(); i++){
+            unsigned int idPunto1 = vertici[i];
+            unsigned int idPunto2;
+
+            // trovo l'
+            if(i < vertici.size()-1){
+                idPunto2 = vertici[i];
+            }else{
+                idPunto2 = vertici[0];
             }
 
-        }
+        } 
+
+
     }
 
     return true;
 }
 
-// prova con 10 alla meno sei come tolleranza perchè non funge
 
 }

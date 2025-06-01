@@ -22,13 +22,7 @@ namespace PolygonalLibrary{
         MatrixXd Cell0DsCoordinates;
         MatrixXi Cell1DsExtrema;
 
-
-        // per ogni faccia ci sono gli id dei vertici e dei lati
-        map<unsigned int, Vector3i> mapVertici;
-        map<unsigned int, Vector3i> mapLati;
-
-
-        // da ora in poi saranno  le nostre strutture dati !!MIGRARE A QUESTE ANCHE NELLA PARTE dei ooligoni platonici e triangolazione UNO!!!!
+        // per ogni faccia ci sono contenuti gli id dei vertici e dei lati in modo ordinato
         vector<vector<unsigned int>> VettoreVertici;
         vector<vector<unsigned int>> VettoreLati;
     };
