@@ -19,9 +19,9 @@ int main(){
     PolygonalMesh meshTriangolata;
     PolygonalMesh meshDuale;
 
-    unsigned int b = 3;
+    unsigned int b = 4;
     //unsigned int p = 3;
-    unsigned int q = 3;
+    unsigned int q = 4;
     string Poliedro = RiconosciPoliedro(q);
 
     cout << Poliedro << endl;
@@ -34,8 +34,8 @@ int main(){
     }
 
     
-    string ParaviewPunti = "./Cell0D" + Poliedro + ".inp";
-    string ParaviewSegmenti = "./Cell1D" + Poliedro + ".inp"; 
+    string ParaviewPunti = "./Cell0D.inp";
+    string ParaviewSegmenti = "./Cell1D.inp"; 
 
     UCDUtilities utilities;
     utilities.ExportPoints(ParaviewPunti,
@@ -53,8 +53,8 @@ int main(){
     }
 
     
-    string ParaviewPuntiTriangolati = "./Cell0D" + Poliedro + "Triang" + ".inp";
-    string ParaviewSegmentiTriangolati = "./Cell1D" + Poliedro + "Triang" + ".inp";
+    string ParaviewPuntiTriangolati = "./Cell0DTriang.inp";
+    string ParaviewSegmentiTriangolati = "./Cell1DTriang.inp";
 
     utilities.ExportPoints(ParaviewPuntiTriangolati, 
                             meshTriangolata.Cell0DsCoordinates);
@@ -70,10 +70,15 @@ int main(){
     }
 
 
-    string ParaviewPuntiDuale = "./Cell0D" + Poliedro + "Duale" + ".inp";
+    string ParaviewPuntiDuale = "./Cell0DDuale.inp";
+    string ParaviewSegmentiDuale = "./Cell1DDuale.inp";
+    
     utilities.ExportPoints(ParaviewPuntiDuale, 
                             meshDuale.Cell0DsCoordinates);
-    
+    utilities.ExportSegments(ParaviewSegmentiDuale,
+                             meshDuale.Cell0DsCoordinates,
+                             meshDuale.Cell1DsExtrema);
+
     
     return 0;
 

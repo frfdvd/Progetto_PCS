@@ -23,13 +23,16 @@ namespace PolygonalLibrary{
     bool ImportCell2Ds(PolygonalMesh& mesh, const string& Poliedro);
 
     // verifica la presenza di duplicati nei lati, se c'è già ritorna true altrimenti false
-    bool TestDuplicati(const MatrixXi& MatriceLati, const unsigned int& id1, const unsigned int& id2);
+    bool TestDuplicati(const MatrixXi& MatriceLati, const unsigned int& id1, const unsigned int& id2, unsigned int* PuntatoreLato = nullptr);
 
     // verifica la presenza di duplicati nei punti, se c'è già ritorna true altrimenti false
     bool TestDuplicatiPunti(const MatrixXi& MatricePunti, const Vector3d& coordinate, unsigned int& idTrovato);
 
     // inserisce i lati all'interno della matrice Cell1DsExtrema verificando tramite test duplicati che tale lato non esista
     bool inserisciLati(MatrixXi& MatriceLati, vector<unsigned int> VettoreIdLati, unsigned int& contaIdLati, const unsigned int& id1, const unsigned int& id2);
+
+    // proietta i punti sulla sfera unitaria
+    bool ProiettaPunti(MatrixXd& MatriceCoordinate);
 
     // riconosce il poliedro che viene inserito
     string RiconosciPoliedro(const unsigned int& q);

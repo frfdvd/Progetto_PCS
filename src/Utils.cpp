@@ -265,12 +265,15 @@ bool ImportCell2Ds(PolygonalMesh& mesh, const string& Poliedro){
 
 /**********************************/
 
-bool TestDuplicati(const MatrixXi& MatriceLati, const unsigned int& id1, const unsigned int& id2){
+bool TestDuplicati(const MatrixXi& MatriceLati, const unsigned int& id1, const unsigned int& id2, unsigned int* PuntatoreLato){
     
     int id1intero = id1;
     int id2intero = id2;
     for(unsigned int i = 0; i < MatriceLati.cols(); i++){
         if( (MatriceLati(0,i) == id1intero || MatriceLati(1,i) == id1intero) & (MatriceLati(0,i) == id2intero || MatriceLati(1,i) == id2intero) ){
+            if(PuntatoreLato != nullptr){
+                *PuntatoreLato = i;
+            }
             return true;
             break;
         }
@@ -298,7 +301,7 @@ bool TestDuplicatiPunti(const MatrixXd& MatricePunti, const Vector3d& coordinate
 
 bool inserisciLati(MatrixXi& MatriceLati, vector<unsigned int> VettoreIdLati, unsigned int& contaIdLati, const unsigned int& id1, const unsigned int& id2){
     if(!TestDuplicati(MatriceLati, id1, id2)){                  
-        cout << "primo lato base " << endl;
+        //cout << "primo lato base " << endl;
         MatriceLati(0, contaIdLati) = id1;
         MatriceLati(1, contaIdLati) = id2;
         VettoreIdLati.push_back(contaIdLati);
@@ -306,6 +309,22 @@ bool inserisciLati(MatrixXi& MatriceLati, vector<unsigned int> VettoreIdLati, un
         cout << "lato " << contaIdLati << " con estremi " << id1 << ", " << id2 << endl;
         contaIdLati += 1;
         //cout << "primo lato base fatto " << endl;
+    }
+
+    return true;
+}
+
+/**********************************/
+
+bool ProiettaPunti(MatrixXd& MatriceCoordinate){
+    for(unsigned int i = 0; i < MatriceCoordinate.cols(); i++){
+        Vector3d punto(MatriceCoordinate(0,i),MatriceCoordinate(1,i),MatriceCoordinate(2,i));
+
+        Vector3d puntoNormalizzato = punto/punto.norm();
+
+        MatriceCoordinate(0,i) = puntoNormalizzato(0);
+        MatriceCoordinate(1,i) = puntoNormalizzato(1);
+        MatriceCoordinate(2,i) = puntoNormalizzato(2);
     }
 
     return true;
@@ -922,15 +941,7 @@ bool TriangolazioneUno(const PolygonalMesh& mesh1, PolygonalMesh& mesh2, const u
 
     // metto i punti di cell0dscoordinates su una sfera
 
-    for(unsigned int i = 0; i < mesh2.Cell0DsCoordinates.cols(); i++){
-        Vector3d punto(mesh2.Cell0DsCoordinates(0,i),mesh2.Cell0DsCoordinates(1,i),mesh2.Cell0DsCoordinates(2,i));
-
-        Vector3d puntoNormalizzato = punto/punto.norm();
-
-        mesh2.Cell0DsCoordinates(0,i) = puntoNormalizzato(0);
-        mesh2.Cell0DsCoordinates(1,i) = puntoNormalizzato(1);
-        mesh2.Cell0DsCoordinates(2,i) = puntoNormalizzato(2);
-    }
+    ProiettaPunti(mesh2.Cell0DsCoordinates);
 
 return true;
 }
@@ -972,6 +983,7 @@ bool CreaDuale(const PolygonalMesh& mesh1, PolygonalMesh& mesh2){
             // i è l'elemento 1 da confrontare
             unsigned int id1 = faccePerVerticeOrdinate[i];
 
+            // rimuovo l'id appena preso così faccio un confronto solo sugli altri
             faccePerVertice.erase(remove(faccePerVertice.begin(), faccePerVertice.end(), id1), faccePerVertice.end());
             cout << "faccia 1 " << id1 << endl;
             for(unsigned int j = 0; j<faccePerVertice.size(); j++){
@@ -1022,6 +1034,7 @@ bool CreaDuale(const PolygonalMesh& mesh1, PolygonalMesh& mesh2){
 
 
     mesh2.Cell0DsCoordinates = MatrixXd::Zero(3, mesh2.NumCell0Ds);
+    mesh2.Cell1DsExtrema = MatrixXi::Zero(2, mesh2.NumCell1Ds);
     mesh2.Cell0DsId.reserve(mesh2.NumCell0Ds);
     mesh2.Cell1DsId.reserve(mesh2.NumCell1Ds);
     mesh2.Cell2DsId.reserve(mesh2.NumCell2Ds);
@@ -1079,27 +1092,49 @@ bool CreaDuale(const PolygonalMesh& mesh1, PolygonalMesh& mesh2){
     }
 
 
-    // adesso riempio le strutture dati che contengono informazioni sui lati 
+    // adesso riempio le strutture dati che contengono informazioni sui lati
+    // devo riempire Cell1DsExtrema e VettoreLati 
 
+
+
+    unsigned int contaIdLati = 0;
     for(vector<unsigned int> vertici : mesh2.VettoreVertici){
         // prendo la lista dei vertici di ogni faccia
         // scorro sui vertici di ogni faccia
         // i vertici di ogni faccia sono ordinati in modo che il successivo sia il vicino di quello prima
+        vector<unsigned int> vecLati;
+        vecLati.reserve(vertici.size());
+
         for(unsigned int i = 0; i < vertici.size(); i++){
             unsigned int idPunto1 = vertici[i];
             unsigned int idPunto2;
 
-            // trovo l'
+            // trovo l'id del seocondo punto, se mi trovo nell'ultima posizione prendo il primo 
             if(i < vertici.size()-1){
-                idPunto2 = vertici[i];
+                idPunto2 = vertici[i+1];
             }else{
                 idPunto2 = vertici[0];
             }
 
+            unsigned int idLatoTrovato;
+            // inserisco il nuovo punto dopo aver controllato che non esista già
+            if(!TestDuplicati(mesh2.Cell1DsExtrema, idPunto1, idPunto2, &idLatoTrovato)){
+                mesh2.Cell1DsExtrema(0, contaIdLati) = idPunto1;
+                mesh2.Cell1DsExtrema(1, contaIdLati) = idPunto2;
+                mesh2.Cell1DsId.push_back(contaIdLati);
+                vecLati.push_back(contaIdLati);
+                contaIdLati += 1;
+            }else{
+                vecLati.push_back(idLatoTrovato);   
+            }
         } 
 
+        mesh2.VettoreLati.push_back(vecLati);
 
     }
+
+    // poietto i punti sulla sfera
+    ProiettaPunti(mesh2.Cell0DsCoordinates);
 
     return true;
 }
