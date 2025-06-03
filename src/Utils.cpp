@@ -1142,7 +1142,7 @@ bool CreaDuale(const PolygonalMesh& mesh1, PolygonalMesh& mesh2){
 
 /**********************************/
 
-bool Dijkstra(const unsigned int& n,const vector<vector<unsigned int>>& LA, const unsigned int& start, const unsigned int& end, MatrixXd& matrice, vector<unsigned int> path){
+bool Dijkstra(const unsigned int& n,const vector<vector<unsigned int>>& LA, const unsigned int& start, const unsigned int& end, MatrixXd& matrice, vector<unsigned int>& path){
     vector<int> pred;
     vector<double> dist;
     pred.reserve(n);
@@ -1156,12 +1156,14 @@ bool Dijkstra(const unsigned int& n,const vector<vector<unsigned int>>& LA, cons
 
     pred[start] = start;
     dist[start] = 0.0;
+    cout << "ok1" << endl;
     
     // creo la coda con priorità, sarà ordinata in ordine crescente
     priority_queue<pair<int, double>, vector<pair<int, double>>, greater<pair<int, double>>> PQ;
     for(unsigned int i = 0; i < n; i++){
 		PQ.push({i, dist[i]});
     }
+    cout << "ok2" << endl;
 
     while(!PQ.empty()){
         int u = PQ.top().first;
@@ -1175,6 +1177,11 @@ bool Dijkstra(const unsigned int& n,const vector<vector<unsigned int>>& LA, cons
             }
         }
     }
+    cout << "pred " << endl;
+    for(unsigned int elemento : pred){
+        cout << elemento << " ";
+    }
+    cout << endl;
 
     unsigned int v = end;
 	while(v != start){
@@ -1183,6 +1190,13 @@ bool Dijkstra(const unsigned int& n,const vector<vector<unsigned int>>& LA, cons
 	} 
     path.push_back(start);
 
+    cout << "path " << endl;
+    for(unsigned int elemento : path){
+        cout << elemento << " ";
+    }
+    cout << endl;
+
+    cout << "ok4" << endl;
     return true;
 
 }
@@ -1249,7 +1263,7 @@ bool CamminoMinimo(const PolygonalMesh& mesh, const unsigned int& id1, const uns
     
     for(unsigned int v = 0; v < listaAdiacenza.size(); v++) {
         cout << "v = " << v << endl;
-        for(unsigned int v1 = 0; v1 < listaAdiacenza[v].size(); v1++) {
+        for(unsigned int v1 :listaAdiacenza[v]) {
             cout << "v1 = " << v1 << endl;
             Vector3d punto(mesh.Cell0DsCoordinates(0, v), mesh.Cell0DsCoordinates(1, v), mesh.Cell0DsCoordinates(2, v));
             Vector3d punto1(mesh.Cell0DsCoordinates(0, v1), mesh.Cell0DsCoordinates(1, v1), mesh.Cell0DsCoordinates(2, v1));
@@ -1269,7 +1283,8 @@ bool CamminoMinimo(const PolygonalMesh& mesh, const unsigned int& id1, const uns
 		ProprietaPuntiPercorso[punto] = 1.0;
     }
 
-    		
+    cout << "ok5" << endl;
+    
     Gedim::UCDProperty<double> ProprietaPercorsoMinimo;
     ProprietaPercorsoMinimo.Label = "percorso minimo";
     ProprietaPercorsoMinimo.UnitLabel = "";
@@ -1288,9 +1303,11 @@ bool CamminoMinimo(const PolygonalMesh& mesh, const unsigned int& id1, const uns
 
     // coloriamo i lati relativi al percorso e calcoliamo la lunghezza del percorso
     vector<unsigned int> latiPercorso;
-    latiPercorso.reserve(path.size()-1);
+    //latiPercorso.reserve(path.size()-1);
     vector<double> ProprietaLatiPercorso(mesh.NumCell1Ds, 0.0);
 
+    cout << "ok6" << endl;
+    cout << path.size() << endl;
     double lunghezzaPercorso = 0.0;
     for(unsigned int i = 0; i < path.size()-1; i++){
         unsigned int punto1 = path[i];
@@ -1303,6 +1320,7 @@ bool CamminoMinimo(const PolygonalMesh& mesh, const unsigned int& id1, const uns
             if( (mesh.Cell1DsExtrema(0,idLato) == punto1Intero && mesh.Cell1DsExtrema(1,idLato) == punto2Intero) || (mesh.Cell1DsExtrema(0,idLato) == punto2Intero && mesh.Cell1DsExtrema(1,idLato) == punto1Intero) ){
                 latiPercorso.push_back(idLato);
                 ProprietaLatiPercorso[idLato] = 1.0;
+                
             }
         } 
     }

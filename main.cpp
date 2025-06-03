@@ -58,11 +58,11 @@ int main(){
     string ParaviewPuntiTriangolati = "./Cell0DTriang.inp";
     string ParaviewSegmentiTriangolati = "./Cell1DTriang.inp";
 
-    utilities.ExportPoints(ParaviewPuntiTriangolati, 
+    /*utilities.ExportPoints(ParaviewPuntiTriangolati, 
                             meshTriangolata.Cell0DsCoordinates);
     utilities.ExportSegments(ParaviewSegmentiTriangolati,
                              meshTriangolata.Cell0DsCoordinates,
-                             meshTriangolata.Cell1DsExtrema);
+                             meshTriangolata.Cell1DsExtrema);*/
 
 
     // calcolo il cammino minimo
@@ -83,11 +83,11 @@ int main(){
     string ParaviewPuntiDuale = "./Cell0DDuale.inp";
     string ParaviewSegmentiDuale = "./Cell1DDuale.inp";
     
-    utilities.ExportPoints(ParaviewPuntiDuale, 
+    /*utilities.ExportPoints(ParaviewPuntiDuale, 
                             meshDuale.Cell0DsCoordinates);
     utilities.ExportSegments(ParaviewSegmentiDuale,
                              meshDuale.Cell0DsCoordinates,
-                             meshDuale.Cell1DsExtrema);
+                             meshDuale.Cell1DsExtrema);*/
 
     
     // qua metto cammino minimo
