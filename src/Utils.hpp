@@ -52,9 +52,9 @@ namespace PolygonalLibrary{
     bool CreaDuale(const PolygonalMesh& mesh1, PolygonalMesh& mesh2);
 
     // calcola il cammino minimo
-    bool CamminoMinimo(const PolygonalMesh& mesh, const unsigned int& q, const unsigned int& id1, const unsigned int& id2, bool Duale);
+    bool CamminoMinimo(const PolygonalMesh& mesh, const unsigned int& id1, const unsigned int& id2, const string& nomefilepunti, const string& nomefilelati);
 
     // implementa l'algoritmo BFS
-    bool Dijkstra(const PolygonalMesh& mesh, const vector<vector<unsigned int>>& LA, const unsigned int& start, const unsigned int& end,  const unsigned int& n, MatrixXd& matrice, vector<unsigned int> path);
+    bool Dijkstra(const unsigned int& n,const vector<vector<unsigned int>>& LA, const unsigned int& start, const unsigned int& end, MatrixXd& matrice, vector<unsigned int> path);
 
 }

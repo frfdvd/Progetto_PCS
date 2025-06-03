@@ -22,6 +22,8 @@ int main(){
     unsigned int b = 4;
     unsigned int p = 3;
     unsigned int q = 3;
+    unsigned int id1 = 0;
+    unsigned int id2 = 5;
     string Poliedro = RiconosciPoliedro(q);
 
     cout << Poliedro << endl;
@@ -33,9 +35,7 @@ int main(){
         return 1;
     }
 
-    // qua metteremo il cammino minimo
-    bool Duale = false;
-    
+ 
     string ParaviewPunti = "./Cell0D.inp";
     string ParaviewSegmenti = "./Cell1D.inp"; 
 
@@ -65,6 +65,10 @@ int main(){
                              meshTriangolata.Cell1DsExtrema);
 
 
+    // calcolo il cammino minimo
+    if(!CamminoMinimo(meshTriangolata, id1, id2, ParaviewPuntiTriangolati, ParaviewSegmentiTriangolati)){
+        return false;
+    }
 
     unsigned int qDuale = p;
     unsigned int pDuale = q;
@@ -74,8 +78,7 @@ int main(){
         return 1;
     }
 
-    // qua metto cammino minimo
-    Duale = true;
+    
 
     string ParaviewPuntiDuale = "./Cell0DDuale.inp";
     string ParaviewSegmentiDuale = "./Cell1DDuale.inp";
@@ -87,7 +90,11 @@ int main(){
                              meshDuale.Cell1DsExtrema);
 
     
+    // qua metto cammino minimo
+    if(!CamminoMinimo(meshDuale, id1, id2, ParaviewPuntiDuale, ParaviewSegmentiDuale)){
+        return false;
+    }
+
+
     return 0;
-
-
 }
