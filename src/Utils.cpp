@@ -1139,5 +1139,29 @@ bool CreaDuale(const PolygonalMesh& mesh1, PolygonalMesh& mesh2){
     return true;
 }
 
+bool CamminoMinimo(const PolygonalMesh& mesh, const unsigned int& id1, const unsigned int& id2){
 
+//controllo che gli id dei vertici passati esistano 
+if(id1 > mesh.NumCell0Ds & id2 > mesh.NumCell0Ds){
+    cerr << "gli id non sono validi" << endl;
+    return false;
+}
+
+// creo la lista di adiacenza
+vector<vector<unsigned int>> listaAdiacenza;
+listaAdiacenza.reserve(mesh.NumCell0Ds);
+
+// ora la riempio
+for(unsigned int idVertice = 0; idVertice < mesh.NumCell0Ds; idVertice++){
+    vector<unsigned int> vettoreAdiacenza;
+    for(unsigned int idAdiacente = 0; idAdiacente < mesh.Cell1DsExtrema.cols(); idAdiacente++){
+
+    }
+}
+
+
+
+
+return true;
+}
 }
