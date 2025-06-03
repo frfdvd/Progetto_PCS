@@ -1139,29 +1139,80 @@ bool CreaDuale(const PolygonalMesh& mesh1, PolygonalMesh& mesh2){
     return true;
 }
 
-bool CamminoMinimo(const PolygonalMesh& mesh, const unsigned int& id1, const unsigned int& id2){
+/**********************************/
 
-//controllo che gli id dei vertici passati esistano 
-if(id1 > mesh.NumCell0Ds & id2 > mesh.NumCell0Ds){
-    cerr << "gli id non sono validi" << endl;
-    return false;
-}
+bool BFS(const vector<vector<unsigned int>>& LA, const unsigned int& v, const unsigned int& n){
+    
+    vector<bool> reached;
+    reached.reserve(n);
 
-// creo la lista di adiacenza
-vector<vector<unsigned int>> listaAdiacenza;
-listaAdiacenza.reserve(mesh.NumCell0Ds);
-
-// ora la riempio
-for(unsigned int idVertice = 0; idVertice < mesh.NumCell0Ds; idVertice++){
-    vector<unsigned int> vettoreAdiacenza;
-    for(unsigned int idAdiacente = 0; idAdiacente < mesh.Cell1DsExtrema.cols(); idAdiacente++){
-
+    for(unsigned int i = 0; i < n; i++){
+        reached.push_back(false);
     }
+
+
+
 }
+
+/**********************************/
+
+bool CamminoMinimo(const PolygonalMesh& mesh, const unsigned int& q, const unsigned int& id1, const unsigned int& id2, bool Duale){
+
+    //controllo che gli id dei vertici passati esistano 
+    if(id1 > mesh.NumCell0Ds & id2 > mesh.NumCell0Ds){
+        cerr << "gli id non sono validi" << endl;
+        return false;
+    }
+
+    // creo la lista di adiacenza
+    vector<vector<unsigned int>> listaAdiacenza;
+    listaAdiacenza.reserve(mesh.NumCell0Ds);
+
+    // ora la riempio
+    for(unsigned int idVertice = 0; idVertice < mesh.NumCell0Ds; idVertice++){
+        vector<unsigned int> vettoreAdiacenza;
+
+        if(!Duale){
+            
+            if( (q == 3) & (idVertice < 3) ){
+                vettoreAdiacenza.reserve(q);
+            }else if( (q == 4) & (idVertice < 6) ){
+                vettoreAdiacenza.reserve(q);
+            }else if( (q == 5) & (idVertice < 12) ){
+                vettoreAdiacenza.reserve(q);
+            }else{
+                vettoreAdiacenza.reserve(6);
+            }
+        }else{
+            vettoreAdiacenza.reserve(3);
+        }
+
+        for(unsigned int idAdiacente = 0; idAdiacente < mesh.Cell1DsExtrema.cols(); idAdiacente++){
+            if( idVertice == mesh.Cell1DsExtrema(0, idAdiacente)){
+                vettoreAdiacenza.push_back(mesh.Cell1DsExtrema(1, idAdiacente));
+            } 
+            
+            if(idVertice == mesh.Cell1DsExtrema(1, idAdiacente)){
+                vettoreAdiacenza.push_back(mesh.Cell1DsExtrema(0, idAdiacente));
+            }
+        }
+        listAdiacenza.push_back(vettoreAdiacenza);
+    }
+
+    cout << "stampo il lista adiacenza " << endl;
+        for (const auto& riga : listaAdiacenza) {
+            for (const auto& elemento :riga) {
+                cout << elemento << " ";
+            }
+            cout << endl;
+        }
+
+    // iniziamo l'algoritmo BFS
 
 
 
 
 return true;
 }
+
 }

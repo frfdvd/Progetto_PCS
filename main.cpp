@@ -20,8 +20,8 @@ int main(){
     PolygonalMesh meshDuale;
 
     unsigned int b = 4;
-    //unsigned int p = 3;
-    unsigned int q = 4;
+    unsigned int p = 3;
+    unsigned int q = 3;
     string Poliedro = RiconosciPoliedro(q);
 
     cout << Poliedro << endl;
@@ -33,6 +33,8 @@ int main(){
         return 1;
     }
 
+    // qua metteremo il cammino minimo
+    bool Duale = false;
     
     string ParaviewPunti = "./Cell0D.inp";
     string ParaviewSegmenti = "./Cell1D.inp"; 
@@ -63,12 +65,17 @@ int main(){
                              meshTriangolata.Cell1DsExtrema);
 
 
+
+    unsigned int qDuale = p;
+    unsigned int pDuale = q;
     if(!CreaDuale(meshTriangolata, meshDuale))
     {
         cerr << "error during triangolation" << endl;
         return 1;
     }
 
+    // qua metto cammino minimo
+    Duale = true;
 
     string ParaviewPuntiDuale = "./Cell0DDuale.inp";
     string ParaviewSegmentiDuale = "./Cell1DDuale.inp";
