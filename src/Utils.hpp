@@ -55,6 +55,6 @@ namespace PolygonalLibrary{
     bool CamminoMinimo(const PolygonalMesh& mesh, const unsigned int& q, const unsigned int& id1, const unsigned int& id2, bool Duale);
 
     // implementa l'algoritmo BFS
-    bool BFS(const vector<vector<unsigned int>>& LA, const unsigned int& v, const unsigned int& n);
+    bool Dijkstra(const PolygonalMesh& mesh, const vector<vector<unsigned int>>& LA, const unsigned int& start, const unsigned int& end,  const unsigned int& n, MatrixXd& matrice, vector<unsigned int> path);
 
 }

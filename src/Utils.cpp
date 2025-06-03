@@ -6,6 +6,7 @@
 #include <cmath>
 #include <string>
 #include <map>
+#include <queue>
 
 namespace PolygonalLibrary{
     bool ImportMesh(PolygonalMesh& mesh, const string& Poliedro)
@@ -1141,16 +1142,50 @@ bool CreaDuale(const PolygonalMesh& mesh1, PolygonalMesh& mesh2){
 
 /**********************************/
 
-bool BFS(const vector<vector<unsigned int>>& LA, const unsigned int& v, const unsigned int& n){
+bool Dijkstra(const PolygonalMesh& mesh, const vector<vector<unsigned int>>& LA, const unsigned int& start, const unsigned int& end,  const unsigned int& n, MatrixXd& matrice, vector<unsigned int> path){
     
-    vector<bool> reached;
-    reached.reserve(n);
-
+    vector<int> pred;
+    vector<double> dist;
+    pred.reserve(n);
+    dist.reserve(n);
+    path.reserve(n);
+    double inf = numeric_limits<double>::infinity();
+   
     for(unsigned int i = 0; i < n; i++){
-        reached.push_back(false);
+        pred.push_back(-1);
+        dist.push_back(inf);
     }
 
+    pred[start] = start;
+    dist[start] = 0.0;
+    
+    // creo la coda con priorità, sarà ordinata in ordine crescente
+    priority_queue<pair<int, double>, vector<pair<int, double>>, greater<pair<int, double>>> PQ;
+    for(unsigned int i = 0; i < mesh.NumCell0Ds; i++){
+		PQ.push({i, dist[i]});
+    }
 
+    while(!PQ.empty()){
+        int u = PQ.top().first;
+		int p = PQ.top().second;
+		PQ.pop();
+        for(unsigned int w : LA[u]){
+            if(dist[w] > dist[u] + matrice(u,w)){
+                dist[w] = dist[u] + matrice(u,w);
+                pred[w] = u;
+                PQ.push({w,dist[w]});
+            }
+        }
+    }
+
+    int v = end;
+	while(v != start){
+		path.push_back(v);
+		v = pred[v];
+	} 
+    path.push_back(start);
+
+return true;
 
 }
 
@@ -1196,9 +1231,9 @@ bool CamminoMinimo(const PolygonalMesh& mesh, const unsigned int& q, const unsig
                 vettoreAdiacenza.push_back(mesh.Cell1DsExtrema(0, idAdiacente));
             }
         }
-        listAdiacenza.push_back(vettoreAdiacenza);
+        listaAdiacenza.push_back(vettoreAdiacenza);
     }
-
+   
     cout << "stampo il lista adiacenza " << endl;
         for (const auto& riga : listaAdiacenza) {
             for (const auto& elemento :riga) {
@@ -1206,8 +1241,19 @@ bool CamminoMinimo(const PolygonalMesh& mesh, const unsigned int& q, const unsig
             }
             cout << endl;
         }
+    //calcolo la matrice di adiacenza
+    MatrixXd matricePesi = MatrixXd::Zero(mesh.NumCell0Ds, mesh.NumCell0Ds);
+    
+    for(unsigned int v = 0; v < listaAdiacenza.size(); v++) {
+        for(unsigned int v1 = 0; v1 < listaAdiacenza[v].size(); v1++) {
+            Vector3d punto(mesh.Cell0DsCoordinates(0, v), mesh.Cell0DsCoordinates(1, v), mesh.Cell0DsCoordinates(2, v));
+            Vector3d punto1(mesh.Cell0DsCoordinates(0, v1), mesh.Cell0DsCoordinates(1, v1), mesh.Cell0DsCoordinates(2, v1));
+            double dist = (punto1 - punto).norm();
+            matricePesi(v, v1) = dist;
+        }
+    }
 
-    // iniziamo l'algoritmo BFS
+    // iniziamo l'algoritmo 
 
 
 
