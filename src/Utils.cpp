@@ -1331,16 +1331,24 @@ return true;
 
 /**********************************/
 
-bool CreaBaricentro(const MatrixXd& Coordinate, const vector<unsigned int>& vecpunti, Vector3d& baricentro){
+bool CreaBaricentro(PolygonalMesh& meshTri, const PolygonalMesh& mesh2 ,const vector<unsigned int>& vecpunti, const unsigned int& IdBar, map<unsigned int, vector<unsigned int>>& map);{
     unsigned int id0 = vecpunti[0];
     unsigned int id1 = vecpunti[1];
     unsigned int id2 = vecpunti[2];
 
-    Vector3d punto0(Coordinate(0,id0),Coordinate(1,id0),Coordinate(2,id0));
-    Vector3d punto1(Coordinate(0,id1),Coordinate(1,id1),Coordinate(2,id1));
-    Vector3d punto2(Coordinate(0,id2),Coordinate(1,id2),Coordinate(2,id2));
+    Vector3d punto0(mesh2.Cell0DsCoordinates(0,id0),mesh2.Cell0DsCoordinates(1,id0),mesh2.Cell0DsCoordinates(2,id0));
+    Vector3d punto1(mesh2.Cell0DsCoordinates(0,id1),mesh2.Cell0DsCoordinates(1,id1),mesh2.Cell0DsCoordinates(2,id1));
+    Vector3d punto2(mesh2.Cell0DsCoordinates(0,id2),mesh2.Cell0DsCoordinates(1,id2),mesh2.Cell0DsCoordinates(2,id2));
     
+    Vector3d baricentro;
     baricento = (punto0 + punto1 + punto2)/3;
+
+    meshTri.Cell0DsCoordinates(0, IdBar) = baricentro(0);
+    meshTri.Cell0DsCoordinates(1, IdBar) = baricentro(1);
+    meshTri.Cell0DsCoordinates(2, IdBar) = baricentro(2);
+    meshTri.Cell0DsId.push_back(IdBar);
+
+    map[IdBar] = vecpunti;
 
     return true;
 }
@@ -1348,10 +1356,59 @@ bool CreaBaricentro(const MatrixXd& Coordinate, const vector<unsigned int>& vecp
 /**********************************/
 
 bool ControllaBordi(const vector<vector<unsigned int>>& latiCompleti, const unsigned int& id1, const unsigned int& id2, const MatrixXd& Coordinate, Vector3d& Medio){
+    for(vector<unsigned int> lato : latiCompleti){
+        if( (find(lato.begin(), lato.end(), id1) != lato.end()) & (find(lato.begin(), lato.end(), id2) != lato.end()) ){
+            Vector3d punto1(Coordinate(0,id1),Coordinate(1,id1),Coordinate(2,id1));
+            Vector3d punto2(Coordinate(0,id2),Coordinate(1,id2),Coordinate(2,id2));
+            Medio = (punto1 + punto2)/2;
+            return true;
+            break;
+    }
+    return false;
+}
+}
+
+/**********************************/
+
+bool AggiungiLati(MatrixXi& MatriceLati,const vector<unsigned int>& vecpunti, const unsigned int& IdBar, unsigned int& contatore){
+    int idBarIntero = idBar;
+    for(unsigned int idPunto : vecpunti){
+        int idPuntoIntero = idPunto;
+        MatriceLati(0, contatore) = idBarIntero;
+        MatriceLati(1, contatore) = idPuntoIntero;
+        contatore += 1;
+    }
+    return true;
+}
+
+/**********************************/
+
+bool CollegaBaricentri(const map<unsigned int, vector<unsigned int>>& MapBaricentri,const unsigned int& IdBaricentro, PolygonalMesh& meshTri){
+
+    vector<unsigned int> vettore1 = MapBaricentri.at(IdBaricentro);
+    unsigned int quanti = 0;
+    for(unsigned int chiave : MapBaricentri){
+        vector<unsigned int> vettore2 = MapBaricentri.at(chiave);
+        for(unsigned int elemento1 : vettore1){
+            for(unsigned int elemento2 : vettore2){
+                if(elemento1 == elemento2){
+                    quanti += 1;
+                }
+            }
+        }
+
+        if(quanti == 2){
+            
+        }
+
+        quanti = 0;
+    }
+
     
 
     return true;
 }
+
 
 /**********************************/
 
@@ -1548,7 +1605,8 @@ bool TriangolazioneDue(const PolygonalMesh& mesh1, PolygonalMesh& meshTri, const
     // creo il contatore per contare l'id dei lati di meshTri
     unsigned int IdPuntiMeshTri = contIdPunti + 1;
     unsigned int IdLatiMeshTri = 0;
-
+    // creo una map che contiene come chiavi gli id dei baricentri e come valore un vettore che contiene gli id dei punti che l'hanno generato
+    map<unsigned int, vector<unsigned int>> MapBaricentri;
 
     for(unsigned int idFaccia = 0; idFaccia < mesh1.NumCell2Ds; idFaccia++) {
         cout << endl;
@@ -1662,24 +1720,49 @@ bool TriangolazioneDue(const PolygonalMesh& mesh1, PolygonalMesh& meshTri, const
                     // TRIANGOLAZIONE DI TIPO DUE
                     // creo il baricentro relativo alla faccia triangolare piccolina e lo salvo
                     Vector3d baricentro;
-                    CreaBaricentro(mesh2.Cell0DsCoordinates, vecpunti, baricentro);
-                    meshTri.Cell0DsCoordinates(0, IdPuntiMeshTri) = baricentro(0);
-                    meshTri.Cell0DsCoordinates(1, IdPuntiMeshTri) = baricentro(1);
-                    meshTri.Cell0DsCoordinates(2, IdPuntiMeshTri) = baricentro(2);
-                    meshTri.Cell0DsId.push_back(IdPuntiMeshTri);
+                    CreaBaricentro(meshTri, mesh2 ,vecpunti, IdPuntiMeshTri, MapBaricentri);
+                    // creo i lati che collegano il baricentro con i tre vertici che lo creano
+                    AggiungiLati(meshTri.Cell1DsExtrema(), vecpunti, IdPuntiMeshTri, IdLatiMeshTri);
+                    unsigned int IdBaricentro = IdPuntiMeshTri;
                     IdPuntiMeshTri += 1;
-
+                    
                     // aggiungo i possibili punti sui bordi del poligono platonico
                     id1 = tetto[tetto.size()-1];
                     id2 = base[scorri/2];
                     Vector3d Medio;
-                    ControllaBordi(latiCompleti, id1, id2, mesh2.Cell0DsCoordinates, Medio);
+                    if(ControllaBordi(latiCompleti, id1, id2, mesh2.Cell0DsCoordinates, Medio)){
+                        meshTri.Cell0DsCoordinates(0, IdPuntiMeshTri) = Medio(0);
+                        meshTri.Cell0DsCoordinates(1, IdPuntiMeshTri) = Medio(1);
+                        meshTri.Cell0DsCoordinates(2, IdPuntiMeshTri) = Medio(2);
+                        meshTri.Cell0DsId.push_back(IdPuntiMeshTri);
+                        // aggiungo i lati che si creano con il bordo e il baricentro
+                        vector<unsigned int> vecpunti1 = {id1, id2, IdBaricentro};
+                        AggiungiLati(meshTri.Cell1DsExtrema(), vecpunti1, IdPuntiMeshTri, IdLatiMeshTri);  
+                        IdPuntiMeshTri += 1;
+                    }
 
+                    id1 = base[scorri/2];
+                    id2 = base[scorri/2+1];
+                    if(ControllaBordi(latiCompleti, id1, id2, mesh2.Cell0DsCoordinates, Medio)){
+                        meshTri.Cell0DsCoordinates(0, IdPuntiMeshTri) = Medio(0);
+                        meshTri.Cell0DsCoordinates(1, IdPuntiMeshTri) = Medio(1);
+                        meshTri.Cell0DsCoordinates(2, IdPuntiMeshTri) = Medio(2);
+                        meshTri.Cell0DsId.push_back(IdPuntiMeshTri);
+                        // aggiungo i lati che si creano con il bordo e il baricentro
+                        vector<unsigned int> vecpunti1 = {id1, id2, IdBaricentro};
+                        AggiungiLati(meshTri.Cell1DsExtrema(), vecpunti1, IdPuntiMeshTri, IdLatiMeshTri);  
+                        IdPuntiMeshTri += 1;
+                    }
+
+
+                    // aggiungo i lati che uniscono i due baricentri
+                    CollegaBaricentri(MapBaricentri, IdBaricentro, meshTri);
 
 
                 }else{
                     // stiamo scorrendo sul tetto
 
+                    // TRIANGOLAZIONE 1
                     // troviamo il nuovo punto di tetto, divido per b-h perchè il tetto è sempre diviso in meno parti, e lo inserisco 
                     if(scorri < 2*lunghezzaBase-5){
                         
@@ -1712,26 +1795,35 @@ bool TriangolazioneDue(const PolygonalMesh& mesh1, PolygonalMesh& meshTri, const
                         }
                         cout << endl;
                     }
-
                     // inseriamo il primo lato (tetto con la base)
                     unsigned int id1 = base[scorri+2-tetto.size()];
                     unsigned int id2 = tetto[tetto.size()-2];
                     inserisciLati(mesh2.Cell1DsExtrema, mesh2.Cell1DsId , contaIdLatiMesh2, id1, id2);
                     cout << "primo lato tetto fatto " << endl;
-
                     // inseriamo il secondo lato (tetto con il tetto) controllando che nell'ultima iterazione non metta tetto-tetto
                     id1 = tetto[tetto.size()-1];
                     id2 = tetto[tetto.size()-2];
                     inserisciLati(mesh2.Cell1DsExtrema, mesh2.Cell1DsId , contaIdLatiMesh2, id1, id2);
                     cout << "secondo lato tetto fatto" << endl;
-
-                    // inseriscoi vertici della faccia dentro al vettore vertici evitando di aggiungere una faccia quando arrivo all'ultimo elemento di tetto
+                    // inserisco i vertici della faccia dentro al vettore vertici evitando di aggiungere una faccia quando arrivo all'ultimo elemento di tetto
                     if(scorri < 2*lunghezzaBase-3){
                         vector<unsigned int> vecpunti = {tetto[tetto.size()-2],base[scorri+2-tetto.size()],tetto[tetto.size()-1]};
                         mesh2.VettoreVertici.push_back(vecpunti);
                     
                     }
 
+
+                    // TRIANGOLAZIONE  DI TIPO 2
+                    // creo solo il baricentro perchè non ci saranno punti a contatto con i lati del poliedro
+                    // evito l'ultimo lato (quando scorri assume l'ultimo valore del tetto mi darebbe errore)
+                    if(scorri < 2*lunghezzaBase-3){
+                        // trovo il baricentro della faccia e lo aggiungo 
+                        CreaBaricentro(meshTri, mesh2 ,vecpunti, IdPuntiMeshTri, MapBaricentri);
+                        // aggiungo i lati che dal baricentro vanno agli estremi del tiangolo
+                        AggiungiLati(meshTri.Cell1DsExtrema(), vecpunti, IdPuntiMeshTri, IdLatiMeshTri);
+                        IdPuntiMeshTri += 1;
+
+                    }
 
                 }
             }       
