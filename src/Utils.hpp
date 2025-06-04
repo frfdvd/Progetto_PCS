@@ -61,13 +61,13 @@ namespace PolygonalLibrary{
     bool CreaBaricentro(PolygonalMesh& meshTri, const PolygonalMesh& mesh2,const vector<unsigned int>& vecpunti, const unsigned int& IdBar, map<unsigned int, vector<unsigned int>>& map);
 
     // controlla se sul bordo si deve aggiungere un punto e nel caso trova le sue coordinate
-    bool ControllaBordi(const vector<vector<unsigned int>>& latiCompleti, const unsigned int& id1, const unsigned int& id2, const MatrixXd& Coordinate, Vector3d& Medio);
+    bool ControllaBordi(const vector<vector<unsigned int>>& latiCompleti, const unsigned int& id1, const unsigned int& id2, const MatrixXd& Coordinate, Vector3d& Medio, PolygonalMesh& meshTri, const unsigned int& contapunti);
 
     // congiunge il baricentro di ogni faccina con i suoi estremi
-    bool AggiungiLati(MatrixXi& MatriceLati,const vector<unsigned int>& vecpunti, const unsigned int& IdBar, unsigned int& contatore);
+    bool AggiungiLati(PolygonalMesh& meshTri,const vector<unsigned int>& vecpunti, const unsigned int& IdBar, unsigned int& contatore);
 
     // collega i baricenti dei triangolini
-    bool CollegaBaricentri(const map<unsigned int, vector<unsigned int>>& MapBaricentri,const unsigned int& IdBaricentro, PolygonalMesh& meshTri);
+    bool CollegaBaricentri(const map<unsigned int, vector<unsigned int>>& MapBaricentri,const unsigned int& IdBaricentro, PolygonalMesh& meshTri, unsigned int& contaLati);
 
     // trova la triangolazione di tipo due dei punti di un poligono
     bool TriangolazioneDue(const PolygonalMesh& mesh1, PolygonalMesh& meshTri, const unsigned int& b, const unsigned int& q);
