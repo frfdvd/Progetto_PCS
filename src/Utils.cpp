@@ -1792,10 +1792,19 @@ bool TriangolazioneDue(const PolygonalMesh& mesh1, PolygonalMesh& meshTri, const
                         cout << "SCORRI" <<scorri << "BASE"<< 2*lunghezzaBase-5<< endl;
                         Vector3d NuovoPuntoTetto = Estremo1 + VettoreDirezione * (scorri+1)/(2*(double)(b-h));
 
+                        // inserisco il nuovo punto nelle coordinate della mesh temporanea
                         mesh2.Cell0DsCoordinates(0,ContaIdPuntiMesh2) = NuovoPuntoTetto(0);
                         mesh2.Cell0DsCoordinates(1,ContaIdPuntiMesh2) = NuovoPuntoTetto(1);
                         mesh2.Cell0DsCoordinates(2,ContaIdPuntiMesh2) = NuovoPuntoTetto(2);
                         mesh2.Cell0DsId.push_back(ContaIdPuntiMesh2);
+
+                        // inserisco il nuovo punto nelle coordinate della mesh di secondo tipo
+                        /*meshTri.Cell0DsCoordinates(0,IdPuntiMeshTri) = NuovoPuntoTetto(0);
+                        meshTri.Cell0DsCoordinates(1,IdPuntiMeshTri) = NuovoPuntoTetto(1);
+                        meshTri.Cell0DsCoordinates(2,IdPuntiMeshTri) = NuovoPuntoTetto(2);
+                        meshTri.Cell0DsId.push_back(IdPuntiMeshTri);
+                        IdPuntiMeshTri += 1;*/
+
                         
                         cout << "idNuovoPunto " << ContaIdPuntiMesh2 << endl;
                         tetto.push_back(ContaIdPuntiMesh2);
@@ -1831,7 +1840,7 @@ bool TriangolazioneDue(const PolygonalMesh& mesh1, PolygonalMesh& meshTri, const
                     // inserisco i vertici della faccia dentro al vettore vertici evitando di aggiungere una faccia quando arrivo all'ultimo elemento di tetto
                     vector<unsigned int> vecpunti;
                     if(scorri < 2*lunghezzaBase-3){
-                        vecpunti = {tetto[tetto.size()-2],base[scorri+2-tetto.size()],tetto[tetto.size()-1]};
+                        vector<unsigned int> vecpunti = {tetto[tetto.size()-2],base[scorri+2-tetto.size()],tetto[tetto.size()-1]};
                         mesh2.VettoreVertici.push_back(vecpunti);
                     
                     }
