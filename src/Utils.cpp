@@ -172,8 +172,8 @@ bool ImportCell1Ds(PolygonalMesh& mesh, const string& Poliedro)
     }
     return true;
 }
-/**********************************/
 
+/**********************************/
 
 bool ImportCell2Ds(PolygonalMesh& mesh, const string& Poliedro){
     string NomeFile="./Cell2D"+Poliedro+".csv";
@@ -1219,21 +1219,6 @@ bool CamminoMinimo(const PolygonalMesh& mesh, const unsigned int& id1, const uns
     for(unsigned int idVertice = 0; idVertice < mesh.NumCell0Ds; idVertice++){
         vector<unsigned int> vettoreAdiacenza;
 
-        /*if(!Duale){
-            
-            if( (q == 3) & (idVertice < 3) ){
-                vettoreAdiacenza.reserve(q);
-            }else if( (q == 4) & (idVertice < 6) ){
-                vettoreAdiacenza.reserve(q);
-            }else if( (q == 5) & (idVertice < 12) ){
-                vettoreAdiacenza.reserve(q);
-            }else{
-                vettoreAdiacenza.reserve(6);
-            }
-        }else{
-            vettoreAdiacenza.reserve(3);
-        }*/
-
         for(unsigned int idAdiacente = 0; idAdiacente < mesh.Cell1DsExtrema.cols(); idAdiacente++){
             int idVerticeIntero = idVertice;
             if( idVerticeIntero == mesh.Cell1DsExtrema(0, idAdiacente)){
@@ -1342,6 +1327,442 @@ bool CamminoMinimo(const PolygonalMesh& mesh, const unsigned int& id1, const uns
 
 
 return true;
+}
+
+/**********************************/
+
+bool CreaBaricentro(const MatrixXd& Coordinate, const vector<unsigned int>& vecpunti, Vector3d& baricentro){
+    unsigned int id0 = vecpunti[0];
+    unsigned int id1 = vecpunti[1];
+    unsigned int id2 = vecpunti[2];
+
+    Vector3d punto0(Coordinate(0,id0),Coordinate(1,id0),Coordinate(2,id0));
+    Vector3d punto1(Coordinate(0,id1),Coordinate(1,id1),Coordinate(2,id1));
+    Vector3d punto2(Coordinate(0,id2),Coordinate(1,id2),Coordinate(2,id2));
+    
+    baricento = (punto0 + punto1 + punto2)/3;
+
+    return true;
+}
+
+/**********************************/
+
+bool ControllaBordi(const vector<vector<unsigned int>>& latiCompleti, const unsigned int& id1, const unsigned int& id2, const MatrixXd& Coordinate, Vector3d& Medio){
+    
+
+    return true;
+}
+
+/**********************************/
+
+bool TriangolazioneDue(const PolygonalMesh& mesh1, PolygonalMesh& meshTri, const unsigned int& b, const unsigned int& q){
+    
+    // mesh temporanea che permette di creare la triangolazione di tipo due
+    PolygonalMesh mesh2;
+    unsigned int T = pow(b,2);
+
+    // salvo il numero di vertici, lati e facce usando le formule per la triangolazione temporanea
+    if(q==3){
+        mesh2.NumCell0Ds = 2*T + 2;
+        mesh2.NumCell1Ds = 6*T;
+        mesh2.NumCell2Ds = 4*T;
+    }
+    else if(q==4){
+        mesh2.NumCell0Ds = 4*T + 2;
+        mesh2.NumCell1Ds = 12*T;
+        mesh2.NumCell2Ds = 8*T;
+    }
+    else if(q==5){
+        mesh2.NumCell0Ds = 10*T + 2;
+        mesh2.NumCell1Ds = 30*T;
+        mesh2.NumCell2Ds = 20*T;
+    }
+
+    // salvo il numero di vertici, lati e facce usando le formule per la triamgolazione di tipo due
+    meshTri.NumCell0Ds = mesh1.Numcell0Ds + mesh1.NumCell1Ds*(2*b - 1) + mesh1.NumCell2Ds*( (3*T - 3*b + 2)/2 );
+    meshTri.NumCell1Ds = mesh1.NumCell1Ds*(2*b) + mesh1.NumCell2Ds*((9*T+3*b)/2);
+    meshTri.NumCell2Ds = mesh1.NumCell2Ds*(3*T+3*b);
+
+
+
+    // alloco lo spazio necessario per inserire le coordinte e gli id dei vertici per la mesh temporanea
+    mesh2.Cell0DsCoordinates = MatrixXd::Zero(3, mesh2.NumCell0Ds);
+    mesh2.Cell0DsId.reserve(mesh2.NumCell0Ds);
+    
+    // alloco lo spazio necessario per inserire le coordinte e gli id dei vertici per la mesh di tipo due
+    meshTri.Cell0DsCoordinates = MatrixXd::Zero(3, meshTri.NumCell0Ds);
+    meshTri.Cell0DsId.reserve(meshTri.NumCell0Ds); 
+
+
+
+    // inizializzo un contatore per avere gli id dei nuovi vertici
+    unsigned int contIdPunti = mesh1.NumCell0Ds - 1;
+
+    // aggiungo a mesh2 temporanea le coordinate dei punti di mesh1
+    for(unsigned int id : mesh1.Cell0DsId){
+        mesh2.Cell0DsId.push_back(id);
+        mesh2.Cell0DsCoordinates(0, id) = mesh1.Cell0DsCoordinates(0, id);
+        mesh2.Cell0DsCoordinates(1, id) = mesh1.Cell0DsCoordinates(1, id);
+        mesh2.Cell0DsCoordinates(2, id) = mesh1.Cell0DsCoordinates(2, id);
+    }
+
+    // faccio lo stesso per la mesh tri
+    for(unsigned int id : mesh1.Cell0DsId){
+        meshTri.Cell0DsId.push_back(id);
+        meshTri.Cell0DsCoordinates(0, id) = mesh1.Cell0DsCoordinates(0, id);
+        meshTri.Cell0DsCoordinates(1, id) = mesh1.Cell0DsCoordinates(1, id);
+        meshTri.Cell0DsCoordinates(2, id) = mesh1.Cell0DsCoordinates(2, id);
+    }
+
+
+    // contiene dei vettori fatti così [idEstremoTetraedro, ...idPuntiInterni..., idEstremoTetraedro2]
+    vector<vector<unsigned int>> latiCompleti; 
+    // aggiungo le coordinate nuove (triangolazione) dei punti che stanno sui lati
+    for(unsigned int id : mesh1.Cell1DsId){
+        //cout << "id lato "<< id << endl;
+
+        // vettore così [idEstremoTetraedro, ...idPuntiInterni..., idEstremoTetraedro2]
+        vector<unsigned int> latoCompleto;
+        
+        // memorizzo gli estremi del lato e li metto dentro dei vettori
+        unsigned int idEstremo1 = mesh1.Cell1DsExtrema(0,id);
+        unsigned int idEstremo2 = mesh1.Cell1DsExtrema(1,id);
+
+
+        latoCompleto.push_back(idEstremo1);
+
+
+        Vector3d Estremo1(mesh1.Cell0DsCoordinates(0,idEstremo1),mesh1.Cell0DsCoordinates(1,idEstremo1),mesh1.Cell0DsCoordinates(2,idEstremo1));
+        Vector3d Estremo2(mesh1.Cell0DsCoordinates(0,idEstremo2),mesh1.Cell0DsCoordinates(1,idEstremo2),mesh1.Cell0DsCoordinates(2,idEstremo2));
+        //cout << "estremo 1 " <<Estremo1(0) << Estremo1(1) << Estremo1(2) << endl;
+        //cout << "estremo 2 " <<Estremo2(0) << Estremo2(1) << Estremo2(2) << endl;
+        
+        // vettore con la direzione del lato
+        Vector3d VettoreDirezione = Estremo2 - Estremo1;
+        //cout << "Vettore direzione " << VettoreDirezione(0) <<VettoreDirezione(1) <<VettoreDirezione(2) << endl;
+        
+        // trovo i punti in mezzo ai lati e li memorizzo
+        for(unsigned int i = 0; i < b-1; i++){
+            Vector3d punto = Estremo1 + VettoreDirezione * (i+1)/(double)(b); 
+            //cout << "nuovo punto" <<punto << endl;
+
+            contIdPunti = contIdPunti + 1;
+            //cout << "id del nuovo punto "<<contIdPunti << endl;
+
+            // salvo i punti sulla mesh2
+            mesh2.Cell0DsId.push_back(contIdPunti);
+            mesh2.Cell0DsCoordinates(0, contIdPunti) = punto(0);
+            mesh2.Cell0DsCoordinates(1, contIdPunti) = punto(1);
+            mesh2.Cell0DsCoordinates(2, contIdPunti) = punto(2);
+
+            // salvo i punti per la tirangolazione di tipo due
+            meshTri.Cell0DsId.push_back(contIdPunti);
+            meshTri.Cell0DsCoordinates(0, contIdPunti) = punto(0);
+            meshTri.Cell0DsCoordinates(1, contIdPunti) = punto(1);
+            meshTri.Cell0DsCoordinates(2, contIdPunti) = punto(2);
+
+            latoCompleto.push_back(contIdPunti);
+        }
+
+        latoCompleto.push_back(idEstremo2);
+        latiCompleti.push_back(latoCompleto);
+
+    }
+
+    // stampiamo lati completi
+    for(unsigned int s = 0; s<latiCompleti.size(); s++){
+            for(unsigned int y = 0;y<latiCompleti[s].size();y++){
+                cout << latiCompleti[s][y] << " ";
+            }
+        cout << endl;
+        }
+
+    // stampiamo vettore vertici per vedere se abbiamo fatto giusto
+    for(unsigned int s = 0; s<mesh1.VettoreVertici.size(); s++){
+            for(unsigned int y = 0;y<mesh1.VettoreVertici[s].size();y++){
+                cout << mesh1.VettoreVertici[s][y] << " ";
+            }
+        cout << endl;
+        }    
+
+    // creo il dizionario che ha come chiave l'id della faccia del poligono iniziale e come valore i lati copleti di quella faccia
+    // DA CAMBIARE IN UN VECTOR DI VECTOR
+    vector<vector<vector<unsigned int>>> vecFacce;
+
+    for(unsigned int i = 0; i < mesh1.NumCell2Ds; i++){
+        unsigned int id1 = mesh1.VettoreVertici[i][0];
+        unsigned int id2 = mesh1.VettoreVertici[i][1];
+        unsigned int id3 = mesh1.VettoreVertici[i][2];
+
+        vector<vector<unsigned int>> lati;
+        for(unsigned int k = 0; k<latiCompleti.size(); k++){
+            if( (find(latiCompleti[k].begin(), latiCompleti[k].end(), id1) != latiCompleti[k].end()) & (find(latiCompleti[k].begin(), latiCompleti[k].end(), id2) != latiCompleti[k].end()) ){
+                lati.push_back(latiCompleti[k]);
+            } 
+
+            if( (find(latiCompleti[k].begin(), latiCompleti[k].end(), id1) != latiCompleti[k].end()) & (find(latiCompleti[k].begin(), latiCompleti[k].end(), id3) != latiCompleti[k].end()) ){
+                lati.push_back(latiCompleti[k]);
+            }
+
+            if( (find(latiCompleti[k].begin(), latiCompleti[k].end(), id2) != latiCompleti[k].end()) & (find(latiCompleti[k].begin(), latiCompleti[k].end(), id3) != latiCompleti[k].end()) ){
+                lati.push_back(latiCompleti[k]);
+            }
+        }
+
+        vecFacce.push_back(lati);
+        cout << "id faccia" << i << endl;
+
+        for(unsigned int s = 0; s<lati.size(); s++){
+            for(unsigned int y = 0;y<lati[s].size();y++){
+                cout << lati[s][y] << " ";
+            }
+            cout << endl;
+        }
+        cout << endl;
+
+        lati = {};
+
+    }
+
+    /*iniziamo a triangolare: prendiamo ogni faccia del poligono e i suoi vettori relativi ai lati completi. prendiamo due lati 
+    (uno sarà la base e l'altro sarà quello su cui iteriamo) e iniziamo ad aggiungere i punti interni relativi a questi due lati (sfruttando il terzo lato
+    per trovare il vettore direzione consono). dopo aver aggiunto i punti interni e aver salvato i segmenti e le facce, saliamo su nell'altezza e usiamo come 
+    base quello che era il tetto del passaggio precedente. andiamo avanti così fino a che il tetto non è lungo due a quel punto uniamo i punti con l'estremo superiore*/
+
+    // alloco lo spazio necessario per Cell1DsExtrema per la mesh temporanea
+    mesh2.Cell1DsExtrema = MatrixXi::Zero(2, mesh2.NumCell1Ds);
+    mesh2.Cell1DsId.reserve(mesh2.NumCell1Ds);
+    mesh2.VettoreVertici.reserve(mesh2.NumCell2Ds);
+    mesh2.VettoreLati.reserve(mesh2.NumCell2Ds);
+
+    // alloco lo spazio necessario per la mesh tirangolazione tipo due
+    meshTri.Cell1DsExtrema = MatrixXi::Zero(2, meshTri.NumCell1Ds);
+    meshTri.Cell1DsId.reserve(meshTri.NumCell1Ds);
+    meshTri.VettoreVertici.reserve(meshTri.NumCell2Ds);
+    meshTri.VettoreLati.reserve(meshTri.NumCell2Ds);
+
+    // creo il contatore per contare l'id dei lati di mesh2 temporanea
+    unsigned int ContaIdPuntiMesh2 = contIdPunti + 1;
+    unsigned int contaIdLatiMesh2 = 0;
+
+    // creo il contatore per contare l'id dei lati di meshTri
+    unsigned int IdPuntiMeshTri = contIdPunti + 1;
+    unsigned int IdLatiMeshTri = 0;
+
+
+    for(unsigned int idFaccia = 0; idFaccia < mesh1.NumCell2Ds; idFaccia++) {
+        cout << endl;
+        cout << "FACCIA NUMERO " << idFaccia << endl;
+        cout << "il conta punti è arrivato a (ho già aggiunto uno in più) " << ContaIdPuntiMesh2 << endl;;
+
+        // trovo la base e le altezze su cui salire, CAMBIARE IL DIZIONARIO IN UN VECTOR DI VECTOR
+        vector<unsigned int> base = vecFacce[idFaccia][0];
+        vector<unsigned int> lato1 = vecFacce[idFaccia][1];  
+        vector<unsigned int> lato2 = vecFacce[idFaccia][2];
+
+
+        // inverto i vettori per avere compatibilità
+        for(unsigned int i = 0; i < base.size(); i++){
+            cout << "base " << base[i] << " ";
+        }
+        cout << endl;
+
+        for(unsigned int i = 0; i < base.size(); i++){
+         
+            cout << "altezza1 " << lato1[i] << " ";
+            
+        }
+        cout << endl;
+
+        for(unsigned int i = 0; i < base.size(); i++){
+            cout << "altezza2 " << lato2[i] << " ";
+        }
+        cout << endl;
+ 
+        if ( (lato1[0] != base[0]) & (lato1[0] != base[base.size()-1])){
+              reverse( lato1.begin(),  lato1.end());
+        }
+
+        for(unsigned int i = 0; i < base.size(); i++){
+         
+           cout << "altezza1 Nuova " << lato1[i] << " ";
+            
+        }
+        cout << endl;
+
+        if ( (lato2[0] != base[0]) & (lato2[0] != base[base.size()-1])){
+              reverse( lato2.begin(),  lato2.end());
+        }
+
+        for(unsigned int i = 0; i < base.size(); i++){
+            cout << "altezza2 Nuova " << lato2[i] << " ";
+        }
+        cout << endl;
+
+        // aggiusto i vettori per fare in modo che altezza 1 inizi come base e altezza 2 inizi come finisce base
+        vector<unsigned int> altezza1;
+        vector<unsigned int> altezza2;
+        if(lato1[0] == base[0]){
+            altezza1 = lato1;
+            altezza2 = lato2;
+        }else{
+            altezza1 = lato2;
+            altezza2 = lato1;
+        }
+
+
+
+        cout << endl;
+        for(unsigned int h = 1; h < altezza1.size()-1; h++){
+            // trovo il vettore direzione del tetto
+            cout << "mi muovo sulle altezze e h = " << h << endl;
+            unsigned int idEstremo1 = altezza1[h];
+            unsigned int idEstremo2 = altezza2[h];
+            cout << "idEstremo1 " << idEstremo1 << " idEstremo2 " << idEstremo2 << endl;
+
+            // prendiamo le coordinate degli estremi
+            Vector3d Estremo1(mesh2.Cell0DsCoordinates(0,idEstremo1),mesh2.Cell0DsCoordinates(1,idEstremo1),mesh2.Cell0DsCoordinates(2,idEstremo1));
+            Vector3d Estremo2(mesh2.Cell0DsCoordinates(0,idEstremo2),mesh2.Cell0DsCoordinates(1,idEstremo2),mesh2.Cell0DsCoordinates(2,idEstremo2));
+            cout << "estremo 1 " <<Estremo1(0) << " " << Estremo1(1) << " " << Estremo1(2) << endl;
+            cout << "estremo 2 " <<Estremo2(0) << " " << Estremo2(1) << " " << Estremo2(2) << endl;
+        
+            // vettore con la direzione del tetto
+            Vector3d VettoreDirezione = Estremo2 - Estremo1;
+            cout << "Vettore direzione " << " " << VettoreDirezione(0) << " " <<VettoreDirezione(1) << " " <<VettoreDirezione(2) << endl;
+
+
+            vector<unsigned int> tetto = {altezza1[h]};
+            cout << "tetto ";
+            for(unsigned int indice = 0; indice < tetto.size(); indice++){
+                cout << tetto[indice] << " "; 
+            }
+            cout << endl;
+            
+            int lunghezzaBase = base.size();
+            for(int scorri = 0; scorri < 2*lunghezzaBase-2; scorri ++){
+                 
+                cout << "scorri " << scorri << endl;
+                
+                if(scorri % 2 == 0){
+                    // MESH TEMPORANEA
+                    //stiamo scorrendo sulla base 
+                    unsigned int id1 = tetto[tetto.size()-1];
+                    unsigned int id2 = base[scorri/2];
+                    inserisciLati(mesh2.Cell1DsExtrema, mesh2.Cell1DsId , contaIdLatiMesh2, id1, id2);
+                    cout << "primo lato base fatto " << endl;
+                    // inseriamo il secondo lato
+                    id1 = base[scorri/2];
+                    id2 = base[scorri/2+1];
+                    inserisciLati(mesh2.Cell1DsExtrema, mesh2.Cell1DsId , contaIdLatiMesh2, id1, id2);
+                    cout << "secondo lato base fatto" << endl;
+                    // inserisco i vertici della faccia dentro a vettore vertici
+                    vector<unsigned int> vecpunti = {base[scorri/2], tetto[tetto.size()-1], base[scorri/2+1]};
+                    mesh2.VettoreVertici.push_back(vecpunti);
+
+                    // TRIANGOLAZIONE DI TIPO DUE
+                    // creo il baricentro relativo alla faccia triangolare piccolina e lo salvo
+                    Vector3d baricentro;
+                    CreaBaricentro(mesh2.Cell0DsCoordinates, vecpunti, baricentro);
+                    meshTri.Cell0DsCoordinates(0, IdPuntiMeshTri) = baricentro(0);
+                    meshTri.Cell0DsCoordinates(1, IdPuntiMeshTri) = baricentro(1);
+                    meshTri.Cell0DsCoordinates(2, IdPuntiMeshTri) = baricentro(2);
+                    meshTri.Cell0DsId.push_back(IdPuntiMeshTri);
+                    IdPuntiMeshTri += 1;
+
+                    // aggiungo i possibili punti sui bordi del poligono platonico
+                    id1 = tetto[tetto.size()-1];
+                    id2 = base[scorri/2];
+                    Vector3d Medio;
+                    ControllaBordi(latiCompleti, id1, id2, mesh2.Cell0DsCoordinates, Medio);
+
+
+
+                }else{
+                    // stiamo scorrendo sul tetto
+
+                    // troviamo il nuovo punto di tetto, divido per b-h perchè il tetto è sempre diviso in meno parti, e lo inserisco 
+                    if(scorri < 2*lunghezzaBase-5){
+                        
+                        cout << "SCORRI" <<scorri << "BASE"<< 2*lunghezzaBase-5<< endl;
+                        Vector3d NuovoPuntoTetto = Estremo1 + VettoreDirezione * (scorri+1)/(2*(double)(b-h));
+
+                        mesh2.Cell0DsCoordinates(0,ContaIdPuntiMesh2) = NuovoPuntoTetto(0);
+                        mesh2.Cell0DsCoordinates(1,ContaIdPuntiMesh2) = NuovoPuntoTetto(1);
+                        mesh2.Cell0DsCoordinates(2,ContaIdPuntiMesh2) = NuovoPuntoTetto(2);
+                        mesh2.Cell0DsId.push_back(ContaIdPuntiMesh2);
+                        
+                        cout << "idNuovoPunto " << ContaIdPuntiMesh2 << endl;
+                        tetto.push_back(ContaIdPuntiMesh2);
+                        ContaIdPuntiMesh2 += 1;
+                        // inserisco l'id di questo punto in tetto
+                        
+                        cout << "tetto ";
+                        for(unsigned int indice = 0; indice < tetto.size(); indice++){
+                            cout << tetto[indice] << " "; 
+                        }
+                        cout << endl;
+
+                    }else{ 
+                        tetto.push_back(altezza2[h]);
+                        
+                        cout << "arrivo all'ultimo punto di tetto" << endl;
+                        cout << "tetto ";
+                        for(unsigned int indice = 0; indice < tetto.size(); indice++){
+                            cout << tetto[indice] << " "; 
+                        }
+                        cout << endl;
+                    }
+
+                    // inseriamo il primo lato (tetto con la base)
+                    unsigned int id1 = base[scorri+2-tetto.size()];
+                    unsigned int id2 = tetto[tetto.size()-2];
+                    inserisciLati(mesh2.Cell1DsExtrema, mesh2.Cell1DsId , contaIdLatiMesh2, id1, id2);
+                    cout << "primo lato tetto fatto " << endl;
+
+                    // inseriamo il secondo lato (tetto con il tetto) controllando che nell'ultima iterazione non metta tetto-tetto
+                    id1 = tetto[tetto.size()-1];
+                    id2 = tetto[tetto.size()-2];
+                    inserisciLati(mesh2.Cell1DsExtrema, mesh2.Cell1DsId , contaIdLatiMesh2, id1, id2);
+                    cout << "secondo lato tetto fatto" << endl;
+
+                    // inseriscoi vertici della faccia dentro al vettore vertici evitando di aggiungere una faccia quando arrivo all'ultimo elemento di tetto
+                    if(scorri < 2*lunghezzaBase-3){
+                        vector<unsigned int> vecpunti = {tetto[tetto.size()-2],base[scorri+2-tetto.size()],tetto[tetto.size()-1]};
+                        mesh2.VettoreVertici.push_back(vecpunti);
+                    
+                    }
+
+
+                }
+            }       
+        
+
+            tetto.pop_back();
+            base = tetto;
+            for(unsigned int i = 0; i < base.size(); i++){
+                cout << "base " << base[i] << " ";
+            }
+            cout << endl; 
+    
+        }        
+
+    // inserisco a mano gli ultimi due lati
+    unsigned int id1 = altezza1[altezza1.size()-1];
+    unsigned int id2 = base[0];
+    inserisciLati(mesh2.Cell1DsExtrema, mesh2.Cell1DsId , contaIdLatiMesh2, id1, id2);
+    cout << "primo lato tetto fatto " << endl;
+
+    id1 = altezza1[altezza1.size()-1];
+    id2 = base[1];
+    inserisciLati(mesh2.Cell1DsExtrema, mesh2.Cell1DsId , contaIdLatiMesh2, id1, id2);
+    cout << "primo lato tetto fatto " << endl;
+
+    // inserisco l'ultima faccia
+    vector<unsigned int> vecpunti = {base[0],altezza1[altezza1.size()-1],base[1]};
+    mesh2.VettoreVertici.push_back(vecpunti);
+
+    
+    }
 }
 
 }

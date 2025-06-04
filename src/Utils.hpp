@@ -57,4 +57,13 @@ namespace PolygonalLibrary{
     // implementa l'algoritmo BFS
     bool Dijkstra(const unsigned int& n,const vector<vector<unsigned int>>& LA, const unsigned int& start, const unsigned int& end, MatrixXd& matrice, vector<unsigned int>& path);
 
+    // crea il baricentro nella triangolazione di tipo due
+    bool CreaBaricentro(const MatrixXd& Coordinate, const vector<unsigned int>& vecpunti, Vector3d& baricentro);
+
+    // controlla se sul bordo si deve aggiungere un punto e nel caso trova le sue coordinate
+    bool ControllaBordi(const vector<vector<unsigned int>>& latiCompleti, const unsigned int& id1, const unsigned int& id2, const MatrixXd& Coordinate, Vector3d& Medio);
+
+    // trova la triangolazione di tipo due dei punti di un poligono
+    bool TriangolazioneDue(const PolygonalMesh& mesh1, PolygonalMesh& meshTri, const unsigned int& b, const unsigned int& q);
+
 }
