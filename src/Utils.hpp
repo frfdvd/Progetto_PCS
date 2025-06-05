@@ -58,16 +58,16 @@ namespace PolygonalLibrary{
     bool Dijkstra(const unsigned int& n,const vector<vector<unsigned int>>& LA, const unsigned int& start, const unsigned int& end, MatrixXd& matrice, vector<unsigned int>& path);
 
     // crea il baricentro nella triangolazione di tipo due, lo aggiunge a meshtri e anche alla mappa dei baricentri
-    bool CreaBaricentro(PolygonalMesh& meshTri, const PolygonalMesh& mesh2,const vector<unsigned int>& vecpunti, const unsigned int& IdBar, map<unsigned int, vector<unsigned int>>& map);
+    bool CreaBaricentro(PolygonalMesh& meshTri,const vector<unsigned int>& vecpunti, const unsigned int& IdBar, map<unsigned int, vector<unsigned int>>& map);
 
     // controlla se sul bordo si deve aggiungere un punto e nel caso trova le sue coordinate
-    bool ControllaBordi(const vector<vector<unsigned int>>& latiCompleti, const unsigned int& id1, const unsigned int& id2, const MatrixXd& Coordinate, Vector3d& Medio, PolygonalMesh& meshTri, const unsigned int& contapunti);
-
+    bool ControllaBordi(const vector<vector<unsigned int>>& latiCompleti, const unsigned int& id1, const unsigned int& id2, Vector3d& Medio, PolygonalMesh& meshTri, unsigned int& contapunti, bool& Duplicato, unsigned int& IdTrovato);
+    
     // congiunge il baricentro di ogni faccina con i suoi estremi
     bool AggiungiLati(PolygonalMesh& meshTri,const vector<unsigned int>& vecpunti, const unsigned int& IdBar, unsigned int& contatore);
 
     // collega i baricenti dei triangolini
-    bool CollegaBaricentri(const map<unsigned int, vector<unsigned int>>& MapBaricentri,const unsigned int& IdBaricentro, PolygonalMesh& meshTri, unsigned int& contaLati);
+    bool CollegaBaricentri(const map<unsigned int, vector<unsigned int>>& MapBaricentri,const unsigned int& IdBaricentro, PolygonalMesh& meshTri, unsigned int& contaLati, const vector<unsigned int>& baricentri);
 
     // trova la triangolazione di tipo due dei punti di un poligono
     bool TriangolazioneDue(const PolygonalMesh& mesh1, PolygonalMesh& meshTri, const unsigned int& b, const unsigned int& q);
