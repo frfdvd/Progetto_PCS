@@ -19,9 +19,9 @@ int main(){
     PolygonalMesh meshTriangolata;
     PolygonalMesh meshDuale;
 
-    unsigned int b = 3;
+    unsigned int b = 7;
     unsigned int p = 3;
-    unsigned int q = 3;
+    unsigned int q = 4;
     //unsigned int id1 = 0;
     //unsigned int id2 = 5;
     string Poliedro = RiconosciPoliedro(q);
