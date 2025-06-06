@@ -1401,9 +1401,12 @@ bool AggiungiLati(PolygonalMesh& meshTri,const vector<unsigned int>& vecpunti, c
 
 /**********************************/
 
-bool CollegaBaricentri(const map<unsigned int, vector<unsigned int>>& MapBaricentri,const unsigned int& IdBaricentro, PolygonalMesh& meshTri, unsigned int& contaLati, const vector<unsigned int>& baricentri){
+bool CollegaBaricentri(const map<unsigned int, vector<unsigned int>>& MapBaricentri,const unsigned int& IdBaricentro, PolygonalMesh& meshTri, unsigned int& contaLati, const vector<unsigned int>& baricentri, unsigned int& contaIdFacce){
     vector<unsigned int> vettore1 = MapBaricentri.at(IdBaricentro);
     unsigned int quanti = 0;
+    vector<unsigned int> VerticiAdiacenti;
+    VerticiAdiacenti.reserve(3);
+    
     for(const auto& chiave : MapBaricentri){
         if(find(baricentri.begin(), baricentri.end(), chiave.first) != baricentri.end() ){
             vector<unsigned int> vettore2 = chiave.second;
@@ -1411,6 +1414,7 @@ bool CollegaBaricentri(const map<unsigned int, vector<unsigned int>>& MapBaricen
                 for(unsigned int elemento2 : vettore2){
                     if(elemento1 == elemento2){
                         quanti += 1;
+                        VerticiAdiacenti.push_back(elemento1);
                     }
                 }
             }
@@ -1421,9 +1425,21 @@ bool CollegaBaricentri(const map<unsigned int, vector<unsigned int>>& MapBaricen
                 meshTri.Cell1DsExtrema(1, contaLati) = chiave.first;
                 meshTri.Cell1DsId.push_back(contaLati);
                 contaLati += 1;
+
+                // aggiungiamo le due facce
+                vector<unsigned int> vecVertici = {IdBaricentro, chiave.first, VerticiAdiacenti[0]};
+                meshTri.VettoreVertici.push_back(vecVertici);
+                meshTri.Cell2DsId.push_back(contaIdFacce);
+                contaIdFacce += 1;
+
+                vecVertici = {IdBaricentro, chiave.first, VerticiAdiacenti[1]};
+                meshTri.VettoreVertici.push_back(vecVertici);
+                meshTri.Cell2DsId.push_back(contaIdFacce);
+                contaIdFacce += 1;
             }
 
         quanti = 0;
+        VerticiAdiacenti = {};
         }
     }
 
@@ -1617,6 +1633,7 @@ bool TriangolazioneDue(const PolygonalMesh& mesh1, PolygonalMesh& meshTri, const
     meshTri.Cell1DsId.reserve(meshTri.NumCell1Ds);
     meshTri.VettoreVertici.reserve(meshTri.NumCell2Ds);
     meshTri.VettoreLati.reserve(meshTri.NumCell2Ds);
+    meshTri.Cell2DsId.push_back(meshTri.NumCell2Ds);
 
     // creo il contatore per contare l'id dei lati di mesh2 temporanea
     unsigned int ContaIdPuntiMesh2 = contIdPunti + 1;
@@ -1625,6 +1642,7 @@ bool TriangolazioneDue(const PolygonalMesh& mesh1, PolygonalMesh& meshTri, const
     // creo il contatore per contare l'id dei lati di meshTri
     unsigned int IdPuntiMeshTri = contIdPunti + 1;
     unsigned int IdLatiMeshTri = 0;
+    unsigned int IdFacceMeshtri = 0;
     // creo una map che contiene come chiavi gli id dei baricentri e come valore un vettore che contiene gli id dei punti che l'hanno generato
     map<unsigned int, vector<unsigned int>> MapBaricentri;
 
@@ -1769,12 +1787,33 @@ bool TriangolazioneDue(const PolygonalMesh& mesh1, PolygonalMesh& meshTri, const
                             AggiungiLati(meshTri, vecpunti1, IdPuntiMeshTri, IdLatiMeshTri);
                             cout << "passo come baricentro " << IdBaricentro;
                             cout << "id del punto sul bordo " << IdPuntiMeshTri << endl;
+                            // aggiungo una faccia
+                            vector<unsigned int> vecVertici = {IdPuntiMeshTri, IdBaricentro, id1};
+                            meshTri.VettoreVertici.push_back(vecVertici);
+                            meshTri.Cell2DsId.push_back(IdFacceMeshtri);
+                            IdFacceMeshtri += 1;
+                            // aggiungo l'altra
+                            vecVertici = {IdPuntiMeshTri, IdBaricentro, id2};
+                            meshTri.VettoreVertici.push_back(vecVertici);
+                            meshTri.Cell2DsId.push_back(IdFacceMeshtri);
+                            IdFacceMeshtri += 1;
                             IdPuntiMeshTri += 1;
                         }else{
                             int idBarIntero = IdBaricentro;
                             meshTri.Cell1DsExtrema(0, IdLatiMeshTri) = idBarIntero;
                             meshTri.Cell1DsExtrema(1, IdLatiMeshTri) = IdTrovato;
                             meshTri.Cell1DsId.push_back(IdLatiMeshTri);
+                            // aggiungo una faccia
+                            vector<unsigned int> vecVertici = {IdTrovato, IdBaricentro, id1};
+                            meshTri.VettoreVertici.push_back(vecVertici);
+                            meshTri.Cell2DsId.push_back(IdFacceMeshtri);
+                            IdFacceMeshtri += 1;
+                            // aggiungo l'altra
+                            vecVertici = {IdTrovato, IdBaricentro, id2};
+                            meshTri.VettoreVertici.push_back(vecVertici);
+                            meshTri.Cell2DsId.push_back(IdFacceMeshtri);
+                            IdFacceMeshtri += 1;
+                            
                             IdLatiMeshTri += 1;
                         }
                     }
@@ -1791,12 +1830,33 @@ bool TriangolazioneDue(const PolygonalMesh& mesh1, PolygonalMesh& meshTri, const
                             AggiungiLati(meshTri, vecpunti1, IdPuntiMeshTri, IdLatiMeshTri);
                             cout << "passo come baricentro " << IdBaricentro;
                             cout << "id del punto sul bordo " << IdPuntiMeshTri << endl;
+                            // aggiungo una faccia
+                            vector<unsigned int> vecVertici = {IdPuntiMeshTri, IdBaricentro, id1};
+                            meshTri.VettoreVertici.push_back(vecVertici);
+                            meshTri.Cell2DsId.push_back(IdFacceMeshtri);
+                            IdFacceMeshtri += 1;
+                            // aggiungo l'altra
+                            vecVertici = {IdPuntiMeshTri, IdBaricentro, id2};
+                            meshTri.VettoreVertici.push_back(vecVertici);
+                            meshTri.Cell2DsId.push_back(IdFacceMeshtri);
+                            IdFacceMeshtri += 1;
                             IdPuntiMeshTri += 1;
                         }else{
                             int idBarIntero = IdBaricentro;
                             meshTri.Cell1DsExtrema(0, IdLatiMeshTri) = idBarIntero;
                             meshTri.Cell1DsExtrema(1, IdLatiMeshTri) = IdTrovato;
                             meshTri.Cell1DsId.push_back(IdLatiMeshTri);
+                            // aggiungo una faccia
+                            vector<unsigned int> vecVertici = {IdTrovato, IdBaricentro, id1};
+                            meshTri.VettoreVertici.push_back(vecVertici);
+                            meshTri.Cell2DsId.push_back(IdFacceMeshtri);
+                            IdFacceMeshtri += 1;
+                            // aggiungo l'altra
+                            vecVertici = {IdTrovato, IdBaricentro, id2};
+                            meshTri.VettoreVertici.push_back(vecVertici);
+                            meshTri.Cell2DsId.push_back(IdFacceMeshtri);
+                            IdFacceMeshtri += 1;
+                            
                             IdLatiMeshTri += 1;
                         }
                     }
@@ -1817,12 +1877,34 @@ bool TriangolazioneDue(const PolygonalMesh& mesh1, PolygonalMesh& meshTri, const
                                 AggiungiLati(meshTri, vecpunti1, IdPuntiMeshTri, IdLatiMeshTri);
                                 cout << "passo come baricentro " << IdBaricentro;
                                 cout << "id del punto sul bordo " << IdPuntiMeshTri << endl;
+                                // aggiungo una faccia
+                                vector<unsigned int> vecVertici = {IdPuntiMeshTri, IdBaricentro, id1};
+                                meshTri.VettoreVertici.push_back(vecVertici);
+                                meshTri.Cell2DsId.push_back(IdFacceMeshtri);
+                                IdFacceMeshtri += 1;
+                                // aggiungo l'altra
+                                vecVertici = {IdPuntiMeshTri, IdBaricentro, id2};
+                                meshTri.VettoreVertici.push_back(vecVertici);
+                                meshTri.Cell2DsId.push_back(IdFacceMeshtri);
+                                IdFacceMeshtri += 1;
+                                
                                 IdPuntiMeshTri += 1;
                             }else{
                                 int idBarIntero = IdBaricentro;
                                 meshTri.Cell1DsExtrema(0, IdLatiMeshTri) = idBarIntero;
                                 meshTri.Cell1DsExtrema(1, IdLatiMeshTri) = IdTrovato;
                                 meshTri.Cell1DsId.push_back(IdLatiMeshTri);
+                                // aggiungo una faccia
+                                vector<unsigned int> vecVertici = {IdTrovato, IdBaricentro, id1};
+                                meshTri.VettoreVertici.push_back(vecVertici);
+                                meshTri.Cell2DsId.push_back(IdFacceMeshtri);
+                                IdFacceMeshtri += 1;
+                                // aggiungo l'altra
+                                vecVertici = {IdTrovato, IdBaricentro, id2};
+                                meshTri.VettoreVertici.push_back(vecVertici);
+                                meshTri.Cell2DsId.push_back(IdFacceMeshtri);
+                                IdFacceMeshtri += 1;
+                                
                                 IdLatiMeshTri += 1;
                             }
                         }
@@ -1830,7 +1912,7 @@ bool TriangolazioneDue(const PolygonalMesh& mesh1, PolygonalMesh& meshTri, const
                     }
 
                     // aggiungo i lati che uniscono i due baricentri
-                    CollegaBaricentri(MapBaricentri, IdBaricentro, meshTri, IdLatiMeshTri, BaricentriXFaccia);
+                    CollegaBaricentri(MapBaricentri, IdBaricentro, meshTri, IdLatiMeshTri, BaricentriXFaccia, IdFacceMeshtri);
 
 
                 }else{
@@ -1923,7 +2005,7 @@ bool TriangolazioneDue(const PolygonalMesh& mesh1, PolygonalMesh& meshTri, const
                         unsigned int IdBaricentro = IdPuntiMeshTri;
                         IdPuntiMeshTri += 1;
 
-                        CollegaBaricentri(MapBaricentri, IdBaricentro, meshTri, IdLatiMeshTri, BaricentriXFaccia);
+                        CollegaBaricentri(MapBaricentri, IdBaricentro, meshTri, IdLatiMeshTri, BaricentriXFaccia, IdFacceMeshtri);
                         cout << "collega i baricentri" << endl;
                     }
 
@@ -1974,12 +2056,34 @@ bool TriangolazioneDue(const PolygonalMesh& mesh1, PolygonalMesh& meshTri, const
             AggiungiLati(meshTri, vecpunti1, IdPuntiMeshTri, IdLatiMeshTri);
             cout << "passo come baricentro " << IdBaricentro;
             cout << "id del punto sul bordo " << IdPuntiMeshTri << endl;
+            // aggiungo una faccia
+            vector<unsigned int> vecVertici = {IdPuntiMeshTri, IdBaricentro, id1};
+            meshTri.VettoreVertici.push_back(vecVertici);
+            meshTri.Cell2DsId.push_back(IdFacceMeshtri);
+            IdFacceMeshtri += 1;
+            // aggiungo l'altra
+            vecVertici = {IdPuntiMeshTri, IdBaricentro, id2};
+            meshTri.VettoreVertici.push_back(vecVertici);
+            meshTri.Cell2DsId.push_back(IdFacceMeshtri);
+            IdFacceMeshtri += 1;
+            
             IdPuntiMeshTri += 1;
         }else{
             int idBarIntero = IdBaricentro;
             meshTri.Cell1DsExtrema(0, IdLatiMeshTri) = idBarIntero;
             meshTri.Cell1DsExtrema(1, IdLatiMeshTri) = IdTrovato;
             meshTri.Cell1DsId.push_back(IdLatiMeshTri);
+            // aggiungo una faccia
+            vector<unsigned int> vecVertici = {IdTrovato, IdBaricentro, id1};
+            meshTri.VettoreVertici.push_back(vecVertici);
+            meshTri.Cell2DsId.push_back(IdFacceMeshtri);
+            IdFacceMeshtri += 1;
+            // aggiungo l'altra
+            vecVertici = {IdTrovato, IdBaricentro, id2};
+            meshTri.VettoreVertici.push_back(vecVertici);
+            meshTri.Cell2DsId.push_back(IdFacceMeshtri);
+            IdFacceMeshtri += 1;
+            
             IdLatiMeshTri += 1;
         } 
     }
@@ -1995,21 +2099,89 @@ bool TriangolazioneDue(const PolygonalMesh& mesh1, PolygonalMesh& meshTri, const
             AggiungiLati(meshTri, vecpunti1, IdPuntiMeshTri, IdLatiMeshTri);
             cout << "passo come baricentro " << IdBaricentro;
             cout << "id del punto sul bordo " << IdPuntiMeshTri << endl;
+            // aggiungo una faccia
+            vector<unsigned int> vecVertici = {IdPuntiMeshTri, IdBaricentro, id1};
+            meshTri.VettoreVertici.push_back(vecVertici);
+            meshTri.Cell2DsId.push_back(IdFacceMeshtri);
+            IdFacceMeshtri += 1;
+            // aggiungo l'altra
+            vecVertici = {IdPuntiMeshTri, IdBaricentro, id2};
+            meshTri.VettoreVertici.push_back(vecVertici);
+            meshTri.Cell2DsId.push_back(IdFacceMeshtri);
+            IdFacceMeshtri += 1;
+             
             IdPuntiMeshTri += 1;
         }else{
             int idBarIntero = IdBaricentro;
             meshTri.Cell1DsExtrema(0, IdLatiMeshTri) = idBarIntero;
             meshTri.Cell1DsExtrema(1, IdLatiMeshTri) = IdTrovato;
             meshTri.Cell1DsId.push_back(IdLatiMeshTri);
+            // aggiungo una faccia
+            vector<unsigned int> vecVertici = {IdTrovato, IdBaricentro, id1};
+            meshTri.VettoreVertici.push_back(vecVertici);
+            meshTri.Cell2DsId.push_back(IdFacceMeshtri);
+            IdFacceMeshtri += 1;
+            // aggiungo l'altra
+            vecVertici = {IdTrovato, IdBaricentro, id2};
+            meshTri.VettoreVertici.push_back(vecVertici);
+            meshTri.Cell2DsId.push_back(IdFacceMeshtri);
+            IdFacceMeshtri += 1;
+            
             IdLatiMeshTri += 1;
         } 
     }
-    CollegaBaricentri(MapBaricentri, IdBaricentro, meshTri, IdLatiMeshTri, BaricentriXFaccia);
+        CollegaBaricentri(MapBaricentri, IdBaricentro, meshTri, IdLatiMeshTri, BaricentriXFaccia, IdFacceMeshtri);
 
-    BaricentriXFaccia = {};
-}
+        BaricentriXFaccia = {};
+    }
 
-return true;
+    cout << "stampo vettore vertici " << endl;
+    for(unsigned int idFaccia = 0; idFaccia < meshTri.VettoreVertici.size(); idFaccia++){
+        cout << "faccia " << idFaccia << " ";
+        for(unsigned int idPunto : meshTri.VettoreVertici[idFaccia]){
+            cout << idPunto << " "; 
+        }
+        cout << endl;
+    }
+
+
+    // riempio il VettoreLati per ogni faccia in ordine
+    for(vector<unsigned int> vertici : meshTri.VettoreVertici){
+        int id1 = vertici[0];
+        int id2 = vertici[1];
+        int id3 = vertici[2];
+
+        vector<unsigned int> vettoreAggiuntivo;
+        vettoreAggiuntivo = {0,0,0};
+        
+        // con questi if faccio in modo da mettere i lati in posizione corretta
+        for(unsigned int idl = 0; idl < meshTri.Cell1DsExtrema.cols(); idl++){
+            if( ( meshTri.Cell1DsExtrema(0,idl) == id1 ||  meshTri.Cell1DsExtrema(1,idl) == id1) & ( meshTri.Cell1DsExtrema(0,idl) == id2 ||  meshTri.Cell1DsExtrema(1,idl) == id2) ){
+                vettoreAggiuntivo[0] = idl;
+            }else if( ( meshTri.Cell1DsExtrema(0,idl) == id2 ||  meshTri.Cell1DsExtrema(1,idl) == id2) & ( meshTri.Cell1DsExtrema(0,idl) == id3 ||  meshTri.Cell1DsExtrema(1,idl) == id3) ){
+                vettoreAggiuntivo[1] = idl;
+            }else if(( meshTri.Cell1DsExtrema(0,idl) == id1 ||  meshTri.Cell1DsExtrema(1,idl) == id1) & ( meshTri.Cell1DsExtrema(0,idl) == id3 ||  meshTri.Cell1DsExtrema(1,idl) == id3)){
+                vettoreAggiuntivo[2] = idl; 
+            }
+                
+                
+        }
+        meshTri.VettoreLati.push_back(vettoreAggiuntivo);
+    }
+
+
+    cout << "stampo vettore lati " << endl;
+    for(unsigned int idFaccia = 0; idFaccia < meshTri.VettoreLati.size(); idFaccia++){
+        cout << "faccia " << idFaccia << " ";
+        for(unsigned int idPunto : meshTri.VettoreLati[idFaccia]){
+            cout << idPunto << " "; 
+        }
+        cout << endl;
+    }
+
+    ProiettaPunti(meshTri.Cell0DsCoordinates);
+
+    return true;
 }
 
 }

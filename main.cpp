@@ -16,14 +16,17 @@ int main(){
     
     // creo un oggetto mesh
     PolygonalMesh mesh;
-    PolygonalMesh meshTriangolata;
-    PolygonalMesh meshDuale;
+    PolygonalMesh meshTriangolata1;
+    PolygonalMesh meshTriangolata2;
+    PolygonalMesh meshDuale1;
+    PolygonalMesh meshDuale2;
 
-    unsigned int b = 7;
+
+    unsigned int b = 3;
     unsigned int p = 3;
-    unsigned int q = 4;
-    //unsigned int id1 = 0;
-    //unsigned int id2 = 5;
+    unsigned int q = 3;
+    unsigned int id1 = 0;
+    unsigned int id2 = 5;
     string Poliedro = RiconosciPoliedro(q);
 
     cout << Poliedro << endl;
@@ -48,48 +51,52 @@ int main(){
                              mesh.Cell1DsExtrema);
 
     
-    if(!TriangolazioneDue(mesh, meshTriangolata, b, q))
+    if(!TriangolazioneDue(mesh, meshTriangolata2, b, q))
     {
         cerr << "error during triangolation" << endl;
         return 1;
     }
                              
-    string ParaviewPuntiTriangolati = "./Cell0DTriang2.inp";
-    string ParaviewSegmentiTriangolati = "./Cell1DTriang2.inp";
+    string ParaviewPuntiTriangolati2 = "./Cell0DTriang2.inp";
+    string ParaviewSegmentiTriangolati2 = "./Cell1DTriang2.inp";
 
-    utilities.ExportPoints(ParaviewPuntiTriangolati, 
-                            meshTriangolata.Cell0DsCoordinates);
-    utilities.ExportSegments(ParaviewSegmentiTriangolati,
-                             meshTriangolata.Cell0DsCoordinates,
-                             meshTriangolata.Cell1DsExtrema);
+    utilities.ExportPoints(ParaviewPuntiTriangolati2, 
+                            meshTriangolata2.Cell0DsCoordinates);
+    utilities.ExportSegments(ParaviewSegmentiTriangolati2,
+                             meshTriangolata2.Cell0DsCoordinates,
+                             meshTriangolata2.Cell1DsExtrema);
 
 
-    /*if(!TriangolazioneUno(mesh, meshTriangolata, b, q))
+    if(!TriangolazioneUno(mesh, meshTriangolata1, b, q))
     {
         cerr << "error during triangolation" << endl;
         return 1;
     }
 
     
-    string ParaviewPuntiTriangolati = "./Cell0DTriang.inp";
-    string ParaviewSegmentiTriangolati = "./Cell1DTriang.inp";
+    string ParaviewPuntiTriangolati1 = "./Cell0DTriang1.inp";
+    string ParaviewSegmentiTriangolati1 = "./Cell1DTriang1.inp";
 
-    utilities.ExportPoints(ParaviewPuntiTriangolati, 
-                            meshTriangolata.Cell0DsCoordinates);
-    utilities.ExportSegments(ParaviewSegmentiTriangolati,
-                             meshTriangolata.Cell0DsCoordinates,
-                             meshTriangolata.Cell1DsExtrema);
+    utilities.ExportPoints(ParaviewPuntiTriangolati1, 
+                            meshTriangolata1.Cell0DsCoordinates);
+    utilities.ExportSegments(ParaviewSegmentiTriangolati1,
+                             meshTriangolata1.Cell0DsCoordinates,
+                             meshTriangolata1.Cell1DsExtrema);
  
 
 
-    calcolo il cammino minimo
-    if(!CamminoMinimo(meshTriangolata, id1, id2, ParaviewPuntiTriangolati, ParaviewSegmentiTriangolati)){
+    //calcolo il cammino minimo
+    if(!CamminoMinimo(meshTriangolata1, id1, id2, ParaviewPuntiTriangolati1, ParaviewSegmentiTriangolati1)){
+        return false;
+    }
+
+    if(!CamminoMinimo(meshTriangolata2, id1, id2, ParaviewPuntiTriangolati2, ParaviewSegmentiTriangolati2)){
         return false;
     }
 
     unsigned int qDuale = p;
     unsigned int pDuale = q;
-    if(!CreaDuale(meshTriangolata, meshDuale))
+    if(!CreaDuale(meshTriangolata1, meshDuale1))
     {
         cerr << "error during triangolation" << endl;
         return 1;
@@ -97,20 +104,41 @@ int main(){
 
     
 
-    string ParaviewPuntiDuale = "./Cell0DDuale.inp";
-    string ParaviewSegmentiDuale = "./Cell1DDuale.inp";
+    string ParaviewPuntiDuale1 = "./Cell0DDuale1.inp";
+    string ParaviewSegmentiDuale1 = "./Cell1DDuale1.inp";
     
-    utilities.ExportPoints(ParaviewPuntiDuale, 
-                            meshDuale.Cell0DsCoordinates);
-    utilities.ExportSegments(ParaviewSegmentiDuale,
-                             meshDuale.Cell0DsCoordinates,
-                             meshDuale.Cell1DsExtrema);
+    utilities.ExportPoints(ParaviewPuntiDuale1, 
+                            meshDuale1.Cell0DsCoordinates);
+    utilities.ExportSegments(ParaviewSegmentiDuale1,
+                             meshDuale1.Cell0DsCoordinates,
+                             meshDuale1.Cell1DsExtrema);
 
     
+    if(!CreaDuale(meshTriangolata2, meshDuale2))
+    {
+        cerr << "error during triangolation" << endl;
+        return 1;
+    }
+
+    
+
+    string ParaviewPuntiDuale2 = "./Cell0DDuale2.inp";
+    string ParaviewSegmentiDuale2 = "./Cell1DDuale2.inp";
+    
+    utilities.ExportPoints(ParaviewPuntiDuale2, 
+                            meshDuale2.Cell0DsCoordinates);
+    utilities.ExportSegments(ParaviewSegmentiDuale2,
+                            meshDuale2.Cell0DsCoordinates,
+                            meshDuale2.Cell1DsExtrema);
+
     // qua metto cammino minimo
-    if(!CamminoMinimo(meshDuale, id1, id2, ParaviewPuntiDuale, ParaviewSegmentiDuale)){
+    if(!CamminoMinimo(meshDuale1, id1, id2, ParaviewPuntiDuale1, ParaviewSegmentiDuale1)){
         return false;
-    }*/
+    }
+    
+    if(!CamminoMinimo(meshDuale2, id1, id2, ParaviewPuntiDuale2, ParaviewSegmentiDuale2)){
+        return false;
+    }
 
     return 0;
 }
