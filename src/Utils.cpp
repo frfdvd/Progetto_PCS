@@ -762,7 +762,7 @@ bool TriangolazioneUno(const PolygonalMesh& mesh1, PolygonalMesh& mesh2, const u
 
     // metto i punti di cell0dscoordinates su una sfera
 
-    //ProiettaPunti(mesh2.Cell0DsCoordinates);
+    ProiettaPunti(mesh2.Cell0DsCoordinates);
 
 return true;
 }
@@ -2045,7 +2045,7 @@ bool TriangolazioneDue(const PolygonalMesh& mesh1, PolygonalMesh& meshTri, const
         cout << endl;
     }
 
-    //ProiettaPunti(meshTri.Cell0DsCoordinates);
+    ProiettaPunti(meshTri.Cell0DsCoordinates);
 
     return true;
 }
