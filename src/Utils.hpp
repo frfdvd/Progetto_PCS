@@ -37,16 +37,8 @@ namespace PolygonalLibrary{
     // riconosce il poliedro che viene inserito
     string RiconosciPoliedro(const unsigned int& q);
 
-    // chiama a cascata le altre funzioni che importano la triangolazione di tipo uno di punti e lati
-    bool ImportTriangolazioneUno(const PolygonalMesh& mesh1, PolygonalMesh& mesh2, const unsigned int& b, const unsigned int& q);
-
     // trova la triangolazione di tipo uno dei punti di un poligono
     bool TriangolazioneUno(const PolygonalMesh& mesh1, PolygonalMesh& mesh2, const unsigned int& b, const unsigned int& q);
-
-    // trova la triangolazione di tipo uno dei lati di un poligono  
-    bool Cell1DTriangolazioneUno(const PolygonalMesh& mesh1, PolygonalMesh& mesh2, const unsigned int& b);
-
-    bool Cell0DTriangolazioneUno(const PolygonalMesh& mesh1, PolygonalMesh& mesh2, const unsigned int& b,const unsigned int& q);
 
     // crea il duale
     bool CreaDuale(const PolygonalMesh& mesh1, PolygonalMesh& mesh2);

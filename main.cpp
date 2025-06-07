@@ -22,7 +22,7 @@ int main(){
     PolygonalMesh meshDuale2;
 
 
-    unsigned int b = 3;
+    unsigned int b = 1;
     unsigned int p = 3;
     unsigned int q = 3;
     unsigned int id1 = 0;
@@ -50,7 +50,9 @@ int main(){
                              mesh.Cell0DsCoordinates,
                              mesh.Cell1DsExtrema);
 
-    
+    cout << "FACCIO LA TRIANGOLAZIONE DUE" << endl;
+    cout << endl;
+
     if(!TriangolazioneDue(mesh, meshTriangolata2, b, q))
     {
         cerr << "error during triangolation" << endl;
@@ -66,6 +68,8 @@ int main(){
                              meshTriangolata2.Cell0DsCoordinates,
                              meshTriangolata2.Cell1DsExtrema);
 
+    cout << "FACCIO LA TRIANGOLAZIONE UNO" << endl;
+    cout << endl;
 
     if(!TriangolazioneUno(mesh, meshTriangolata1, b, q))
     {
@@ -86,13 +90,21 @@ int main(){
 
 
     //calcolo il cammino minimo
+    cout << "FACCIO IL CAMMINO MINIMO 1" << endl;
+    cout << endl;
     if(!CamminoMinimo(meshTriangolata1, id1, id2, ParaviewPuntiTriangolati1, ParaviewSegmentiTriangolati1)){
         return false;
     }
 
+    cout << "FACCIO IL CAMMINO MINIMO 2" << endl;
+    cout << endl;
     if(!CamminoMinimo(meshTriangolata2, id1, id2, ParaviewPuntiTriangolati2, ParaviewSegmentiTriangolati2)){
         return false;
     }
+
+
+    cout << "FACCIO IL DUALE UNO" << endl;
+    cout << endl;
 
     unsigned int qDuale = p;
     unsigned int pDuale = q;
@@ -114,6 +126,9 @@ int main(){
                              meshDuale1.Cell1DsExtrema);
 
     
+    cout << "FACCIO IL DUALE DUE" << endl;
+    cout << endl;
+
     if(!CreaDuale(meshTriangolata2, meshDuale2))
     {
         cerr << "error during triangolation" << endl;

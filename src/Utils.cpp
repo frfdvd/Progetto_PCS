@@ -334,193 +334,13 @@ bool ProiettaPunti(MatrixXd& MatriceCoordinate){
 
 /**********************************/
 
-bool ImportTriangolazioneUno(const PolygonalMesh& mesh1, PolygonalMesh& mesh2, const unsigned int& b, const unsigned int& q){
-
-    if(!Cell0DTriangolazioneUno(mesh1, mesh2, b, q))
-        return false;
-
-    if(!Cell1DTriangolazioneUno(mesh1, mesh2, b))
-        return false;
-
-    return true;
-}
-
-bool Cell0DTriangolazioneUno(const PolygonalMesh& mesh1, PolygonalMesh& mesh2, const unsigned int& b, const unsigned int& q){
-    
-    unsigned int T = pow(b,2);
-
-    // salvo il numero di vertici, lati e facce usando le formule
-    if(q==3){
-        mesh2.NumCell0Ds = 2*T + 2;
-        mesh2.NumCell1Ds = 6*T;
-        mesh2.NumCell2Ds = 4*T;
-    }
-    else if(q==4){
-        mesh2.NumCell0Ds = 4*T + 2;
-        mesh2.NumCell1Ds = 12*T;
-        mesh2.NumCell2Ds = 8*T;
-    }
-    else if(q==5){
-        mesh2.NumCell0Ds = 10*T + 2;
-        mesh2.NumCell1Ds = 30*T;
-        mesh2.NumCell2Ds = 20*T;
-    }
-
-    // alloco lo spazio necessario per inserire le coordinte e gli id dei vertici
-    mesh2.Cell0DsCoordinates = MatrixXd::Zero(3, mesh2.NumCell0Ds);
-    mesh2.Cell0DsId.reserve(mesh2.NumCell0Ds);
-    
-    // inizializzo un contatore per avere gli id dei nuovi vertici
-    unsigned int contIdPunti = mesh1.NumCell0Ds - 1;
-
-    // aggiungo a mesh2 le coordinate dei punti di mesh1
-    for(unsigned int id : mesh1.Cell0DsId){
-        mesh2.Cell0DsId.push_back(id);
-        mesh2.Cell0DsCoordinates(0, id) = mesh1.Cell0DsCoordinates(0, id);
-        mesh2.Cell0DsCoordinates(1, id) = mesh1.Cell0DsCoordinates(1, id);
-        mesh2.Cell0DsCoordinates(2, id) = mesh1.Cell0DsCoordinates(2, id);
-    }
-    
-    // aggiungo le coordinate nuove (triangolazione) dei punti che stanno sui lati
-    for(unsigned int id : mesh1.Cell1DsId){
-        //cout << "id lato "<< id << endl;
-
-        // memorizzo gli estremi del lato e li metto dentro dei vettori
-        unsigned int idEstremo1 = mesh1.Cell1DsExtrema(0,id);
-        unsigned int idEstremo2 = mesh1.Cell1DsExtrema(1,id);
-
-
-
-        Vector3d Estremo1(mesh1.Cell0DsCoordinates(0,idEstremo1),mesh1.Cell0DsCoordinates(1,idEstremo1),mesh1.Cell0DsCoordinates(2,idEstremo1));
-        Vector3d Estremo2(mesh1.Cell0DsCoordinates(0,idEstremo2),mesh1.Cell0DsCoordinates(1,idEstremo2),mesh1.Cell0DsCoordinates(2,idEstremo2));
-        //cout << "estremo 1 " <<Estremo1(0) << Estremo1(1) << Estremo1(2) << endl;
-        //cout << "estremo 2 " <<Estremo2(0) << Estremo2(1) << Estremo2(2) << endl;
-        
-        // vettore con la direzione del lato
-        Vector3d VettoreDirezione = Estremo2 - Estremo1;
-        //cout << "Vettore direzione " << VettoreDirezione(0) <<VettoreDirezione(1) <<VettoreDirezione(2) << endl;
-        
-        // trovo i punti in mezzo ai lati e li memorizzo
-        for(unsigned int i = 0; i < b-1; i++){
-            Vector3d punto = Estremo1 + VettoreDirezione * (i+1)/(double)(b); 
-            //cout << "nuovo punto" <<punto << endl;
-
-            contIdPunti = contIdPunti + 1;
-            //cout << "id del nuovo punto "<<contIdPunti << endl;
-
-            // salvo i punti sulle strutture dati 
-            mesh2.Cell0DsId.push_back(contIdPunti);
-            mesh2.Cell0DsCoordinates(0, contIdPunti) = punto(0);
-            mesh2.Cell0DsCoordinates(1, contIdPunti) = punto(1);
-            mesh2.Cell0DsCoordinates(2, contIdPunti) = punto(2);
-        }
-    }
-    
-    /*for (int i = 0; i < mesh2.Cell0DsCoordinates.rows(); ++i) {
-        for (int j = 0; j < mesh2.Cell0DsCoordinates.cols(); ++j) {
-            std::cout << mesh2.Cell0DsCoordinates(i,j) << " ";
-        }
-        cout << endl;
-    }*/
-
-
-    // aggiungo le coordinate dei punti interni alle facce
-    for(unsigned int idFaccia : mesh1.Cell2DsId){
-        // prendo l'id del primo lato della faccia idFaccia
-         
-        unsigned int idLato = mesh1.VettoreLati[idFaccia][0];
-        cout << idLato << endl;
-
-        // prendo gli id degli estremi del primo lato della faccia idFaccia
-        unsigned int idEstremo1 = mesh1.Cell1DsExtrema(0,idLato);
-        unsigned int idEstremo2 = mesh1.Cell1DsExtrema(1,idLato);
-
-        // prendo l'id dell'estremo mancante 
-        unsigned int idEstremo3 = mesh1.VettoreVertici[idFaccia][2];
-
-        // FARE CONTROLLO/TEST CHE GLI ID SIANO DIVERSI
-
-        // vado a prendere le coordinate dei punti
-        Vector3d Estremo1(mesh1.Cell0DsCoordinates(0,idEstremo1),mesh1.Cell0DsCoordinates(1,idEstremo1),mesh1.Cell0DsCoordinates(2,idEstremo1));
-        Vector3d Estremo2(mesh1.Cell0DsCoordinates(0,idEstremo2),mesh1.Cell0DsCoordinates(1,idEstremo2),mesh1.Cell0DsCoordinates(2,idEstremo2));
-        Vector3d Estremo3(mesh1.Cell0DsCoordinates(0,idEstremo3),mesh1.Cell0DsCoordinates(1,idEstremo3),mesh1.Cell0DsCoordinates(2,idEstremo3));
-
-        // trovo le direzioni lungo le quali muovermi
-        Vector3d VettoreDirezione1 = Estremo3 - Estremo1;
-        Vector3d VettoreDirezione2 = Estremo3 - Estremo2;
-
-        for(unsigned int i = 0; i < b-1; i++){
-            // inizializzo un contatore che calcola in quanti punti devo dividere il lato
-
-            // trovo i punti sui lati nelle direzioni 
-            Vector3d puntoDir1 = Estremo1 + VettoreDirezione1 * (i+1)/(double)(b); 
-            Vector3d puntoDir2 = Estremo2 + VettoreDirezione2 * (i+1)/(double)(b);
-            //cout << "nuovo punto" <<punto << endl;
-            
-            // trovo la direzione che congiunge i due punti alla stessa altezza
-            Vector3d VettoreDirezione3 = puntoDir2 - puntoDir1;
-
-            for(unsigned int k = 0; k < b-2-i; k++){
-                // trovo i punti della triangolazione interna
-                Vector3d punto = puntoDir1 + VettoreDirezione3 * (k+1)/(double)(b-i-1);
-                
-
-                // trovo l'id dei punti continuando il conteggio di prima
-                contIdPunti = contIdPunti + 1;
-
-                // inseriamo il punto nuovo nelle strutture dati
-                mesh2.Cell0DsId.push_back(contIdPunti);
-                mesh2.Cell0DsCoordinates(0, contIdPunti) = punto(0);
-                mesh2.Cell0DsCoordinates(1, contIdPunti) = punto(1);
-                mesh2.Cell0DsCoordinates(2, contIdPunti) = punto(2);
-            }
-        }      
-    }
-    return true;
-}
-
-bool Cell1DTriangolazioneUno(const PolygonalMesh& mesh1, PolygonalMesh& mesh2, const unsigned int& b){
-    
-    //calcolo la lunghezza di un lato del poligono e poi di un lato della triangolazione
-    Vector3d coord1(mesh1.Cell0DsCoordinates(0,0), mesh1.Cell0DsCoordinates(1,0), mesh1.Cell0DsCoordinates(2,0));
-    Vector3d coord2(mesh1.Cell0DsCoordinates(0,1), mesh1.Cell0DsCoordinates(1,1), mesh1.Cell0DsCoordinates(2,1));
-    double d = (coord2 - coord1).norm();
-    double latotri = d / b ;
-
-    // faccio una copia della matrice con le coordinate
-    MatrixXd temp = mesh2.Cell0DsCoordinates;
-
-    //collego i punti che si trovano a distanza latotri
-    
-    mesh2.Cell1DsId.reserve(mesh2.NumCell1Ds);
-    // inizializzo il contatore per l'id dei lati 
-    unsigned int contaIdLati = 0;
-
-    // itero sulla matrice che contiene i punti 
-    for(unsigned int id : mesh2.Cell0DsId) {
-        Vector3d puntocfr(mesh2.Cell0DsCoordinates(0,id), mesh2.Cell0DsCoordinates(1,id), mesh2.Cell0DsCoordinates(2,id));
-        // confronto le distanze tra i punti facendo in modo che non esistano duplicati 
-        for(unsigned int idTemp = id; idTemp < temp.cols(); idTemp ++) {
-            Vector3d puntotemp(mesh2.Cell0DsCoordinates(0,idTemp), mesh2.Cell0DsCoordinates(1,idTemp), mesh2.Cell0DsCoordinates(2,idTemp));
-            double distanza = (puntocfr - puntotemp).norm();
-            // se la distanza è pari a latotri aggiungo il lato a cell1dextrema
-            if (abs(distanza - latotri) < numeric_limits<double>::epsilon()){  //non posso confrontare con 0!!!
-                mesh2.Cell1DsId.push_back(contaIdLati);
-                mesh2.Cell1DsExtrema(0,contaIdLati) = id;
-                mesh2.Cell1DsExtrema(1,contaIdLati) = idTemp;
-                contaIdLati = contaIdLati + 1;
-
-            }     
-            
-        }
-    }
-    return true;
-
-}
-
-/**********************************/
-
 bool TriangolazioneUno(const PolygonalMesh& mesh1, PolygonalMesh& mesh2, const unsigned int& b, const unsigned int& q){
+    
+    // tratto subito a parte il caso b = 1
+    if(b == 1){
+        mesh2 = mesh1;
+        return true;
+    }
     
     unsigned int T = pow(b,2);
 
@@ -942,7 +762,7 @@ bool TriangolazioneUno(const PolygonalMesh& mesh1, PolygonalMesh& mesh2, const u
 
     // metto i punti di cell0dscoordinates su una sfera
 
-    ProiettaPunti(mesh2.Cell0DsCoordinates);
+    //ProiettaPunti(mesh2.Cell0DsCoordinates);
 
 return true;
 }
@@ -1206,7 +1026,7 @@ bool Dijkstra(const unsigned int& n,const vector<vector<unsigned int>>& LA, cons
 bool CamminoMinimo(const PolygonalMesh& mesh, const unsigned int& id1, const unsigned int& id2, const string& nomefilepunti, const string& nomefilelati){
 
     //controllo che gli id dei vertici passati esistano 
-    if( (id1 > mesh.NumCell0Ds) && (id2 > mesh.NumCell0Ds) ){
+    if( (id1 > mesh.NumCell0Ds) || (id2 > mesh.NumCell0Ds) ){
         cerr << "gli id non sono validi" << endl;
         return false;
     }
@@ -1445,7 +1265,6 @@ bool CollegaBaricentri(const map<unsigned int, vector<unsigned int>>& MapBaricen
 
     return true;
 }
-
 
 /**********************************/
 
@@ -2130,9 +1949,56 @@ bool TriangolazioneDue(const PolygonalMesh& mesh1, PolygonalMesh& meshTri, const
             IdLatiMeshTri += 1;
         } 
     }
-        CollegaBaricentri(MapBaricentri, IdBaricentro, meshTri, IdLatiMeshTri, BaricentriXFaccia, IdFacceMeshtri);
+    CollegaBaricentri(MapBaricentri, IdBaricentro, meshTri, IdLatiMeshTri, BaricentriXFaccia, IdFacceMeshtri);
 
-        BaricentriXFaccia = {};
+    BaricentriXFaccia = {};
+    
+    // tratto a parte il caso b = 1
+    if(b == 1){
+        id1 = base[0];
+        id2 = base[1];
+        
+        Duplicato = false;
+        IdTrovato = 0;
+        if(ControllaBordi(latiCompleti, id1, id2, Medio, meshTri, IdPuntiMeshTri, Duplicato, IdTrovato)){
+            if(!Duplicato){
+                vector<unsigned int> vecpunti1 = {id1, id2, IdBaricentro};
+                AggiungiLati(meshTri, vecpunti1, IdPuntiMeshTri, IdLatiMeshTri);
+                cout << "passo come baricentro " << IdBaricentro;
+                cout << "id del punto sul bordo " << IdPuntiMeshTri << endl;
+                // aggiungo una faccia
+                vector<unsigned int> vecVertici = {IdPuntiMeshTri, IdBaricentro, id1};
+                meshTri.VettoreVertici.push_back(vecVertici);
+                meshTri.Cell2DsId.push_back(IdFacceMeshtri);
+                IdFacceMeshtri += 1;
+                // aggiungo l'altra
+                vecVertici = {IdPuntiMeshTri, IdBaricentro, id2};
+                meshTri.VettoreVertici.push_back(vecVertici);
+                meshTri.Cell2DsId.push_back(IdFacceMeshtri);
+                IdFacceMeshtri += 1;
+                
+                IdPuntiMeshTri += 1;
+            }else{
+                int idBarIntero = IdBaricentro;
+                meshTri.Cell1DsExtrema(0, IdLatiMeshTri) = idBarIntero;
+                meshTri.Cell1DsExtrema(1, IdLatiMeshTri) = IdTrovato;
+                meshTri.Cell1DsId.push_back(IdLatiMeshTri);
+                // aggiungo una faccia
+                vector<unsigned int> vecVertici = {IdTrovato, IdBaricentro, id1};
+                meshTri.VettoreVertici.push_back(vecVertici);
+                meshTri.Cell2DsId.push_back(IdFacceMeshtri);
+                IdFacceMeshtri += 1;
+                // aggiungo l'altra
+                vecVertici = {IdTrovato, IdBaricentro, id2};
+                meshTri.VettoreVertici.push_back(vecVertici);
+                meshTri.Cell2DsId.push_back(IdFacceMeshtri);
+                IdFacceMeshtri += 1;
+                
+                IdLatiMeshTri += 1;
+        } 
+        }
+    }
+    
     }
 
     cout << "stampo vettore vertici " << endl;
@@ -2179,7 +2045,7 @@ bool TriangolazioneDue(const PolygonalMesh& mesh1, PolygonalMesh& meshTri, const
         cout << endl;
     }
 
-    ProiettaPunti(meshTri.Cell0DsCoordinates);
+    //ProiettaPunti(meshTri.Cell0DsCoordinates);
 
     return true;
 }
