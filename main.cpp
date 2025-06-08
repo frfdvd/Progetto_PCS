@@ -3,6 +3,7 @@
 #include "Utils.hpp"
 #include "UCDUtilities.hpp"
 #include <string>
+#include <sstream>
 
 using namespace std;
 using namespace Eigen;
@@ -12,7 +13,7 @@ using namespace Gedim;
 
 
 
-int main(){
+int main(int argc, char* argv[]){
     
     // creo un oggetto mesh
     PolygonalMesh mesh;
@@ -21,13 +22,55 @@ int main(){
     PolygonalMesh meshDuale1;
     PolygonalMesh meshDuale2;
 
+    int p;
+    int q; 
+    int b; 
+    int c;
+    int id1;
+    int id2;
 
-    unsigned int b = 1;
+    if (argc != 5 && argc != 7) {
+        cerr << "Input non valido" ;
+        return 1;
+	}
+    
+    stringstream convert;
+	
+	for (int i = 1; i < argc; i++){
+		convert << argv[i] << " ";
+    }
+    convert >> p >> q >> b >> c;
+
+
+
+    /* prendo i dati in input
+    unsigned int p;
+    unsigned int q;
+    cout << "inserire i valori di p e q: ";
+    cin >> p >> q;
+    while (p != 3 || q < 3 || q > 5) {
+        cout << "Valori inseriti non validi. Riprova: ";
+        cin >> p >> q;
+    }
+    unsigned int b;
+    unsigned int c;
+    cout << "inserire i valori di b e c: ";
+    cin >> b >> c;
+    while (b != c && c != 0) {
+        cout << "Valori inseriti non validi. Riprova: ";
+        cin >> b >> c;
+    }*/
+
+
+    
+
+    /*
     unsigned int p = 3;
-    unsigned int q = 3;
+    unsigned int q = 3; 
+    unsigned int b = 1; 
     unsigned int id1 = 0;
-    unsigned int id2 = 5;
-    string Poliedro = RiconosciPoliedro(q);
+    unsigned int id2 = 5;*/
+    string Poliedro = RiconosciPoliedro(q); 
 
     cout << Poliedro << endl;
 
