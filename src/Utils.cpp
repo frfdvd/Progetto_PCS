@@ -1042,34 +1042,28 @@ bool CamminoMinimo(const PolygonalMesh& mesh, const unsigned int& id1, const uns
         for(unsigned int idAdiacente = 0; idAdiacente < mesh.Cell1DsExtrema.cols(); idAdiacente++){
             int idVerticeIntero = idVertice;
             if( idVerticeIntero == mesh.Cell1DsExtrema(0, idAdiacente)){
-                cout << "entrato nell'if" << endl;
                 vettoreAdiacenza.push_back(mesh.Cell1DsExtrema(1, idAdiacente));
-                cout << "uscito nell'if" << endl;
             } 
             
             if(idVerticeIntero == mesh.Cell1DsExtrema(1, idAdiacente)){
-                cout << "entrato nell'if" << endl;
                 vettoreAdiacenza.push_back(mesh.Cell1DsExtrema(0, idAdiacente));
-                cout << "uscito nell'if" << endl;
             }
         }
         listaAdiacenza.push_back(vettoreAdiacenza);
     }
    
-    cout << "stampo il lista adiacenza " << endl;
+    /*cout << "stampo il lista adiacenza " << endl;
     for (const auto& riga : listaAdiacenza) {
         for (const auto& elemento :riga) {
             cout << elemento << " ";
         }
         cout << endl;
-    }
+    }*/
     //calcolo la matrice di adiacenza
     MatrixXd matricePesi = MatrixXd::Zero(mesh.NumCell0Ds, mesh.NumCell0Ds);
     
     for(unsigned int v = 0; v < listaAdiacenza.size(); v++) {
-        cout << "v = " << v << endl;
         for(unsigned int v1 :listaAdiacenza[v]) {
-            cout << "v1 = " << v1 << endl;
             Vector3d punto(mesh.Cell0DsCoordinates(0, v), mesh.Cell0DsCoordinates(1, v), mesh.Cell0DsCoordinates(2, v));
             Vector3d punto1(mesh.Cell0DsCoordinates(0, v1), mesh.Cell0DsCoordinates(1, v1), mesh.Cell0DsCoordinates(2, v1));
             double dist = (punto1 - punto).norm();
@@ -1088,7 +1082,6 @@ bool CamminoMinimo(const PolygonalMesh& mesh, const unsigned int& id1, const uns
 		ProprietaPuntiPercorso[punto] = 1.0;
     }
 
-    cout << "ok5" << endl;
     
     Gedim::UCDProperty<double> ProprietaPercorsoMinimo;
     ProprietaPercorsoMinimo.Label = "percorso minimo";
@@ -1111,7 +1104,7 @@ bool CamminoMinimo(const PolygonalMesh& mesh, const unsigned int& id1, const uns
     //latiPercorso.reserve(path.size()-1);
     vector<double> ProprietaLatiPercorso(mesh.NumCell1Ds, 0.0);
 
-    cout << "ok6" << endl;
+
     cout << path.size() << endl;
     double lunghezzaPercorso = 0.0;
     for(unsigned int i = 0; i < path.size()-1; i++){
@@ -1169,7 +1162,7 @@ bool CreaBaricentro(PolygonalMesh& meshTri ,const vector<unsigned int>& vecpunti
     meshTri.Cell0DsId.push_back(IdBar);
 
     map[IdBar] = vecpunti;
-    cout << "id dek baricentro " << IdBar << endl;
+    //cout << "id dek baricentro " << IdBar << endl;
     return true;
 }
 
@@ -1186,7 +1179,6 @@ bool ControllaBordi(const vector<vector<unsigned int>>& latiCompleti, const unsi
                 return true;
                 break;
             }else{
-                cout << "creo il punto sul bordo numero " << contapunti << endl;
                 meshTri.Cell0DsCoordinates(0, contapunti) = Medio(0);
                 meshTri.Cell0DsCoordinates(1, contapunti) = Medio(1);
                 meshTri.Cell0DsCoordinates(2, contapunti) = Medio(2);
@@ -1206,10 +1198,10 @@ bool AggiungiLati(PolygonalMesh& meshTri,const vector<unsigned int>& vecpunti, c
     cout << "id del punto sul bordo in aggiungi lati " << IdBar << endl;
     cout << "entro in aggiungi lati" << endl;
     for(unsigned int idPunto : vecpunti){
-        cout << "dobbiamo unire " << IdBar << " con " << idPunto << endl;
+        //cout << "dobbiamo unire " << IdBar << " con " << idPunto << endl;
         if(!TestDuplicati(meshTri.Cell1DsExtrema, IdBar, idPunto)){
             int idPuntoIntero = idPunto;
-            cout << "creo lato numero " << contatore << "con id " << idBarIntero << " " << idPuntoIntero << endl;
+            //cout << "creo lato numero " << contatore << "con id " << idBarIntero << " " << idPuntoIntero << endl;
             meshTri.Cell1DsExtrema(0, contatore) = idBarIntero;
             meshTri.Cell1DsExtrema(1, contatore) = idPuntoIntero;
             meshTri.Cell1DsId.push_back(contatore);
@@ -1382,7 +1374,7 @@ bool TriangolazioneDue(const PolygonalMesh& mesh1, PolygonalMesh& meshTri, const
 
     }
 
-    // stampiamo lati completi
+    /*stampiamo lati completi
     for(unsigned int s = 0; s<latiCompleti.size(); s++){
             for(unsigned int y = 0;y<latiCompleti[s].size();y++){
                 cout << latiCompleti[s][y] << " ";
@@ -1396,7 +1388,7 @@ bool TriangolazioneDue(const PolygonalMesh& mesh1, PolygonalMesh& meshTri, const
                 cout << mesh1.VettoreVertici[s][y] << " ";
             }
         cout << endl;
-        }    
+        } */   
 
     // creo il dizionario che ha come chiave l'id della faccia del poligono iniziale e come valore i lati copleti di quella faccia
     vector<vector<vector<unsigned int>>> vecFacce;
@@ -1424,13 +1416,13 @@ bool TriangolazioneDue(const PolygonalMesh& mesh1, PolygonalMesh& meshTri, const
         vecFacce.push_back(lati);
         cout << "id faccia" << i << endl;
 
-        for(unsigned int s = 0; s<lati.size(); s++){
+        /*for(unsigned int s = 0; s<lati.size(); s++){
             for(unsigned int y = 0;y<lati[s].size();y++){
                 cout << lati[s][y] << " ";
             }
             cout << endl;
         }
-        cout << endl;
+        cout << endl;*/
 
         lati = {};
 
@@ -1483,7 +1475,7 @@ bool TriangolazioneDue(const PolygonalMesh& mesh1, PolygonalMesh& meshTri, const
         vector<unsigned int> base2 = vecFacce[idFaccia][0];
 
         // inverto i vettori per avere compatibilità
-        for(unsigned int i = 0; i < base.size(); i++){
+        /*for(unsigned int i = 0; i < base.size(); i++){
             cout << "base " << base[i] << " ";
         }
         cout << endl;
@@ -1498,7 +1490,7 @@ bool TriangolazioneDue(const PolygonalMesh& mesh1, PolygonalMesh& meshTri, const
         for(unsigned int i = 0; i < base.size(); i++){
             cout << "altezza2 " << lato2[i] << " ";
         }
-        cout << endl;
+        cout << endl;*/
  
         if ( (lato1[0] != base[0]) & (lato1[0] != base[base.size()-1])){
               reverse( lato1.begin(),  lato1.end());
@@ -2036,14 +2028,14 @@ bool TriangolazioneDue(const PolygonalMesh& mesh1, PolygonalMesh& meshTri, const
     }
 
 
-    cout << "stampo vettore lati " << endl;
+    /*cout << "stampo vettore lati " << endl;
     for(unsigned int idFaccia = 0; idFaccia < meshTri.VettoreLati.size(); idFaccia++){
         cout << "faccia " << idFaccia << " ";
         for(unsigned int idPunto : meshTri.VettoreLati[idFaccia]){
             cout << idPunto << " "; 
         }
         cout << endl;
-    }
+    }*/
 
     ProiettaPunti(meshTri.Cell0DsCoordinates);
 

@@ -41,27 +41,93 @@ int main(int argc, char* argv[]){
     }
     convert >> p >> q >> b >> c;
 
-
-
-    /* prendo i dati in input
-    unsigned int p;
-    unsigned int q;
-    cout << "inserire i valori di p e q: ";
-    cin >> p >> q;
-    while (p != 3 || q < 3 || q > 5) {
-        cout << "Valori inseriti non validi. Riprova: ";
-        cin >> p >> q;
+    if (p != 3){
+        cerr << "la costruzione del solido geodetico richiede p = 3";
+        return 1;
     }
-    unsigned int b;
-    unsigned int c;
-    cout << "inserire i valori di b e c: ";
-    cin >> b >> c;
-    while (b != c && c != 0) {
-        cout << "Valori inseriti non validi. Riprova: ";
-        cin >> b >> c;
-    }*/
+    if (q < 3 || q > 5){
+        cerr << "non esiste un poligono platonico con" << q << "come valore di q";
+        return 1;
+    }
+    if (b != c && (c != 0 && b!= 0)){
+        cerr << "valori di b e c non validi";
+        return 1;
+    }
+    
+    string Poliedro = RiconosciPoliedro(q); 
+    cout << Poliedro << endl;
 
+    // importo la mesh e verifico che avvenga correttamente
+    if(!ImportMesh(mesh, Poliedro))
+    {
+        cerr << "file not found" << endl;
+        return 1;
+    }
 
+ 
+    string ParaviewPunti = "./Cell0D.inp";
+    string ParaviewSegmenti = "./Cell1D.inp"; 
+
+    UCDUtilities utilities;
+    utilities.ExportPoints(ParaviewPunti,
+                           mesh.Cell0DsCoordinates);
+
+    utilities.ExportSegments(ParaviewSegmenti,
+                             mesh.Cell0DsCoordinates,
+                             mesh.Cell1DsExtrema);
+
+     string ParaviewPuntiTriangolati1 = "./Cell0DTriang1.inp";
+     string ParaviewSegmentiTriangolati1 = "./Cell1DTriang1.inp";                         
+    if(b == 0 || c == 0){
+        cout << "FACCIO LA TRIANGOLAZIONE UNO" << endl;
+        cout << endl;
+
+        if(b==0){
+            b = c;
+        }
+
+        if(!TriangolazioneUno(mesh, meshTriangolata1, b, q))
+        {
+            cerr << "error during triangolation" << endl;
+            return 1;
+        }
+    
+        
+        //string ParaviewPuntiTriangolati1 = "./Cell0DTriang1.inp";
+        //string ParaviewSegmentiTriangolati1 = "./Cell1DTriang1.inp";
+    
+        utilities.ExportPoints(ParaviewPuntiTriangolati1, 
+                                meshTriangolata1.Cell0DsCoordinates);
+        utilities.ExportSegments(ParaviewSegmentiTriangolati1,
+                                 meshTriangolata1.Cell0DsCoordinates,
+                                 meshTriangolata1.Cell1DsExtrema);
+
+    }
+
+    string ParaviewPuntiTriangolati2 = "./Cell0DTriang2.inp";
+    string ParaviewSegmentiTriangolati2 = "./Cell1DTriang2.inp";
+
+    if(b == c){
+        cout << "FACCIO LA TRIANGOLAZIONE DUE" << endl;
+        cout << endl;
+
+        if(!TriangolazioneDue(mesh, meshTriangolata2, b, q))
+        {
+            cerr << "error during triangolation" << endl;
+            return 1;
+        }
+                                
+        //string ParaviewPuntiTriangolati2 = "./Cell0DTriang2.inp";
+        //string ParaviewSegmentiTriangolati2 = "./Cell1DTriang2.inp";
+
+        utilities.ExportPoints(ParaviewPuntiTriangolati2, 
+                                meshTriangolata2.Cell0DsCoordinates);
+        utilities.ExportSegments(ParaviewSegmentiTriangolati2,
+                                meshTriangolata2.Cell0DsCoordinates,
+                                meshTriangolata2.Cell1DsExtrema);
+
+    }
+    
     
 
     /*
@@ -69,7 +135,7 @@ int main(int argc, char* argv[]){
     unsigned int q = 3; 
     unsigned int b = 1; 
     unsigned int id1 = 0;
-    unsigned int id2 = 5;*/
+    unsigned int id2 = 5;
     string Poliedro = RiconosciPoliedro(q); 
 
     cout << Poliedro << endl;
@@ -130,7 +196,7 @@ int main(int argc, char* argv[]){
                              meshTriangolata1.Cell0DsCoordinates,
                              meshTriangolata1.Cell1DsExtrema);
  
-
+    */
 
     //calcolo il cammino minimo
     cout << "FACCIO IL CAMMINO MINIMO 1" << endl;
