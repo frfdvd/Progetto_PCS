@@ -82,11 +82,14 @@ int main(int argc, char* argv[]){
         cout << "FACCIO LA TRIANGOLAZIONE UNO" << endl;
         cout << endl;
 
-        if(b==0){
-            b = c;
+        int b_temp;
+        b_temp = b;
+
+        if(b_temp ==0){
+            b_temp = c;
         }
 
-        if(!TriangolazioneUno(mesh, meshTriangolata1, b, q))
+        if(!TriangolazioneUno(mesh, meshTriangolata1, b_temp, q))
         {
             cerr << "error during triangolation" << endl;
             return 1;
