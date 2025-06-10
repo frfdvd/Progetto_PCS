@@ -10,8 +10,7 @@
 #include "UCDUtilities.hpp"
 
 namespace PolygonalLibrary{
-  bool ImportMesh(PolygonalMesh& mesh, const string& Poliedro)
-{
+  bool ImportMesh(PolygonalMesh& mesh, const string& Poliedro){
 
     if(!ImportCell0Ds(mesh, Poliedro))
         return false;
@@ -23,41 +22,61 @@ namespace PolygonalLibrary{
         return false;
         
     return true;
-
 }
 
 /**********************************/
 bool StampasuFile(const PolygonalMesh& mesh){
-    ofstream outFile0("Cell0Ds.txt");
+    ofstream outFile0("Cell0DsTRI.txt");
 
     if (!outFile0) {
-        cerr << "Errore nell'apertura del file Cell0Ds.txt." << endl;
+        cerr << "Errore nell'apertura del file Cell0DsTRI.txt." << endl;
         return false;
     }
-
+    outFile0 <<"id;x;y;z"<<endl;
     for(unsigned int idPunto = 0; idPunto < mesh.Cell0DsCoordinates.cols(); idPunto ++) {
         double x = mesh.Cell0DsCoordinates(0, idPunto);
         double y = mesh.Cell0DsCoordinates(1, idPunto);
         double z = mesh.Cell0DsCoordinates(2, idPunto);
        
-        outFile0 << idPunto << " " << x << " " << y << " " << z << endl;
+        outFile0 << idPunto << ";" << x << ";" << y << ";" << z << endl;
 
     }
     outFile0.close(); 
 
-    ofstream outFile1("Cell1Ds.txt");
+    ofstream outFile1("Cell1DsTRI.txt");
     if (!outFile1) {
-        cerr << "Errore nell'apertura del file Cell1Ds.txt." << endl;
+        cerr << "Errore nell'apertura del file Cell1DsTRI.txt." << endl;
         return false;
     }
-
+    outFile1<<"id;origin;end"<<endl;
     for(unsigned int idLato = 0; idLato < mesh.Cell1DsExtrema.cols(); idLato ++) {
         double id1 = mesh.Cell1DsExtrema(0, idLato);
         double id2 = mesh.Cell1DsExtrema(1, idLato);
 
-        outFile1 << idLato << id1 << " " << id2 << endl;
+        outFile1 << idLato <<";"<<id1 << ";" << id2 << endl;
     }
     outFile1.close(); 
+    
+    ofstream outFile2("Cell2DsTRI.txt");
+    if (!outFile2) {
+        cerr << "Errore nell'apertura del file Cell2DsTRI.txt." << endl;
+        return false;
+    }
+    outFile2<<"id;NumVertices;Vertices;NumEdges;Edges"<<endl;
+
+
+    outFile2.close(); 
+
+    ofstream outFile3("Cell3DsTRI.txt");
+    if (!outFile2) {
+        cerr << "Errore nell'apertura del file Cell3DsTRI.txt." << endl;
+        return false;
+    }
+    outFile3<<"id;NumVertices;Vertices;NumEdges;Edges;NumFaces;Faces"<<endl;
+
+
+    outFile3.close(); 
+
 
     return true;
 }
@@ -344,7 +363,7 @@ bool inserisciLati(MatrixXi& MatriceLati, vector<unsigned int> VettoreIdLati, un
         MatriceLati(1, contaIdLati) = id2;
         VettoreIdLati.push_back(contaIdLati);
     
-        cout << "lato " << contaIdLati << " con estremi " << id1 << ", " << id2 << endl;
+        //cout << "lato " << contaIdLati << " con estremi " << id1 << ", " << id2 << endl;
         contaIdLati += 1;
         //cout << "primo lato base fatto " << endl;
     }
@@ -461,7 +480,7 @@ bool TriangolazioneUno(const PolygonalMesh& mesh1, PolygonalMesh& mesh2, const u
 
     }
 
-    for(unsigned int s = 0; s<latiCompleti.size(); s++){
+    /*for(unsigned int s = 0; s<latiCompleti.size(); s++){
             for(unsigned int y = 0;y<latiCompleti[s].size();y++){
                 cout << latiCompleti[s][y] << " ";
             }
@@ -474,7 +493,7 @@ bool TriangolazioneUno(const PolygonalMesh& mesh1, PolygonalMesh& mesh2, const u
                 cout << mesh1.VettoreVertici[s][y] << " ";
             }
         cout << endl;
-        }    
+        }    */
 
     // creo il dizionario che ha come chiave l'id della faccia del poligono iniziale e come valore i lati copleti di quella faccia
     
@@ -501,7 +520,7 @@ bool TriangolazioneUno(const PolygonalMesh& mesh1, PolygonalMesh& mesh2, const u
         }
 
         mapFacce[i] = lati;
-        cout << "id faccia" << i << endl;
+        /*cout << "id faccia" << i << endl;
 
         for(unsigned int s = 0; s<lati.size(); s++){
             for(unsigned int y = 0;y<lati[s].size();y++){
@@ -509,7 +528,7 @@ bool TriangolazioneUno(const PolygonalMesh& mesh1, PolygonalMesh& mesh2, const u
             }
             cout << endl;
         }
-        cout << endl;
+        cout << endl;*/
 
         lati = {};
 
@@ -531,9 +550,9 @@ bool TriangolazioneUno(const PolygonalMesh& mesh1, PolygonalMesh& mesh2, const u
     unsigned int contaIdLatiMesh2 = 0;
 
     for(unsigned int idFaccia = 0; idFaccia < mesh1.NumCell2Ds; idFaccia++) {
-        cout << endl;
-        cout << "FACCIA NUMERO " << idFaccia << endl;
-        cout << "il conta punti è arrivato a (ho già aggiunto uno in più) " << ContaIdPuntiMesh2 << endl;;
+        //cout << endl;
+        //cout << "FACCIA NUMERO " << idFaccia << endl;
+        //cout << "il conta punti è arrivato a (ho già aggiunto uno in più) " << ContaIdPuntiMesh2 << endl;
 
         // trovo la base e le altezze su cui salire
         vector<unsigned int> base = mapFacce.at(idFaccia)[0];
@@ -542,7 +561,7 @@ bool TriangolazioneUno(const PolygonalMesh& mesh1, PolygonalMesh& mesh2, const u
 
 
         // inverto i vettori per avere compatibilità
-        for(unsigned int i = 0; i < base.size(); i++){
+        /*for(unsigned int i = 0; i < base.size(); i++){
             cout << "base " << base[i] << " ";
         }
         cout << endl;
@@ -557,7 +576,7 @@ bool TriangolazioneUno(const PolygonalMesh& mesh1, PolygonalMesh& mesh2, const u
         for(unsigned int i = 0; i < base.size(); i++){
             cout << "altezza2 " << lato2[i] << " ";
         }
-        cout << endl;
+        cout << endl;*/
 
         
         
@@ -566,22 +585,22 @@ bool TriangolazioneUno(const PolygonalMesh& mesh1, PolygonalMesh& mesh2, const u
               reverse( lato1.begin(),  lato1.end());
         }
 
-        for(unsigned int i = 0; i < base.size(); i++){
+        /*for(unsigned int i = 0; i < base.size(); i++){
          
            cout << "altezza1 Nuova " << lato1[i] << " ";
             
         }
-        cout << endl;
+        cout << endl;*/
 
         if ( (lato2[0] != base[0]) & (lato2[0] != base[base.size()-1])){
               reverse( lato2.begin(),  lato2.end());
         }
 
 
-        for(unsigned int i = 0; i < base.size(); i++){
+        /*for(unsigned int i = 0; i < base.size(); i++){
             cout << "altezza2 Nuova " << lato2[i] << " ";
         }
-        cout << endl;
+        cout << endl;*/
 
         // aggiusto i vettori per fare in modo che altezza 1 inizi come base e altezza 2 inizi come finisce base
         vector<unsigned int> altezza1;
@@ -595,37 +614,35 @@ bool TriangolazioneUno(const PolygonalMesh& mesh1, PolygonalMesh& mesh2, const u
         }
 
 
-
-        cout << endl;
         for(unsigned int h = 1; h < altezza1.size()-1; h++){
             // trovo il vettore direzione del tetto
-            cout << "mi muovo sulle altezze e h = " << h << endl;
+            //cout << "mi muovo sulle altezze e h = " << h << endl;
             unsigned int idEstremo1 = altezza1[h];
             unsigned int idEstremo2 = altezza2[h];
-            cout << "idEstremo1 " << idEstremo1 << " idEstremo2 " << idEstremo2 << endl;
+            //cout << "idEstremo1 " << idEstremo1 << " idEstremo2 " << idEstremo2 << endl;
 
 
             // prendiamo le coordinate degli estremi
             Vector3d Estremo1(mesh2.Cell0DsCoordinates(0,idEstremo1),mesh2.Cell0DsCoordinates(1,idEstremo1),mesh2.Cell0DsCoordinates(2,idEstremo1));
             Vector3d Estremo2(mesh2.Cell0DsCoordinates(0,idEstremo2),mesh2.Cell0DsCoordinates(1,idEstremo2),mesh2.Cell0DsCoordinates(2,idEstremo2));
-            cout << "estremo 1 " <<Estremo1(0) << " " << Estremo1(1) << " " << Estremo1(2) << endl;
-            cout << "estremo 2 " <<Estremo2(0) << " " << Estremo2(1) << " " << Estremo2(2) << endl;
+            //cout << "estremo 1 " <<Estremo1(0) << " " << Estremo1(1) << " " << Estremo1(2) << endl;
+            //cout << "estremo 2 " <<Estremo2(0) << " " << Estremo2(1) << " " << Estremo2(2) << endl;
         
             // vettore con la direzione del tetto
             Vector3d VettoreDirezione = Estremo2 - Estremo1;
-            cout << "Vettore direzione " << " " << VettoreDirezione(0) << " " <<VettoreDirezione(1) << " " <<VettoreDirezione(2) << endl;
+            //cout << "Vettore direzione " << " " << VettoreDirezione(0) << " " <<VettoreDirezione(1) << " " <<VettoreDirezione(2) << endl;
 
 
             vector<unsigned int> tetto = {altezza1[h]};
-            cout << "tetto ";
+            /*cout << "tetto ";
             for(unsigned int indice = 0; indice < tetto.size(); indice++){
                 cout << tetto[indice] << " "; 
             }
-            cout << endl;
+            cout << endl;*/
             int lunghezzaBase = base.size();
             for(int scorri = 0; scorri < 2*lunghezzaBase-2; scorri ++){
                  
-                cout << "scorri " << scorri << endl;
+                //cout << "scorri " << scorri << endl;
                 
                 if(scorri % 2 == 0){
                     //stiamo scorrendo sulla base 
@@ -633,14 +650,14 @@ bool TriangolazioneUno(const PolygonalMesh& mesh1, PolygonalMesh& mesh2, const u
                     unsigned int id1 = tetto[tetto.size()-1];
                     unsigned int id2 = base[scorri/2];
                     inserisciLati(mesh2.Cell1DsExtrema, mesh2.Cell1DsId , contaIdLatiMesh2, id1, id2);
-                    cout << "primo lato base fatto " << endl;
+                    //cout << "primo lato base fatto " << endl;
 
                     // inseriamo il secondo lato
                     
                     id1 = base[scorri/2];
                     id2 = base[scorri/2+1];
                     inserisciLati(mesh2.Cell1DsExtrema, mesh2.Cell1DsId , contaIdLatiMesh2, id1, id2);
-                    cout << "secondo lato base fatto" << endl;
+                    //cout << "secondo lato base fatto" << endl;
 
                     // inserisco i vertici della faccia dentro a vettore vertici
                     vector<unsigned int> vecpunti = {base[scorri/2], tetto[tetto.size()-1],base[scorri/2+1]};
@@ -652,7 +669,7 @@ bool TriangolazioneUno(const PolygonalMesh& mesh1, PolygonalMesh& mesh2, const u
                     // troviamo il nuovo punto di tetto, divido per b-h perchè il tetto è sempre diviso in meno parti, e lo inserisco 
                     if(scorri < 2*lunghezzaBase-5){
                         
-                        cout << "SCORRI" <<scorri << "BASE"<< 2*lunghezzaBase-5<< endl;
+                        //cout << "SCORRI" <<scorri << "BASE"<< 2*lunghezzaBase-5<< endl;
                         Vector3d NuovoPuntoTetto = Estremo1 + VettoreDirezione * (scorri+1)/(2*(double)(b-h));
 
                         mesh2.Cell0DsCoordinates(0,ContaIdPuntiMesh2) = NuovoPuntoTetto(0);
@@ -660,39 +677,39 @@ bool TriangolazioneUno(const PolygonalMesh& mesh1, PolygonalMesh& mesh2, const u
                         mesh2.Cell0DsCoordinates(2,ContaIdPuntiMesh2) = NuovoPuntoTetto(2);
                         mesh2.Cell0DsId.push_back(ContaIdPuntiMesh2);
                         
-                        cout << "idNuovoPunto " << ContaIdPuntiMesh2 << endl;
+                        //cout << "idNuovoPunto " << ContaIdPuntiMesh2 << endl;
                         tetto.push_back(ContaIdPuntiMesh2);
                         ContaIdPuntiMesh2 += 1;
                         // inserisco l'id di questo punto in tetto
                         
-                        cout << "tetto ";
+                        /*cout << "tetto ";
                         for(unsigned int indice = 0; indice < tetto.size(); indice++){
                             cout << tetto[indice] << " "; 
                         }
-                        cout << endl;
+                        cout << endl;*/
 
                     }else{ 
                         tetto.push_back(altezza2[h]);
                         
-                        cout << "arrivo all'ultimo punto di tetto" << endl;
+                        /*cout << "arrivo all'ultimo punto di tetto" << endl;
                         cout << "tetto ";
                         for(unsigned int indice = 0; indice < tetto.size(); indice++){
                             cout << tetto[indice] << " "; 
                         }
-                        cout << endl;
+                        cout << endl;*/
                     }
 
                     // inseriamo il primo lato (tetto con la base)
                     unsigned int id1 = base[scorri+2-tetto.size()];
                     unsigned int id2 = tetto[tetto.size()-2];
                     inserisciLati(mesh2.Cell1DsExtrema, mesh2.Cell1DsId , contaIdLatiMesh2, id1, id2);
-                    cout << "primo lato tetto fatto " << endl;
+                    //cout << "primo lato tetto fatto " << endl;
 
                     // inseriamo il secondo lato (tetto con il tetto) controllando che nell'ultima iterazione non metta tetto-tetto
                     id1 = tetto[tetto.size()-1];
                     id2 = tetto[tetto.size()-2];
                     inserisciLati(mesh2.Cell1DsExtrema, mesh2.Cell1DsId , contaIdLatiMesh2, id1, id2);
-                    cout << "secondo lato tetto fatto" << endl;
+                    //cout << "secondo lato tetto fatto" << endl;
 
                     // inseriscoi vertici della faccia dentro al vettore vertici evitando di aggiungere una faccia quando arrivo all'ultimo elemento di tetto
                     if(scorri < 2*lunghezzaBase-3){
@@ -708,10 +725,10 @@ bool TriangolazioneUno(const PolygonalMesh& mesh1, PolygonalMesh& mesh2, const u
 
             tetto.pop_back();
             base = tetto;
-            for(unsigned int i = 0; i < base.size(); i++){
+            /*for(unsigned int i = 0; i < base.size(); i++){
                 cout << "base " << base[i] << " ";
             }
-            cout << endl; 
+            cout << endl; */
     
         }        
 
@@ -719,12 +736,12 @@ bool TriangolazioneUno(const PolygonalMesh& mesh1, PolygonalMesh& mesh2, const u
     unsigned int id1 = altezza1[altezza1.size()-1];
     unsigned int id2 = base[0];
     inserisciLati(mesh2.Cell1DsExtrema, mesh2.Cell1DsId , contaIdLatiMesh2, id1, id2);
-    cout << "primo lato tetto fatto " << endl;
+    //cout << "primo lato tetto fatto " << endl;
 
     id1 = altezza1[altezza1.size()-1];
     id2 = base[1];
     inserisciLati(mesh2.Cell1DsExtrema, mesh2.Cell1DsId , contaIdLatiMesh2, id1, id2);
-    cout << "primo lato tetto fatto " << endl;
+    //cout << "primo lato tetto fatto " << endl;
 
     // inserisco l'ultima faccia
     vector<unsigned int> vecpunti = {base[0],altezza1[altezza1.size()-1],base[1]};
@@ -734,7 +751,7 @@ bool TriangolazioneUno(const PolygonalMesh& mesh1, PolygonalMesh& mesh2, const u
     }
 
 
-    cout << endl;
+    /*cout << endl;
     for (int i = 0; i < mesh2.Cell0DsCoordinates.cols(); i++) {
         for (int j = 0; j < mesh2.Cell0DsCoordinates.rows(); j++) {
             std::cout << mesh2.Cell0DsCoordinates(j, i) << " ";
@@ -748,15 +765,15 @@ bool TriangolazioneUno(const PolygonalMesh& mesh1, PolygonalMesh& mesh2, const u
             std::cout << mesh2.Cell1DsExtrema(i, j) << " ";
         }
         std::cout << std::endl;
-    }
+    }*/
 
-    cout << "stampo il vettore dei vertici" << endl;
+    /*cout << "stampo il vettore dei vertici" << endl;
     for (const auto& riga : mesh2.VettoreVertici) {
         for (const auto& elemento :riga) {
             cout << elemento << " ";
         }
         cout << endl;
-    }
+    }*/
 
 
     // inserisco nel vettore lati i lati relativi a ogni faccia in ordine
@@ -784,7 +801,7 @@ bool TriangolazioneUno(const PolygonalMesh& mesh1, PolygonalMesh& mesh2, const u
     }
     
       
-    cout << "stampo il vettore dei lati" << endl;
+    /*cout << "stampo il vettore dei lati" << endl;
     unsigned int contatore = 0;
     for (const auto& riga : mesh2.VettoreLati) {
         cout << "faccia " << contatore << " ";
@@ -793,7 +810,7 @@ bool TriangolazioneUno(const PolygonalMesh& mesh1, PolygonalMesh& mesh2, const u
             cout << elemento << " ";
         }
         cout << endl;
-    }
+    }*/
 
 
     // metto i punti di cell0dscoordinates su una sfera
@@ -842,11 +859,11 @@ bool CreaDuale(const PolygonalMesh& mesh1, PolygonalMesh& mesh2){
 
             // rimuovo l'id appena preso così faccio un confronto solo sugli altri
             faccePerVertice.erase(remove(faccePerVertice.begin(), faccePerVertice.end(), id1), faccePerVertice.end());
-            cout << "faccia 1 " << id1 << endl;
+            //cout << "faccia 1 " << id1 << endl;
             for(unsigned int j = 0; j<faccePerVertice.size(); j++){
                 // j è l'elemento 2 da confrontare
                 unsigned int id2 = faccePerVertice[j];
-                cout << "faccia da confrontare " << id2 << endl;
+                //cout << "faccia da confrontare " << id2 << endl;
                 // trovo i lati delle due facce id1 e id2
                 vector<unsigned int> latiId1 = mesh1.VettoreLati[id1];
                 vector<unsigned int> latiId2 = mesh1.VettoreLati[id2];
@@ -861,11 +878,11 @@ bool CreaDuale(const PolygonalMesh& mesh1, PolygonalMesh& mesh2){
 
                 if(Trovato){
                     faccePerVerticeOrdinate.push_back(id2);
-                    cout << "facce per vertice ordinate ";
+                    /*cout << "facce per vertice ordinate ";
                     for(unsigned int s = 0; s < faccePerVerticeOrdinate.size(); s++){
                         cout << faccePerVerticeOrdinate[s] << " ";
                     }
-                    cout << endl;
+                    cout << endl;*/
                     break;
                 } 
             }
@@ -876,13 +893,13 @@ bool CreaDuale(const PolygonalMesh& mesh1, PolygonalMesh& mesh2){
         facceAdiacenti.push_back(faccePerVerticeOrdinate);
     }
 
-    cout << "stampo il vettore delle facce adiacenti " << endl;
+    /*cout << "stampo il vettore delle facce adiacenti " << endl;
     for (const auto& riga : facceAdiacenti) {
         for (const auto& elemento :riga) {
             cout << elemento << " ";
         }
         cout << endl;
-    }
+    }*/
 
     // inizializziamo gli elementi di mesh2 (quella del duale)
     mesh2.NumCell0Ds = mesh1.NumCell2Ds;
@@ -901,7 +918,7 @@ bool CreaDuale(const PolygonalMesh& mesh1, PolygonalMesh& mesh2){
 
     // itero sui vettori di facce adiacenti
     for(unsigned int idV = 0; idV < facceAdiacenti.size(); idV++){
-        cout << "id Vertice" << idV << endl;
+        //cout << "id Vertice" << idV << endl;
         // inizializzo un vettore dove inserire, per ogni faccia del duale, i suoi vertici
         vector<unsigned int> vecVert;
         // tale vettore deve essere lungo quanto il numero di facce andiacenti a ogni vertice
@@ -909,14 +926,14 @@ bool CreaDuale(const PolygonalMesh& mesh1, PolygonalMesh& mesh2){
 
         // ora itero sulle facce dentro i vettori
         for(unsigned int idF : facceAdiacenti[idV]){
-            cout << "id Faccia " << idF << endl;
+            //cout << "id Faccia " << idF << endl;
             // vettore contenente i vertici della faccia
             vector<unsigned int> verticiPerFaccia = mesh1.VettoreVertici[idF];
             unsigned int idPunto1 = verticiPerFaccia[0];
             unsigned int idPunto2 = verticiPerFaccia[1];
             unsigned int idPunto3 = verticiPerFaccia[2];
 
-            cout << "id punti della faccia " << idPunto1 << " " << idPunto2 << " " <<  idPunto3 << " " << endl;
+            //cout << "id punti della faccia " << idPunto1 << " " << idPunto2 << " " <<  idPunto3 << " " << endl;
 
             Vector3d punto1(mesh1.Cell0DsCoordinates(0,idPunto1),mesh1.Cell0DsCoordinates(1,idPunto1),mesh1.Cell0DsCoordinates(2,idPunto1));
             Vector3d punto2(mesh1.Cell0DsCoordinates(0,idPunto2),mesh1.Cell0DsCoordinates(1,idPunto2),mesh1.Cell0DsCoordinates(2,idPunto2));
@@ -936,7 +953,7 @@ bool CreaDuale(const PolygonalMesh& mesh1, PolygonalMesh& mesh2){
                 vecVert.push_back(contaIdPunti);
 
                 contaIdPunti += 1;
-                cout << "entrato nell'if" << endl;
+                //cout << "entrato nell'if" << endl;
             }else{
                 // nel caso in cui il punto era già stato messo aggiungo il suo id
                 vecVert.push_back(idPuntoDuale);
@@ -1031,11 +1048,11 @@ bool Dijkstra(const unsigned int& n,const vector<vector<unsigned int>>& LA, cons
             }
         }
     }
-    cout << "pred " << endl;
+    /*cout << "pred " << endl;
     for(unsigned int elemento : pred){
         cout << elemento << " ";
     }
-    cout << endl;
+    cout << endl;*/
 
     unsigned int v = end;
 	while(v != start){
@@ -1044,11 +1061,11 @@ bool Dijkstra(const unsigned int& n,const vector<vector<unsigned int>>& LA, cons
 	} 
     path.push_back(start);
 
-    cout << "path " << endl;
+    /*cout << "path " << endl;
     for(unsigned int elemento : path){
         cout << elemento << " ";
     }
-    cout << endl;
+    cout << endl;*/
     return true;
 
 }
@@ -1109,7 +1126,7 @@ bool CamminoMinimo(const PolygonalMesh& mesh, const unsigned int& id1, const uns
     Dijkstra(mesh.NumCell0Ds, listaAdiacenza, id1, id2, matricePesi, path);
 
     //stampa del percorso minimo
-    cout << "ID dei punti del percorso minimo:" << endl;
+    cout << "ID dei punti toccati dal percorso minimo:" << endl;
     for (unsigned int id : path) {
         cout << id << " ";
     }
@@ -1234,8 +1251,8 @@ bool ControllaBordi(const vector<vector<unsigned int>>& latiCompleti, const unsi
 
 bool AggiungiLati(PolygonalMesh& meshTri,const vector<unsigned int>& vecpunti, const unsigned int& IdBar, unsigned int& contatore){
     int idBarIntero = IdBar;
-    cout << "id del punto sul bordo in aggiungi lati " << IdBar << endl;
-    cout << "entro in aggiungi lati" << endl;
+    //cout << "id del punto sul bordo in aggiungi lati " << IdBar << endl;
+    //cout << "entro in aggiungi lati" << endl;
     for(unsigned int idPunto : vecpunti){
         //cout << "dobbiamo unire " << IdBar << " con " << idPunto << endl;
         if(!TestDuplicati(meshTri.Cell1DsExtrema, IdBar, idPunto)){
@@ -1453,7 +1470,7 @@ bool TriangolazioneDue(const PolygonalMesh& mesh1, PolygonalMesh& meshTri, const
         }
 
         vecFacce.push_back(lati);
-        cout << "id faccia" << i << endl;
+        //cout << "id faccia" << i << endl;
 
         /*for(unsigned int s = 0; s<lati.size(); s++){
             for(unsigned int y = 0;y<lati[s].size();y++){
@@ -1501,9 +1518,9 @@ bool TriangolazioneDue(const PolygonalMesh& mesh1, PolygonalMesh& meshTri, const
     BaricentriXFaccia.reserve(T);
     
     for(unsigned int idFaccia = 0; idFaccia < mesh1.NumCell2Ds; idFaccia++) {
-        cout << endl;
-        cout << "FACCIA NUMERO " << idFaccia << endl;
-        cout << "il conta punti è arrivato a (ho già aggiunto uno in più) " << ContaIdPuntiMesh2 << endl;;
+        //cout << endl;
+        //cout << "FACCIA NUMERO " << idFaccia << endl;
+        //cout << "il conta punti è arrivato a (ho già aggiunto uno in più) " << ContaIdPuntiMesh2 << endl;;
 
         // trovo la base e le altezze su cui salire, CAMBIARE IL DIZIONARIO IN UN VECTOR DI VECTOR
         vector<unsigned int> base = vecFacce[idFaccia][0];
@@ -1535,21 +1552,21 @@ bool TriangolazioneDue(const PolygonalMesh& mesh1, PolygonalMesh& meshTri, const
               reverse( lato1.begin(),  lato1.end());
         }
 
-        for(unsigned int i = 0; i < base.size(); i++){
+        /*for(unsigned int i = 0; i < base.size(); i++){
          
            cout << "altezza1 Nuova " << lato1[i] << " ";
             
         }
-        cout << endl;
+        cout << endl;*/
 
         if ( (lato2[0] != base[0]) & (lato2[0] != base[base.size()-1])){
               reverse( lato2.begin(),  lato2.end());
         }
 
-        for(unsigned int i = 0; i < base.size(); i++){
+        /*for(unsigned int i = 0; i < base.size(); i++){
             cout << "altezza2 Nuova " << lato2[i] << " ";
         }
-        cout << endl;
+        cout << endl;*/
 
         // aggiusto i vettori per fare in modo che altezza 1 inizi come base e altezza 2 inizi come finisce base
         vector<unsigned int> altezza1;
@@ -1563,38 +1580,36 @@ bool TriangolazioneDue(const PolygonalMesh& mesh1, PolygonalMesh& meshTri, const
         }
 
 
-
-        cout << endl;
         for(unsigned int h = 1; h < altezza1.size()-1; h++){
             // trovo il vettore direzione del tetto
-            cout << "mi muovo sulle altezze e h = " << h << endl;
+            //cout << "mi muovo sulle altezze e h = " << h << endl;
             unsigned int idEstremo1 = altezza1[h];
             unsigned int idEstremo2 = altezza2[h];
-            cout << "idEstremo1 " << idEstremo1 << " idEstremo2 " << idEstremo2 << endl;
+            //cout << "idEstremo1 " << idEstremo1 << " idEstremo2 " << idEstremo2 << endl;
 
             // prendiamo le coordinate degli estremi
             Vector3d Estremo1(mesh2.Cell0DsCoordinates(0,idEstremo1),mesh2.Cell0DsCoordinates(1,idEstremo1),mesh2.Cell0DsCoordinates(2,idEstremo1));
             Vector3d Estremo2(mesh2.Cell0DsCoordinates(0,idEstremo2),mesh2.Cell0DsCoordinates(1,idEstremo2),mesh2.Cell0DsCoordinates(2,idEstremo2));
-            cout << "estremo 1 " <<Estremo1(0) << " " << Estremo1(1) << " " << Estremo1(2) << endl;
-            cout << "estremo 2 " <<Estremo2(0) << " " << Estremo2(1) << " " << Estremo2(2) << endl;
+            //cout << "estremo 1 " <<Estremo1(0) << " " << Estremo1(1) << " " << Estremo1(2) << endl;
+            //cout << "estremo 2 " <<Estremo2(0) << " " << Estremo2(1) << " " << Estremo2(2) << endl;
         
             // vettore con la direzione del tetto
             Vector3d VettoreDirezione = Estremo2 - Estremo1;
-            cout << "Vettore direzione " << " " << VettoreDirezione(0) << " " <<VettoreDirezione(1) << " " <<VettoreDirezione(2) << endl;
+            //cout << "Vettore direzione " << " " << VettoreDirezione(0) << " " <<VettoreDirezione(1) << " " <<VettoreDirezione(2) << endl;
 
 
             vector<unsigned int> tetto = {altezza1[h]};
             vector<unsigned int> tetto2 = {altezza1[h]};
-            cout << "tetto ";
+            /*cout << "tetto ";
             for(unsigned int indice = 0; indice < tetto.size(); indice++){
                 cout << tetto[indice] << " "; 
             }
-            cout << endl;
+            cout << endl;*/
             
             int lunghezzaBase = base.size();
             for(int scorri = 0; scorri < 2*lunghezzaBase-2; scorri ++){
                  
-                cout << "scorri " << scorri << endl;
+                //cout << "scorri " << scorri << endl;
                 
                 if(scorri % 2 == 0){
                     // MESH TEMPORANEA
@@ -1602,12 +1617,12 @@ bool TriangolazioneDue(const PolygonalMesh& mesh1, PolygonalMesh& meshTri, const
                     unsigned int id1 = tetto[tetto.size()-1];
                     unsigned int id2 = base[scorri/2];
                     inserisciLati(mesh2.Cell1DsExtrema, mesh2.Cell1DsId , contaIdLatiMesh2, id1, id2);
-                    cout << "primo lato base fatto " << endl;
+                    //cout << "primo lato base fatto " << endl;
                     // inseriamo il secondo lato
                     id1 = base[scorri/2];
                     id2 = base[scorri/2+1];
                     inserisciLati(mesh2.Cell1DsExtrema, mesh2.Cell1DsId , contaIdLatiMesh2, id1, id2);
-                    cout << "secondo lato base fatto" << endl;
+                    //cout << "secondo lato base fatto" << endl;
                     // inserisco i vertici della faccia dentro a vettore vertici
                     vector<unsigned int> vecpunti = {base[scorri/2], tetto[tetto.size()-1], base[scorri/2+1]};
                     mesh2.VettoreVertici.push_back(vecpunti);
@@ -1629,14 +1644,14 @@ bool TriangolazioneDue(const PolygonalMesh& mesh1, PolygonalMesh& meshTri, const
                     Vector3d Medio;
                     bool Duplicato = false;
                     unsigned int IdTrovato = 0;
-                    cout << "id 1 " << id1 << " id2 " << id2 << endl;
+                    //cout << "id 1 " << id1 << " id2 " << id2 << endl;
                     if(ControllaBordi(latiCompleti, id1, id2, Medio, meshTri, IdPuntiMeshTri, Duplicato, IdTrovato)){
                         // aggiungo i lati che si creano con il bordo e il baricentro
                         if(!Duplicato){
                             vecpunti1 = {id1, id2, IdBaricentro};
                             AggiungiLati(meshTri, vecpunti1, IdPuntiMeshTri, IdLatiMeshTri);
-                            cout << "passo come baricentro " << IdBaricentro;
-                            cout << "id del punto sul bordo " << IdPuntiMeshTri << endl;
+                            //cout << "passo come baricentro " << IdBaricentro;
+                            //cout << "id del punto sul bordo " << IdPuntiMeshTri << endl;
                             // aggiungo una faccia
                             vector<unsigned int> vecVertici = {IdPuntiMeshTri, IdBaricentro, id1};
                             meshTri.VettoreVertici.push_back(vecVertici);
@@ -1678,8 +1693,8 @@ bool TriangolazioneDue(const PolygonalMesh& mesh1, PolygonalMesh& meshTri, const
                         if(!Duplicato){
                             vecpunti1 = {id1, id2, IdBaricentro};
                             AggiungiLati(meshTri, vecpunti1, IdPuntiMeshTri, IdLatiMeshTri);
-                            cout << "passo come baricentro " << IdBaricentro;
-                            cout << "id del punto sul bordo " << IdPuntiMeshTri << endl;
+                            //cout << "passo come baricentro " << IdBaricentro;
+                            //cout << "id del punto sul bordo " << IdPuntiMeshTri << endl;
                             // aggiungo una faccia
                             vector<unsigned int> vecVertici = {IdPuntiMeshTri, IdBaricentro, id1};
                             meshTri.VettoreVertici.push_back(vecVertici);
@@ -1725,8 +1740,8 @@ bool TriangolazioneDue(const PolygonalMesh& mesh1, PolygonalMesh& meshTri, const
                             if(!Duplicato){
                                 vecpunti1 = {id1, id2, IdBaricentro};
                                 AggiungiLati(meshTri, vecpunti1, IdPuntiMeshTri, IdLatiMeshTri);
-                                cout << "passo come baricentro " << IdBaricentro;
-                                cout << "id del punto sul bordo " << IdPuntiMeshTri << endl;
+                                //cout << "passo come baricentro " << IdBaricentro;
+                                //cout << "id del punto sul bordo " << IdPuntiMeshTri << endl;
                                 // aggiungo una faccia
                                 vector<unsigned int> vecVertici = {IdPuntiMeshTri, IdBaricentro, id1};
                                 meshTri.VettoreVertici.push_back(vecVertici);
@@ -1772,7 +1787,7 @@ bool TriangolazioneDue(const PolygonalMesh& mesh1, PolygonalMesh& meshTri, const
                     // troviamo il nuovo punto di tetto, divido per b-h perchè il tetto è sempre diviso in meno parti, e lo inserisco 
                     if(scorri < 2*lunghezzaBase-5){
                         
-                        cout << "SCORRI" <<scorri << "BASE"<< 2*lunghezzaBase-5<< endl;
+                        //cout << "SCORRI" <<scorri << "BASE"<< 2*lunghezzaBase-5<< endl;
                         Vector3d NuovoPuntoTetto = Estremo1 + VettoreDirezione * (scorri+1)/(2*(double)(b-h));
 
                         // inserisco il nuovo punto nelle coordinate della mesh temporanea
@@ -1786,17 +1801,17 @@ bool TriangolazioneDue(const PolygonalMesh& mesh1, PolygonalMesh& meshTri, const
                         meshTri.Cell0DsCoordinates(1,IdPuntiMeshTri) = NuovoPuntoTetto(1);
                         meshTri.Cell0DsCoordinates(2,IdPuntiMeshTri) = NuovoPuntoTetto(2);
                         meshTri.Cell0DsId.push_back(IdPuntiMeshTri);
-                        cout << "idNuovoPunto " << IdPuntiMeshTri << endl;
+                        //cout << "idNuovoPunto " << IdPuntiMeshTri << endl;
                         tetto2.push_back(IdPuntiMeshTri);
                         IdPuntiMeshTri += 1;
 
                         
-                        cout << "idNuovoPunto " << ContaIdPuntiMesh2 << endl;
+                        //cout << "idNuovoPunto " << ContaIdPuntiMesh2 << endl;
                         tetto.push_back(ContaIdPuntiMesh2);
                         ContaIdPuntiMesh2 += 1;
                         // inserisco l'id di questo punto in tetto
                         
-                        cout << "tetto ";
+                        /*cout << "tetto ";
                         for(unsigned int indice = 0; indice < tetto.size(); indice++){
                             cout << tetto[indice] << " "; 
                         }
@@ -1807,29 +1822,29 @@ bool TriangolazioneDue(const PolygonalMesh& mesh1, PolygonalMesh& meshTri, const
                         for(unsigned int indice = 0; indice < tetto.size(); indice++){
                             cout << tetto2[indice] << " "; 
                         }
-                        cout << endl;
+                        cout << endl;*/
 
                     }else{ 
                         tetto.push_back(altezza2[h]);
                         tetto2.push_back(altezza2[h]);
                         
-                        cout << "arrivo all'ultimo punto di tetto" << endl;
+                        /*cout << "arrivo all'ultimo punto di tetto" << endl;
                         cout << "tetto ";
                         for(unsigned int indice = 0; indice < tetto.size(); indice++){
                             cout << tetto[indice] << " "; 
                         }
-                        cout << endl;
+                        cout << endl;*/
                     }
                     // inseriamo il primo lato (tetto con la base)
                     unsigned int id1 = base[scorri+2-tetto.size()];
                     unsigned int id2 = tetto[tetto.size()-2];
                     inserisciLati(mesh2.Cell1DsExtrema, mesh2.Cell1DsId , contaIdLatiMesh2, id1, id2);
-                    cout << "primo lato tetto fatto " << endl;
+                    //cout << "primo lato tetto fatto " << endl;
                     // inseriamo il secondo lato (tetto con il tetto) controllando che nell'ultima iterazione non metta tetto-tetto
                     id1 = tetto[tetto.size()-1];
                     id2 = tetto[tetto.size()-2];
                     inserisciLati(mesh2.Cell1DsExtrema, mesh2.Cell1DsId , contaIdLatiMesh2, id1, id2);
-                    cout << "secondo lato tetto fatto" << endl;
+                    //cout << "secondo lato tetto fatto" << endl;
                     // inserisco i vertici della faccia dentro al vettore vertici evitando di aggiungere una faccia quando arrivo all'ultimo elemento di tetto
                     vector<unsigned int> vecpunti;
                     if(scorri < 2*lunghezzaBase-3){
@@ -1845,18 +1860,18 @@ bool TriangolazioneDue(const PolygonalMesh& mesh1, PolygonalMesh& meshTri, const
                     if(scorri < 2*lunghezzaBase-3){
                         // trovo il baricentro della faccia e lo aggiungo 
                         vector<unsigned int> vecpunti2 = {tetto2[tetto2.size()-2],base2[scorri+2-tetto2.size()],tetto2[tetto2.size()-1]};
-                        cout << "vecpunti fatto tetto2" << endl;
+                        //cout << "vecpunti fatto tetto2" << endl;
                         BaricentriXFaccia.push_back(IdPuntiMeshTri);
                         CreaBaricentro(meshTri ,vecpunti2, IdPuntiMeshTri, MapBaricentri);
-                        cout << "crea il baricentro" << endl;
+                        //cout << "crea il baricentro" << endl;
                         // aggiungo i lati che dal baricentro vanno agli estremi del tiangolo
                         AggiungiLati(meshTri, vecpunti2, IdPuntiMeshTri, IdLatiMeshTri);
-                        cout << "aggiungo i lati" << endl;
+                        //cout << "aggiungo i lati" << endl;
                         unsigned int IdBaricentro = IdPuntiMeshTri;
                         IdPuntiMeshTri += 1;
 
                         CollegaBaricentri(MapBaricentri, IdBaricentro, meshTri, IdLatiMeshTri, BaricentriXFaccia, IdFacceMeshtri);
-                        cout << "collega i baricentri" << endl;
+                        //cout << "collega i baricentri" << endl;
                     }
 
                 }
@@ -1865,10 +1880,10 @@ bool TriangolazioneDue(const PolygonalMesh& mesh1, PolygonalMesh& meshTri, const
             tetto2.pop_back();
             base = tetto;
             base2 = tetto2;
-            for(unsigned int i = 0; i < base.size(); i++){
+            /*for(unsigned int i = 0; i < base.size(); i++){
                 cout << "base " << base[i] << " ";
             }
-            cout << endl; 
+            cout << endl; */
         }        
 
     // TRIANGOLAZIONE TEMPORANEA
@@ -1876,11 +1891,11 @@ bool TriangolazioneDue(const PolygonalMesh& mesh1, PolygonalMesh& meshTri, const
     unsigned int id1 = altezza1[altezza1.size()-1];
     unsigned int id2 = base[0];
     inserisciLati(mesh2.Cell1DsExtrema, mesh2.Cell1DsId , contaIdLatiMesh2, id1, id2);
-    cout << "primo lato tetto fatto " << endl;
+    //cout << "primo lato tetto fatto " << endl;
     id1 = altezza1[altezza1.size()-1];
     id2 = base[1];
     inserisciLati(mesh2.Cell1DsExtrema, mesh2.Cell1DsId , contaIdLatiMesh2, id1, id2);
-    cout << "primo lato tetto fatto " << endl;
+    //cout << "primo lato tetto fatto " << endl;
     // inserisco l'ultima faccia
     vector<unsigned int> vecpunti = {base[0],altezza1[altezza1.size()-1],base[1]};
     mesh2.VettoreVertici.push_back(vecpunti);
@@ -1904,8 +1919,8 @@ bool TriangolazioneDue(const PolygonalMesh& mesh1, PolygonalMesh& meshTri, const
         if(!Duplicato){
             vector<unsigned int> vecpunti1 = {id1, id2, IdBaricentro};
             AggiungiLati(meshTri, vecpunti1, IdPuntiMeshTri, IdLatiMeshTri);
-            cout << "passo come baricentro " << IdBaricentro;
-            cout << "id del punto sul bordo " << IdPuntiMeshTri << endl;
+            //cout << "passo come baricentro " << IdBaricentro;
+            //cout << "id del punto sul bordo " << IdPuntiMeshTri << endl;
             // aggiungo una faccia
             vector<unsigned int> vecVertici = {IdPuntiMeshTri, IdBaricentro, id1};
             meshTri.VettoreVertici.push_back(vecVertici);
@@ -1947,8 +1962,8 @@ bool TriangolazioneDue(const PolygonalMesh& mesh1, PolygonalMesh& meshTri, const
         if(!Duplicato){
             vector<unsigned int> vecpunti1 = {id1, id2, IdBaricentro};
             AggiungiLati(meshTri, vecpunti1, IdPuntiMeshTri, IdLatiMeshTri);
-            cout << "passo come baricentro " << IdBaricentro;
-            cout << "id del punto sul bordo " << IdPuntiMeshTri << endl;
+            //cout << "passo come baricentro " << IdBaricentro;
+            //cout << "id del punto sul bordo " << IdPuntiMeshTri << endl;
             // aggiungo una faccia
             vector<unsigned int> vecVertici = {IdPuntiMeshTri, IdBaricentro, id1};
             meshTri.VettoreVertici.push_back(vecVertici);
@@ -1995,8 +2010,8 @@ bool TriangolazioneDue(const PolygonalMesh& mesh1, PolygonalMesh& meshTri, const
             if(!Duplicato){
                 vector<unsigned int> vecpunti1 = {id1, id2, IdBaricentro};
                 AggiungiLati(meshTri, vecpunti1, IdPuntiMeshTri, IdLatiMeshTri);
-                cout << "passo come baricentro " << IdBaricentro;
-                cout << "id del punto sul bordo " << IdPuntiMeshTri << endl;
+                //cout << "passo come baricentro " << IdBaricentro;
+                //cout << "id del punto sul bordo " << IdPuntiMeshTri << endl;
                 // aggiungo una faccia
                 vector<unsigned int> vecVertici = {IdPuntiMeshTri, IdBaricentro, id1};
                 meshTri.VettoreVertici.push_back(vecVertici);
@@ -2032,14 +2047,14 @@ bool TriangolazioneDue(const PolygonalMesh& mesh1, PolygonalMesh& meshTri, const
     
     }
 
-    cout << "stampo vettore vertici " << endl;
+    /*cout << "stampo vettore vertici " << endl;
     for(unsigned int idFaccia = 0; idFaccia < meshTri.VettoreVertici.size(); idFaccia++){
         cout << "faccia " << idFaccia << " ";
         for(unsigned int idPunto : meshTri.VettoreVertici[idFaccia]){
             cout << idPunto << " "; 
         }
         cout << endl;
-    }
+    }*/
 
 
     // riempio il VettoreLati per ogni faccia in ordine
