@@ -64,4 +64,6 @@ namespace PolygonalLibrary{
     // trova la triangolazione di tipo due dei punti di un poligono
     bool TriangolazioneDue(const PolygonalMesh& mesh1, PolygonalMesh& meshTri, const unsigned int& b, const unsigned int& q);
 
+    //stampa su file
+    bool StampasuFile(const PolygonalMesh& mesh);
 }

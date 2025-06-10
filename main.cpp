@@ -29,6 +29,7 @@ int main(int argc, char* argv[]){
     int id1;
     int id2;
 
+
     if (argc != 5 && argc != 7) {
         cerr << "Input non valido" ;
         return 1;
@@ -39,7 +40,13 @@ int main(int argc, char* argv[]){
 	for (int i = 1; i < argc; i++){
 		convert << argv[i] << " ";
     }
-    convert >> p >> q >> b >> c;
+    if(argc == 5) {
+      convert >> p >> q >> b >> c;
+    } else {
+      convert >> p >> q >> b >> c >> id1 >> id2;
+      cout << id1 << " " << id2 << endl;
+    }
+    
 
     if (p != 3){
         cerr << "la costruzione del solido geodetico richiede p = 3";

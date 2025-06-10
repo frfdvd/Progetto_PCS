@@ -10,7 +10,7 @@
 #include "UCDUtilities.hpp"
 
 namespace PolygonalLibrary{
-    bool ImportMesh(PolygonalMesh& mesh, const string& Poliedro)
+  bool ImportMesh(PolygonalMesh& mesh, const string& Poliedro)
 {
 
     if(!ImportCell0Ds(mesh, Poliedro))
@@ -24,6 +24,42 @@ namespace PolygonalLibrary{
         
     return true;
 
+}
+
+/**********************************/
+bool StampasuFile(const PolygonalMesh& mesh){
+    ofstream outFile0("Cell0Ds.txt");
+
+    if (!outFile0) {
+        cerr << "Errore nell'apertura del file Cell0Ds.txt." << endl;
+        return false;
+    }
+
+    for(unsigned int idPunto = 0; idPunto < mesh.Cell0DsCoordinates.cols(); idPunto ++) {
+        double x = mesh.Cell0DsCoordinates(0, idPunto);
+        double y = mesh.Cell0DsCoordinates(1, idPunto);
+        double z = mesh.Cell0DsCoordinates(2, idPunto);
+       
+        outFile0 << idPunto << " " << x << " " << y << " " << z << endl;
+
+    }
+    outFile0.close(); 
+
+    ofstream outFile1("Cell1Ds.txt");
+    if (!outFile1) {
+        cerr << "Errore nell'apertura del file Cell1Ds.txt." << endl;
+        return false;
+    }
+
+    for(unsigned int idLato = 0; idLato < mesh.Cell1DsExtrema.cols(); idLato ++) {
+        double id1 = mesh.Cell1DsExtrema(0, idLato);
+        double id2 = mesh.Cell1DsExtrema(1, idLato);
+
+        outFile1 << idLato << id1 << " " << id2 << endl;
+    }
+    outFile1.close(); 
+
+    return true;
 }
 
 /**********************************/
@@ -976,14 +1012,12 @@ bool Dijkstra(const unsigned int& n,const vector<vector<unsigned int>>& LA, cons
 
     pred[start] = start;
     dist[start] = 0.0;
-    cout << "ok1" << endl;
     
     // creo la coda con priorità, sarà ordinata in ordine crescente
     priority_queue<pair<int, double>, vector<pair<int, double>>, greater<pair<int, double>>> PQ;
     for(unsigned int i = 0; i < n; i++){
 		PQ.push({i, dist[i]});
     }
-    cout << "ok2" << endl;
 
     while(!PQ.empty()){
         int u = PQ.top().first;
@@ -1015,8 +1049,6 @@ bool Dijkstra(const unsigned int& n,const vector<vector<unsigned int>>& LA, cons
         cout << elemento << " ";
     }
     cout << endl;
-
-    cout << "ok4" << endl;
     return true;
 
 }
@@ -1075,6 +1107,13 @@ bool CamminoMinimo(const PolygonalMesh& mesh, const unsigned int& id1, const uns
     vector<unsigned int> path;
     path.reserve(mesh.NumCell0Ds);
     Dijkstra(mesh.NumCell0Ds, listaAdiacenza, id1, id2, matricePesi, path);
+
+    //stampa del percorso minimo
+    cout << "ID dei punti del percorso minimo:" << endl;
+    for (unsigned int id : path) {
+        cout << id << " ";
+    }
+    cout<<endl;
 
     // coloriamo i punti relativi al percorso
     vector<double> ProprietaPuntiPercorso(mesh.NumCell0Ds, 0.0);
