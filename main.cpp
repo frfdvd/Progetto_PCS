@@ -148,6 +148,14 @@ int main(int argc, char* argv[]){
             if(!CamminoMinimo(meshTriangolata1, id1, id2, ParaviewPuntiTriangolati1, ParaviewSegmentiTriangolati1)){
                 return false;
             }
+
+            cout << endl;
+
+            cout << "FACCIO IL CAMMINO MINIMO 1 SUL DUALE" << endl;
+            cout << endl;
+            if(!CamminoMinimo(meshDuale1, id1, id2, ParaviewPuntiDuale1, ParaviewSegmentiDuale1)){
+                return false;
+            }
         }
     }
 
@@ -196,6 +204,13 @@ int main(int argc, char* argv[]){
             if(!CamminoMinimo(meshTriangolata2, id1, id2, ParaviewPuntiTriangolati2, ParaviewSegmentiTriangolati2)){
                 return false;
             }
+
+            cout << endl;
+            cout << "FACCIO IL CAMMINO MINIMO 2 SUL DUALE" << endl;
+            cout << endl;
+            if(!CamminoMinimo(meshDuale2, id1, id2, ParaviewPuntiDuale2, ParaviewSegmentiDuale2)){
+                return false;
+            }
         }
     }
 
@@ -203,59 +218,3 @@ int main(int argc, char* argv[]){
 
     }
     
-  
-
-    /*cout << "FACCIO IL DUALE UNO" << endl;
-    cout << endl;
-
-    unsigned int qDuale = p;
-    unsigned int pDuale = q;
-    if(!CreaDuale(meshTriangolata1, meshDuale1))
-    {
-        cerr << "error during triangolation" << endl;
-        return 1;
-    }
-
-    
-
-    string ParaviewPuntiDuale1 = "./Cell0DDuale1.inp";
-    string ParaviewSegmentiDuale1 = "./Cell1DDuale1.inp";
-    
-    utilities.ExportPoints(ParaviewPuntiDuale1, 
-                            meshDuale1.Cell0DsCoordinates);
-    utilities.ExportSegments(ParaviewSegmentiDuale1,
-                             meshDuale1.Cell0DsCoordinates,
-                             meshDuale1.Cell1DsExtrema);
-
-    
-    cout << "FACCIO IL DUALE DUE" << endl;
-    cout << endl;
-
-    if(!CreaDuale(meshTriangolata2, meshDuale2))
-    {
-        cerr << "error during triangolation" << endl;
-        return 1;
-    }
-
-    
-
-    string ParaviewPuntiDuale2 = "./Cell0DDuale2.inp";
-    string ParaviewSegmentiDuale2 = "./Cell1DDuale2.inp";
-    
-    utilities.ExportPoints(ParaviewPuntiDuale2, 
-                            meshDuale2.Cell0DsCoordinates);
-    utilities.ExportSegments(ParaviewSegmentiDuale2,
-                            meshDuale2.Cell0DsCoordinates,
-                            meshDuale2.Cell1DsExtrema);
-
-    // qua metto cammino minimo
-    if(!CamminoMinimo(meshDuale1, id1, id2, ParaviewPuntiDuale1, ParaviewSegmentiDuale1)){
-        return false;
-    }
-    
-    if(!CamminoMinimo(meshDuale2, id1, id2, ParaviewPuntiDuale2, ParaviewSegmentiDuale2)){
-        return false;
-    }
-
-    return 0;
-}*/
