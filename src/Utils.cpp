@@ -63,8 +63,18 @@ bool StampasuFile(const PolygonalMesh& mesh){
         return false;
     }
     outFile2<<"id;NumVertices;Vertices;NumEdges;Edges"<<endl;
-
-
+    for(unsigned idFaccia = 0; idFaccia < mesh.VettoreVertici.size(); idFaccia++){
+         outFile2<<idFaccia<<";"<<mesh.VettoreVertici[idFaccia].size()<<";";
+         for(unsigned int v = 0; v < mesh.VettoreVertici[idFaccia].size(); v++ ){
+             outFile2<<mesh.VettoreVertici[idFaccia][v]<<";";
+         }
+         outFile2<<mesh.VettoreLati[idFaccia].size()<<";";
+         for(unsigned int y = 0; y < mesh.VettoreLati[idFaccia].size(); y++ ){
+             outFile2<<mesh.VettoreLati[idFaccia][y]<<";";
+         }
+         outFile2<<endl;
+         idFaccia += 1;
+    }
     outFile2.close(); 
 
     ofstream outFile3("Cell3DsTRI.txt");
@@ -73,6 +83,9 @@ bool StampasuFile(const PolygonalMesh& mesh){
         return false;
     }
     outFile3<<"id;NumVertices;Vertices;NumEdges;Edges;NumFaces;Faces"<<endl;
+    outFile3<<0;
+
+
 
 
     outFile3.close(); 
@@ -1073,12 +1086,6 @@ bool Dijkstra(const unsigned int& n,const vector<vector<unsigned int>>& LA, cons
 /**********************************/
 
 bool CamminoMinimo(const PolygonalMesh& mesh, const unsigned int& id1, const unsigned int& id2, const string& nomefilepunti, const string& nomefilelati){
-
-    //controllo che gli id dei vertici passati esistano 
-    if( (id1 > mesh.NumCell0Ds) || (id2 > mesh.NumCell0Ds) ){
-        cerr << "gli id non sono validi" << endl;
-        return false;
-    }
 
     // creo la lista di adiacenza
     vector<vector<unsigned int>> listaAdiacenza;

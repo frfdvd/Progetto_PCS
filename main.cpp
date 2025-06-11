@@ -145,16 +145,32 @@ int main(int argc, char* argv[]){
         if (cammino == true ) {
             cout << "FACCIO IL CAMMINO MINIMO 1" << endl;
             cout << endl;
-            if(!CamminoMinimo(meshTriangolata1, id1, id2, ParaviewPuntiTriangolati1, ParaviewSegmentiTriangolati1)){
-                return false;
+            //controllo che gli id passati siano validi
+            bool valido = true;
+            if( (id1 > meshTriangolata1.NumCell0Ds) || (id2 > meshTriangolata1.NumCell0Ds) ){
+                cerr << "Gli id non sono validi per il cammino minimo" << endl;
+                valido = false;
             }
 
+            if (valido == true){
+               if(!CamminoMinimo(meshTriangolata1, id1, id2, ParaviewPuntiTriangolati1, ParaviewSegmentiTriangolati1)){
+                                return false;
+                            }
+            }
             cout << endl;
 
             cout << "FACCIO IL CAMMINO MINIMO 1 SUL DUALE" << endl;
             cout << endl;
-            if(!CamminoMinimo(meshDuale1, id1, id2, ParaviewPuntiDuale1, ParaviewSegmentiDuale1)){
-                return false;
+            //controllo che gli id passati siano validi
+            bool validoD = true;
+            if( (id1 > meshDuale1.NumCell0Ds) || (id2 > meshDuale1.NumCell0Ds) ){
+                cerr << "Gli id non sono validi per il cammino minimo sul duale" << endl;
+                validoD = false;
+            }
+            if(validoD == true){
+                if(!CamminoMinimo(meshDuale1, id1, id2, ParaviewPuntiDuale1, ParaviewSegmentiDuale1)){
+                    return false;
+                }
             }
         }
     }
@@ -201,15 +217,30 @@ int main(int argc, char* argv[]){
         if (cammino == true ) {
             cout << "FACCIO IL CAMMINO MINIMO 2" << endl;
             cout << endl;
-            if(!CamminoMinimo(meshTriangolata2, id1, id2, ParaviewPuntiTriangolati2, ParaviewSegmentiTriangolati2)){
+            //controllo che gli id passati siano validi
+            bool valido = true;
+            if( (id1 > meshTriangolata2.NumCell0Ds) || (id2 > meshTriangolata2.NumCell0Ds) ){
+                cerr << "Gli id non sono validi per il cammino minimo" << endl;
+                valido = false;
+            }
+            if (valido == true) {
+                if(!CamminoMinimo(meshTriangolata2, id1, id2, ParaviewPuntiTriangolati2, ParaviewSegmentiTriangolati2)){
                 return false;
+                }
             }
 
             cout << endl;
             cout << "FACCIO IL CAMMINO MINIMO 2 SUL DUALE" << endl;
             cout << endl;
-            if(!CamminoMinimo(meshDuale2, id1, id2, ParaviewPuntiDuale2, ParaviewSegmentiDuale2)){
+            bool validoD = true;
+            if( (id1 > meshDuale2.NumCell0Ds) || (id2 > meshDuale2.NumCell0Ds) ){
+                cerr << "Gli id non sono validi per il cammino minimo" << endl;
+                validoD = false;
+            }
+            if (validoD == true){
+                if(!CamminoMinimo(meshDuale2, id1, id2, ParaviewPuntiDuale2, ParaviewSegmentiDuale2)){
                 return false;
+                }
             }
         }
     }
