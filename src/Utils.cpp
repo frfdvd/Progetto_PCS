@@ -26,10 +26,10 @@ namespace PolygonalLibrary{
 
 /**********************************/
 bool StampasuFile(const PolygonalMesh& mesh){
-    ofstream outFile0("Cell0DsTRI.txt");
+    ofstream outFile0("Cell0Ds.txt");
 
     if (!outFile0) {
-        cerr << "Errore nell'apertura del file Cell0DsTRI.txt." << endl;
+        cerr << "Errore nell'apertura del file Cell0Ds.txt." << endl;
         return false;
     }
     outFile0 <<"id;x;y;z"<<endl;
@@ -43,9 +43,9 @@ bool StampasuFile(const PolygonalMesh& mesh){
     }
     outFile0.close(); 
 
-    ofstream outFile1("Cell1DsTRI.txt");
+    ofstream outFile1("Cell1Ds.txt");
     if (!outFile1) {
-        cerr << "Errore nell'apertura del file Cell1DsTRI.txt." << endl;
+        cerr << "Errore nell'apertura del file Cell1Ds.txt." << endl;
         return false;
     }
     outFile1<<"id;origin;end"<<endl;
@@ -57,9 +57,9 @@ bool StampasuFile(const PolygonalMesh& mesh){
     }
     outFile1.close(); 
     
-    ofstream outFile2("Cell2DsTRI.txt");
+    ofstream outFile2("Cell2Ds.txt");
     if (!outFile2) {
-        cerr << "Errore nell'apertura del file Cell2DsTRI.txt." << endl;
+        cerr << "Errore nell'apertura del file Cell2Ds.txt." << endl;
         return false;
     }
     outFile2<<"id;NumVertices;Vertices;NumEdges;Edges"<<endl;
@@ -77,9 +77,9 @@ bool StampasuFile(const PolygonalMesh& mesh){
     }
     outFile2.close(); 
 
-    ofstream outFile3("Cell3DsTRI.txt");
+    ofstream outFile3("Cell3Ds.txt");
     if (!outFile2) {
-        cerr << "Errore nell'apertura del file Cell3DsTRI.txt." << endl;
+        cerr << "Errore nell'apertura del file Cell3Ds.txt." << endl;
         return false;
     }
     outFile3<<"id;NumVertices;Vertices;NumEdges;Edges;NumFaces;Faces"<<endl;
