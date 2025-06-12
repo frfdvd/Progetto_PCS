@@ -31,7 +31,7 @@ array<unsigned int, 3> ProprietaSolido(const unsigned int& V, const unsigned int
 
 TEST(TestTriangolazioneUno, TestTetraedro1)
 {
-	unsigned int q = 4;
+	unsigned int q = 3;
 	PolygonalMesh poliPlatonico;
 	if (!PolygonalLibrary::ImportMesh(poliPlatonico, "Tetraedro")){
 		FAIL() << "errore nella creazione della mesh del tetraedro triangolato con triangolazione uno";
@@ -61,10 +61,73 @@ TEST(TestTriangolazioneUno, TestTetraedro1)
 	EXPECT_EQ(numgradoAtteso2, numVGrado2);
 }
 
+TEST(TestTriangolazioneUno, TestOttaedro1)
+{
+	unsigned int q = 4;
+	PolygonalMesh poliPlatonico;
+	if (!PolygonalLibrary::ImportMesh(poliPlatonico, "Ottaedro")){
+		FAIL() << "errore nella creazione della mesh del ottaedro triangolato con triangolazione uno";
+	}
+
+	PolygonalMesh poliTRI;
+	PolygonalLibrary::TriangolazioneUno(poliPlatonico, poliTRI, b, q);
+	
+	int T = pow(b,2);
+	int verticiAttesi = 4*T + 2;
+	int latiAttesi = 12*T;
+	int facceAttese = 8*T;
+	
+	EXPECT_EQ(poliTRI.NumCell0Ds, verticiAttesi);
+	EXPECT_EQ(poliTRI.NumCell1Ds, latiAttesi);
+	EXPECT_EQ(poliTRI.NumCell2Ds, facceAttese);
+	
+	int grado1 = 4;
+	int grado2 = 6;
+	int numgradoAtteso1 = 6;
+	int numgradoAtteso2 = 4*(T-1);
+	
+	int numVGrado1 = GradoV(grado1, poliTRI.Cell0DsId, poliTRI.VettoreVertici);
+	int numVGrado2 = GradoV(grado2, poliTRI.Cell0DsId, poliTRI.VettoreVertici);
+	
+	EXPECT_EQ(numgradoAtteso1, numVGrado1);
+	EXPECT_EQ(numgradoAtteso2, numVGrado2);
+}
+
+TEST(TestTriangolazioneUno, TestIcosaedro1)
+{
+	unsigned int q = 5;
+	PolygonalMesh poliPlatonico;
+	if (!PolygonalLibrary::ImportMesh(poliPlatonico, "Icosaedro")){
+		FAIL() << "errore nella creazione della mesh del icosaedro triangolato con triangolazione uno";
+	}
+
+	PolygonalMesh poliTRI;
+	PolygonalLibrary::TriangolazioneUno(poliPlatonico, poliTRI, b, q);
+	
+	int T = pow(b,2);
+	int verticiAttesi = 10*T + 2;
+	int latiAttesi = 30*T;
+	int facceAttese = 20*T;
+	
+	EXPECT_EQ(poliTRI.NumCell0Ds, verticiAttesi);
+	EXPECT_EQ(poliTRI.NumCell1Ds, latiAttesi);
+	EXPECT_EQ(poliTRI.NumCell2Ds, facceAttese);
+	
+	int grado1 = 5;
+	int grado2 = 6;
+	int numgradoAtteso1 = 12;
+	int numgradoAtteso2 = 10*(T-1);
+	
+	int numVGrado1 = GradoV(grado1, poliTRI.Cell0DsId, poliTRI.VettoreVertici);
+	int numVGrado2 = GradoV(grado2, poliTRI.Cell0DsId, poliTRI.VettoreVertici);
+	
+	EXPECT_EQ(numgradoAtteso1, numVGrado1);
+	EXPECT_EQ(numgradoAtteso2, numVGrado2);
+}
 
 TEST(TestTriangolazioneUno, TestTetraedro2)
 {
-	unsigned int q = 4;
+	unsigned int q = 3;
 	PolygonalMesh poliPlatonico;
 	if (!PolygonalLibrary::ImportMesh(poliPlatonico, "Tetraedro")){
 		FAIL() << "errore nella creazione della mesh del tetraedro triangolato con triangolazione uno";
@@ -82,6 +145,67 @@ TEST(TestTriangolazioneUno, TestTetraedro2)
 
 	EXPECT_EQ(proprietasolido, proprietasolidoattese);
 }
+
+TEST(TestTriangolazioneUno, TestOttaedro2)
+{
+	unsigned int q = 4;
+	PolygonalMesh poliPlatonico;
+	if (!PolygonalLibrary::ImportMesh(poliPlatonico, "Ottaedro")){
+		FAIL() << "errore nella creazione della mesh del ottaedro triangolato con triangolazione uno";
+	}
+
+	PolygonalMesh poliTRI;
+	PolygonalLibrary::TriangolazioneDue(poliPlatonico, poliTRI, b, q);
+	
+	unsigned int V = 6;
+	unsigned int E = 12;
+	unsigned int F = 8;
+	
+	array<unsigned int, 3> proprietasolidoattese = ProprietaSolido(V, E, F, b);
+	array<unsigned int, 3> proprietasolido = {poliTRI.NumCell0Ds, poliTRI.NumCell1Ds, poliTRI.NumCell2Ds};
+
+	EXPECT_EQ(proprietasolido, proprietasolidoattese);
+}
+
+TEST(TestTriangolazioneUno, TestIcosaedrodro2)
+{
+	unsigned int q = 4;
+	PolygonalMesh poliPlatonico;
+	if (!PolygonalLibrary::ImportMesh(poliPlatonico, "Tetraedro")){
+		FAIL() << "errore nella creazione della mesh del tetraedro triangolato con triangolazione uno";
+	}
+
+	PolygonalMesh poliTRI;
+	PolygonalLibrary::TriangolazioneDue(poliPlatonico, poliTRI, b, q);
+	
+	unsigned int V = 12;
+	unsigned int E = 30;
+	unsigned int F = 20;
+	
+	array<unsigned int, 3> proprietasolidoattese = ProprietaSolido(V, E, F, b);
+	array<unsigned int, 3> proprietasolido = {poliTRI.NumCell0Ds, poliTRI.NumCell1Ds, poliTRI.NumCell2Ds};
+
+	EXPECT_EQ(proprietasolido, proprietasolidoattese);
+}
+
+TEST(TestDuale, Test1)
+{
+	PolygonalMesh poliPlatonico;
+	if (!PolygonalLibrary::ImportMesh(poliPlatonico, "Tetraedro")){
+		FAIL() << "errore nella creazione della mesh del tetraedro triangolato con triangolazione uno";
+	}
+	
+	PolygonalMesh poliDuale;
+	PolygonalLibrary::CreaDuale(poliPlatonico, poliDuale);
+	
+	unsigned int T = pow(b, 2);
+	unsigned int verticiattesi = 4*T;
+	unsigned int facceattese = 2*T+2;
+	
+	EXPECT_EQ(poliDuale.NumCell0Ds, verticiattesi);
+	EXPECT_EQ(poliDuale.NumCell2Ds, facceattese);
+}
+
 
 TEST(TestDuale, Test2)
 {
