@@ -1,4 +1,9 @@
-int main(){
+#include <gtest/gtest.h>
 
-    return 0;
+#include "test_poliedro.hpp" 
+
+int main(int argc, char *argv[])
+{
+	::testing::InitGoogleTest(&argc, argv); 
+	return RUN_ALL_TESTS();
 }

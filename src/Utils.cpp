@@ -83,7 +83,7 @@ bool StampasuFile(const PolygonalMesh& mesh){
         return false;
     }
     outFile3<<"id;NumVertices;Vertices;NumEdges;Edges;NumFaces;Faces"<<endl;
-    outFile3<<0;
+    outFile3<<0<<";"<<mesh.NumCell0Ds<<";"<<mesh.NumCell1Ds<<";"<<mesh.NumCell2Ds;
 
 
 
