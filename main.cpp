@@ -11,8 +11,6 @@ using namespace PolygonalLibrary;
 using namespace Gedim;
 
 
-
-
 int main(int argc, char* argv[]){
     
     // creo un oggetto mesh
@@ -146,8 +144,6 @@ int main(int argc, char* argv[]){
             cout << "FACCIO IL DUALE UNO" << endl;
             cout << endl;
 
-            unsigned int qDuale = p;
-            unsigned int pDuale = q;
             if(!CreaDuale(meshTriangolata1, meshDuale1))
             {
                 cerr << "error during triangolation" << endl;

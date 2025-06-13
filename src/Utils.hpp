@@ -23,18 +23,23 @@ namespace PolygonalLibrary{
     bool ImportCell2Ds(PolygonalMesh& mesh, const string& Poliedro);
 
     // verifica la presenza di duplicati nei lati, se c'è già ritorna true altrimenti false
+    // costo computazionale O(n) con n numero di lati nella matrice
     bool TestDuplicati(const MatrixXi& MatriceLati, const unsigned int& id1, const unsigned int& id2, unsigned int* PuntatoreLato = nullptr);
 
     // verifica la presenza di duplicati nei punti, se c'è già ritorna true altrimenti false
+    // costo computazionale O(n) con n numero di punti nella matrice
     bool TestDuplicatiPunti(const MatrixXi& MatricePunti, const Vector3d& coordinate, unsigned int& idTrovato);
 
     // inserisce i lati all'interno della matrice Cell1DsExtrema verificando tramite test duplicati che tale lato non esista
+    // costo computazionale O(n) con n numero di lati perchè chiama TestDuplicati
     bool inserisciLati(MatrixXi& MatriceLati, vector<unsigned int> VettoreIdLati, unsigned int& contaIdLati, const unsigned int& id1, const unsigned int& id2);
 
     // proietta i punti sulla sfera unitaria
+    // costo computazionale O(n) con n numero di punti 
     bool ProiettaPunti(MatrixXd& MatriceCoordinate);
 
     // riconosce il poliedro che viene inserito
+    // costo computazionale O(1)
     string RiconosciPoliedro(const unsigned int& q);
 
     // trova la triangolazione di tipo uno dei punti di un poligono
@@ -50,6 +55,7 @@ namespace PolygonalLibrary{
     bool Dijkstra(const unsigned int& n,const vector<vector<unsigned int>>& LA, const unsigned int& start, const unsigned int& end, MatrixXd& matrice, vector<unsigned int>& path);
 
     // crea il baricentro nella triangolazione di tipo due, lo aggiunge a meshtri e anche alla mappa dei baricentri
+    // costo computazionale O(1)
     bool CreaBaricentro(PolygonalMesh& meshTri,const vector<unsigned int>& vecpunti, const unsigned int& IdBar, map<unsigned int, vector<unsigned int>>& map);
 
     // controlla se sul bordo si deve aggiungere un punto e nel caso trova le sue coordinate
