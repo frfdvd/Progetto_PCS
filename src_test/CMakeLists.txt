@@ -1,5 +1,5 @@
 list(APPEND src_test_headers 
-${CMAKE_CURRENT_SOURCE_DIR}/test_progetto_pcs.cpp)
+${CMAKE_CURRENT_SOURCE_DIR}/test_progetto_pcs.hpp)
 
 list(APPEND src_test_includes ${CMAKE_CURRENT_SOURCE_DIR})
 

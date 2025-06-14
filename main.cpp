@@ -39,7 +39,7 @@ int main(int argc, char* argv[]){
         string arg = argv[i];
         for (char c : arg) {
             if (!isdigit(c)) {
-                cerr << "Errore: '"<< arg<< "' non � un numero positivo"<<endl;
+                cerr << "Errore: '"<< arg<< "' non è un numero positivo"<<endl;
                 return 1;
             }
         }
@@ -68,8 +68,14 @@ int main(int argc, char* argv[]){
         return 1;
     }
     
-    string Poliedro = RiconosciPoliedro(q); 
-    cout << Poliedro << endl;
+    string Poliedro;
+    if(p == 3){
+        Poliedro = RiconosciPoliedro(q); 
+        cout << Poliedro << endl;
+    }else if(q == 3){
+        Poliedro = RiconosciPoliedro(p); 
+        cout << Poliedro << endl;
+    }
 
     // importo la mesh e verifico che avvenga correttamente
     if(!ImportMesh(mesh, Poliedro))
@@ -90,26 +96,26 @@ int main(int argc, char* argv[]){
                              mesh.Cell0DsCoordinates,
                              mesh.Cell1DsExtrema);
 
-     string ParaviewPuntiTriangolati1 = "./Cell0DTriang1.inp";
-     string ParaviewSegmentiTriangolati1 = "./Cell1DTriang1.inp";    
+    string ParaviewPuntiTriangolati1 = "./Cell0DTriang1.inp";
+    string ParaviewSegmentiTriangolati1 = "./Cell1DTriang1.inp";    
      
     if(b == 0 || c == 0){
 
         unsigned int b_temp;
             b_temp = b;
 
-            if(b_temp ==0){
-                b_temp = c;
-            }
+        if(b_temp ==0){
+            b_temp = c;
+        }
 
-        if(!TriangolazioneUno(mesh, meshTriangolata1, b_temp, q))
+        if (p == 3){
+
+            if(!TriangolazioneUno(mesh, meshTriangolata1, b_temp, q))
             {
                 cerr << "error during triangolation" << endl;
                 return 1;
             }
-
-        if (p == 3){
-
+            
             cout << endl << "FACCIO LA TRIANGOLAZIONE UNO" << endl;
             cout << endl;
 
@@ -141,6 +147,12 @@ int main(int argc, char* argv[]){
 
         } else if ( q == 3 ) {
 
+            if(!TriangolazioneUno(mesh, meshTriangolata1, b_temp, p))
+            {
+                cerr << "error during triangolation" << endl;
+                return 1;
+            }
+            
             cout << "FACCIO IL DUALE UNO" << endl;
             cout << endl;
 
@@ -183,12 +195,15 @@ int main(int argc, char* argv[]){
     string ParaviewSegmentiTriangolati2 = "./Cell1DTriang2.inp";
 
     if(b == c){
-        if(!TriangolazioneDue(mesh, meshTriangolata2, b, q))
-        {
-            cerr << "error during triangolation" << endl;
-            return 1;
-        }
+        
         if( p == 3 ) {
+            
+            if(!TriangolazioneDue(mesh, meshTriangolata2, b, q))
+            {
+                cerr << "error during triangolation" << endl;
+                return 1;
+            }
+            
             cout << endl << "FACCIO LA TRIANGOLAZIONE DUE" << endl;
             cout << endl;
 
@@ -228,6 +243,12 @@ int main(int argc, char* argv[]){
             cout << "FACCIO IL DUALE DUE" << endl;
             cout << endl;
 
+            if(!TriangolazioneDue(mesh, meshTriangolata2, b, p))
+            {
+                cerr << "error during triangolation" << endl;
+                return 1;
+            }
+            
             if(!CreaDuale(meshTriangolata2, meshDuale2))
             {
                 cerr << "error during triangolation" << endl;
