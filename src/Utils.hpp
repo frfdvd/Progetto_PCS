@@ -43,7 +43,7 @@ namespace PolygonalLibrary{
     string RiconosciPoliedro(const unsigned int& q);
 
     // trova la triangolazione di tipo uno dei punti di un poligono
-    // costo computazionale O(C*b^4) con C > 60 almeno
+    // costo computazionale O(C*b^5) con C > 60 almeno
     bool TriangolazioneUno(const PolygonalMesh& mesh1, PolygonalMesh& mesh2, const unsigned int& b, const unsigned int& q);
 
     // crea il duale

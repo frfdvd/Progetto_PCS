@@ -516,7 +516,7 @@ bool TriangolazioneUno(const PolygonalMesh& mesh1, PolygonalMesh& mesh2, const u
     unsigned int contaIdLatiMesh2 = 0;
 
     // scorro su ogni faccia
-    // il costo di tutto questo ciclo for è O(Cb^4) con C > 50 almeno
+    // il costo di tutto questo ciclo for è O(Cb^5) con C > 50 almeno
     for(unsigned int idFaccia = 0; idFaccia < mesh1.NumCell2Ds; idFaccia++) {
         
         // trovo la base e le altezze su cui salire
@@ -561,7 +561,7 @@ bool TriangolazioneUno(const PolygonalMesh& mesh1, PolygonalMesh& mesh2, const u
 
             vector<unsigned int> tetto = {altezza1[h]};
             int lunghezzaBase = base.size();
-            // costo di questo for O(b) (la prima base costa 2*b-2 e da li in poi costa di meno)
+            // costo di questo for O(b^2) (la prima base costa 2*b-2 e da li in poi costa di meno)
             for(int scorri = 0; scorri < 2*lunghezzaBase-2; scorri ++){
                 if(scorri % 2 == 0){
                     //stiamo scorrendo sulla base 

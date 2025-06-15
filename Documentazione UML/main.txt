@@ -1,36 +1,43 @@
 @startuml
-
 start
-:Legge input (p,q,b,c) oppure (p,q,b,c,id1,id2);
-if (len(input) = 5 or len(input) = 7) then (no)
-  :Errore: Input non valido
-  stop
-endif
-switch (valore di q)
-case (q == 3)
-   :Importa Tetraedro;
-case (q == 4)
-   :Importa Ottaedro;
-case (q == 5)
-   :Importa Icosaedro;
-case (altrimenti)
-   :Errore: valore non accettabile;
-   stop
-endswitch
-if (b o c uguali a 0) then (sì)
-   :Genera poliedro geodetico Type1;
-elseif (b == c) then (sì)
-   :Genera poliedro geodetico Type2;
-else
-   :Errore: tipo di triangolazione non implementata;
-   stop
-endif
-if (q == 3) then (sì)
-  :Genera poliedro duale;
-endif
-if (input include coordinate dei vertici) then (sì)
-  :Calcola shortest path sull'ultimo poliedro generato;
-endif
-:Esporta file .txt e .inp;
+:Legge input {p,q,b,c} oppure {p,q,b,c,id1,id2};
+:controlla che len(input) = 5 or len(input) = 7;
+:controlla i valori di b e c;
+:controlla che (p = 3 and q in {3,4,5}) or (q = 3 and p in {3,4,5}));
+  :Importa la mesh relativa al solido platonico inserito;
+  switch(separo per i valori di p e q)
+  case(p = 3)
+      switch()
+      case (b = c) 
+          :Effettua la triangolazionde di tipo II;
+          :Esporta su paraview;
+          if(inseriti id1 e id2)
+            :Calcolo del cammino minimo;
+          endif
+      case (b = 0 or c = 0) 
+          :Effettua la triangolazione di tipo I;
+          :Esporta su paraview;
+          if(inseriti id1 e id2)
+            :Calcolo del cammino minimo;
+          endif
+      endswitch
+  case(q = 3)
+      switch()
+      case(b = c)
+          :Effettua la triangolazione di tipo II;
+          :Crea il duale;
+          :Esporta su paraview;
+          if(inseriti id1 e id2)
+            :Calcolo del cammino minimo;
+          endif
+      case(b = 0 or c = 0)
+          :Effettua la triangolazione di tipo I;
+          :Crea il duale;
+          :Esporta su paraview;
+          if(inseriti id1 e id2)
+            :Calcolo del cammino minimo;
+          endif
+      endswitch
+  endswitch
 stop
 @enduml

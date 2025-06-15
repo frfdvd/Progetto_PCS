@@ -1,0 +1,53 @@
+@startuml
+start
+:Alloco, per le strutture dati da usare, lo spazio necessario;
+:Inserisco nella mesh nuova i punti del poligono platonico;
+:Creo e memorizzo i punti che giacciono sui lati del poligono platonico; 
+note left
+O(b)
+end note
+:Memorizzo per ogni faccia del poligono platonico i lati e i loro id;
+note left
+O(b^2)
+end note
+:Itero sulle facce del solido platonico;
+note left
+I prossimi tre cicli for 
+hanno costo totale O(b^5)
+end note
+repeat
+:Aggiusto i vettori dei lati della faccia;
+
+  repeat
+  :Definisco base e tetto;
+  
+    repeat
+    switch()
+    case(Base)
+      :Inserisco due lati e una faccia;
+      note right
+      Chiamo la funzione inserisci 
+      lati che controlla che non 
+      ci siano duplicati
+      end note
+    case(Tetto)
+      :Creo il punto sul tetto;
+      :Collego i lati e creo la faccia;
+    endswitch
+    while(Ho finito di scorrere su base e tetto?) is (si)
+    :base = tetto;
+  
+  while(Sono finiti i punti del lato obliquo?) is (si)
+  :Inserisco i lati e la faccia del triangolo sulla punta;
+
+while(Sono state triangolate tutte le facce?) is (si)
+:Dal VettoreVertici creo VettoreFacce;
+note left
+O(b^4)
+end note
+:Proietto i punti sulla sfera;
+note left
+O(b^2)
+end note
+stop
+@enduml
