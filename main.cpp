@@ -71,10 +71,8 @@ int main(int argc, char* argv[]){
     string Poliedro;
     if(p == 3){
         Poliedro = RiconosciPoliedro(q); 
-        cout << Poliedro << endl;
     }else if(q == 3){
         Poliedro = RiconosciPoliedro(p); 
-        cout << Poliedro << endl;
     }
 
     // importo la mesh e verifico che avvenga correttamente
@@ -110,17 +108,21 @@ int main(int argc, char* argv[]){
 
         if (p == 3){
 
+            cout << "CALCOLO DELLA TRIANGOLAZIONE IN CORSO" << endl;
+            cout << endl;
+
             if(!TriangolazioneUno(mesh, meshTriangolata1, b_temp, q))
             {
                 cerr << "error during triangolation" << endl;
                 return 1;
             }
             
-            cout << endl << "FACCIO LA TRIANGOLAZIONE UNO" << endl;
+            cout << "STAMPA SUI FILE IN CORSO" << endl;
             cout << endl;
-
             StampasuFile(meshTriangolata1);
     
+            cout << "EXPORT SU PARAVIEW IN CORSO" << endl;
+            cout << endl;
             utilities.ExportPoints(ParaviewPuntiTriangolati1, 
                                     meshTriangolata1.Cell0DsCoordinates);
             utilities.ExportSegments(ParaviewSegmentiTriangolati1,
@@ -128,8 +130,7 @@ int main(int argc, char* argv[]){
                                         meshTriangolata1.Cell1DsExtrema);
 
             if (cammino == true ) {
-                cout << "FACCIO IL CAMMINO MINIMO 1" << endl;
-                cout << endl;
+                
                 //controllo che gli id passati siano validi
                 bool valido = true;
                 if( (id1 > meshTriangolata1.NumCell0Ds) || (id2 > meshTriangolata1.NumCell0Ds) ){
@@ -137,6 +138,8 @@ int main(int argc, char* argv[]){
                     valido = false;
                 }
 
+                cout << "CALCOLO DEL CAMMINO MINIMO IN CORSO" << endl;
+                cout << endl;
                 if (valido == true){
                    if(!CamminoMinimo(meshTriangolata1, id1, id2, ParaviewPuntiTriangolati1, ParaviewSegmentiTriangolati1)){
                                     return false;
@@ -147,22 +150,28 @@ int main(int argc, char* argv[]){
 
         } else if ( q == 3 ) {
 
+            cout << "CALCOLO DELLA TRIANGOLAZIONE IN CORSO" << endl;
+            cout << endl;
+
             if(!TriangolazioneUno(mesh, meshTriangolata1, b_temp, p))
             {
                 cerr << "error during triangolation" << endl;
                 return 1;
             }
             
-            cout << "FACCIO IL DUALE UNO" << endl;
-            cout << endl;
-
+            
             if(!CreaDuale(meshTriangolata1, meshDuale1))
             {
                 cerr << "error during triangolation" << endl;
                 return 1;
             }
+
+            cout << "STAMPA SUI FILE IN CORSO" << endl;
+            cout << endl;
             StampasuFile(meshDuale1);
 
+            cout << "EXPORT SU PARAVIEW IN CORSO" << endl;
+            cout << endl;
             string ParaviewPuntiDuale1 = "./Cell0DDuale1.inp";
             string ParaviewSegmentiDuale1 = "./Cell1DDuale1.inp";
     
@@ -174,14 +183,15 @@ int main(int argc, char* argv[]){
 
 
             if (cammino == true ) {
-                cout << "FACCIO IL CAMMINO MINIMO 1 SUL DUALE" << endl;
-                cout << endl;
+                
                 //controllo che gli id passati siano validi
                 bool validoD = true;
                 if( (id1 > meshDuale1.NumCell0Ds) || (id2 > meshDuale1.NumCell0Ds) ){
                     cerr << "Gli id non sono validi per il cammino minimo sul duale" << endl;
                     validoD = false;
                 }
+                cout << "CALCOLO DEL CAMMINO MINIMO IN CORSO" << endl;
+                cout << endl;
                 if(validoD == true){
                     if(!CamminoMinimo(meshDuale1, id1, id2, ParaviewPuntiDuale1, ParaviewSegmentiDuale1)){
                         return false;
@@ -198,23 +208,20 @@ int main(int argc, char* argv[]){
         
         if( p == 3 ) {
             
+            cout << "CALCOLO DELLA TRIANGOLAZIONE IN CORSO" << endl;
+            cout << endl;
             if(!TriangolazioneDue(mesh, meshTriangolata2, b, q))
             {
                 cerr << "error during triangolation" << endl;
                 return 1;
             }
             
-            cout << endl << "FACCIO LA TRIANGOLAZIONE DUE" << endl;
+            cout << "STAMPA SUI FILE IN CORSO" << endl;
             cout << endl;
-
-            if(!TriangolazioneDue(mesh, meshTriangolata2, b, q))
-            {
-                cerr << "error during triangolation" << endl;
-                return 1;
-            }
-
             StampasuFile(meshTriangolata2);
 
+            cout << "EXPORT SU PARAVIEW IN CORSO" << endl;
+            cout << endl;
             utilities.ExportPoints(ParaviewPuntiTriangolati2, 
                                     meshTriangolata2.Cell0DsCoordinates);
             utilities.ExportSegments(ParaviewSegmentiTriangolati2,
@@ -222,14 +229,14 @@ int main(int argc, char* argv[]){
                                     meshTriangolata2.Cell1DsExtrema);
 
             if (cammino == true ) {
-                cout << "FACCIO IL CAMMINO MINIMO 2" << endl;
-                cout << endl;
                 //controllo che gli id passati siano validi
                 bool valido = true;
                 if( (id1 > meshTriangolata2.NumCell0Ds) || (id2 > meshTriangolata2.NumCell0Ds) ){
                     cerr << "Gli id non sono validi per il cammino minimo" << endl;
                     valido = false;
                 }
+                cout << "CALCOLO DEL CAMMINO MINIMO IN CORSO" << endl;
+                cout << endl;
                 if (valido == true) {
                     if(!CamminoMinimo(meshTriangolata2, id1, id2, ParaviewPuntiTriangolati2, ParaviewSegmentiTriangolati2)){
                     return false;
@@ -240,7 +247,7 @@ int main(int argc, char* argv[]){
             }
 
         } else if (q == 3) {
-            cout << "FACCIO IL DUALE DUE" << endl;
+            cout << "CALCOLO DELLA TRIANGOLAZIONE IN CORSO" << endl;
             cout << endl;
 
             if(!TriangolazioneDue(mesh, meshTriangolata2, b, p))
@@ -254,8 +261,13 @@ int main(int argc, char* argv[]){
                 cerr << "error during triangolation" << endl;
                 return 1;
             }
+
+            cout << "STAMPA SUI FILE IN CORSO" << endl;
+            cout << endl;
             StampasuFile(meshDuale2);
 
+            cout << "EXPORT SU PARAVIEW IN CORSO" << endl;
+            cout << endl;
             string ParaviewPuntiDuale2 = "./Cell0DDuale2.inp";
             string ParaviewSegmentiDuale2 = "./Cell1DDuale2.inp";
     
@@ -266,13 +278,15 @@ int main(int argc, char* argv[]){
                                     meshDuale2.Cell1DsExtrema);
 
             if (cammino == true ) {
-                cout << "FACCIO IL CAMMINO MINIMO 2 SUL DUALE" << endl;
-                cout << endl;
+                
                 bool validoD = true;
                 if( (id1 > meshDuale2.NumCell0Ds) || (id2 > meshDuale2.NumCell0Ds) ){
                     cerr << "Gli id non sono validi per il cammino minimo" << endl;
                     validoD = false;
                 }
+                cout << "CALCOLO DEL CAMMINO MINIMO IN CORSO" << endl;
+                cout << endl;
+
                 if (validoD == true){
                     if(!CamminoMinimo(meshDuale2, id1, id2, ParaviewPuntiDuale2, ParaviewSegmentiDuale2)){
                     return false;
