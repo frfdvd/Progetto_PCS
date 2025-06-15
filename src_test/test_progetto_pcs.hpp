@@ -7,14 +7,15 @@ using namespace PolygonalLibrary;
 
 const unsigned int b = 5;
 
-int GradoV(int& GradoVAtteso, const std::vector<unsigned int>& Vertici, const std::vector<std::vector<unsigned int>>& Facce) {
+int GradoV(int GradoVAtteso, const std::vector<unsigned int>& Vertici, const std::vector<std::vector<unsigned int>>& Facce) {
 	int numVGradoAtteso = 0;
 	for (const auto& idV : Vertici) {
 		int corrente = 0;
-		for (const std::vector<unsigned int>& listaFacce : Facce )
-			if (std::find(listaFacce.begin(), listaFacce.end(), idV) != listaFacce.end())
+		for (const auto& listaFacce : Facce )
+			if (std::find(listaFacce.begin(), listaFacce.end(), idV) != listaFacce.end()){
 				corrente++;
-		if (corrente == numVGradoAtteso)
+			}
+		if (corrente == GradoVAtteso)
 			numVGradoAtteso++;
 	}
 	
@@ -40,7 +41,7 @@ TEST(TestTriangolazioneUno, TestTetraedro1)
 	PolygonalMesh poliTRI;
 	PolygonalLibrary::TriangolazioneUno(poliPlatonico, poliTRI, b, q);
 	
-	int T = pow(b,2);
+	int T = b*b;
 	int verticiAttesi = 2*T + 2;
 	int latiAttesi = 6*T;
 	int facceAttese = 4*T;
@@ -125,12 +126,12 @@ TEST(TestTriangolazioneUno, TestIcosaedro1)
 	EXPECT_EQ(numgradoAtteso2, numVGrado2);
 }
 
-TEST(TestTriangolazioneUno, TestTetraedro2)
+TEST(TestTriangolazioneDue, TestTetraedro2)
 {
 	unsigned int q = 3;
 	PolygonalMesh poliPlatonico;
 	if (!PolygonalLibrary::ImportMesh(poliPlatonico, "Tetraedro")){
-		FAIL() << "errore nella creazione della mesh del tetraedro triangolato con triangolazione uno";
+		FAIL() << "errore nella creazione della mesh del tetraedro triangolato con triangolazione due";
 	}
 
 	PolygonalMesh poliTRI;
@@ -140,18 +141,18 @@ TEST(TestTriangolazioneUno, TestTetraedro2)
 	unsigned int E = 6;
 	unsigned int F = 4;
 	
-	array<unsigned int, 3> proprietasolidoattese = ProprietaSolido(V, E, F, b);
-	array<unsigned int, 3> proprietasolido = {poliTRI.NumCell0Ds, poliTRI.NumCell1Ds, poliTRI.NumCell2Ds};
+	array<unsigned int, 3> ProprietaSolidoAttese = ProprietaSolido(V, E, F, b);
+	array<unsigned int, 3> ProprietaSolido = {poliTRI.NumCell0Ds, poliTRI.NumCell1Ds, poliTRI.NumCell2Ds};
 
-	EXPECT_EQ(proprietasolido, proprietasolidoattese);
+	EXPECT_EQ(ProprietaSolido, ProprietaSolidoAttese);
 }
 
-TEST(TestTriangolazioneUno, TestOttaedro2)
+TEST(TestTriangolazioneDue, TestOttaedro2)
 {
 	unsigned int q = 4;
 	PolygonalMesh poliPlatonico;
 	if (!PolygonalLibrary::ImportMesh(poliPlatonico, "Ottaedro")){
-		FAIL() << "errore nella creazione della mesh del ottaedro triangolato con triangolazione uno";
+		FAIL() << "errore nella creazione della mesh del ottaedro triangolato con triangolazione due";
 	}
 
 	PolygonalMesh poliTRI;
@@ -167,12 +168,12 @@ TEST(TestTriangolazioneUno, TestOttaedro2)
 	EXPECT_EQ(proprietasolido, proprietasolidoattese);
 }
 
-TEST(TestTriangolazioneUno, TestIcosaedrodro2)
+TEST(TestTriangolazioneDue, TestIcosaedrodro2)
 {
-	unsigned int q = 4;
+	unsigned int q = 5;
 	PolygonalMesh poliPlatonico;
-	if (!PolygonalLibrary::ImportMesh(poliPlatonico, "Tetraedro")){
-		FAIL() << "errore nella creazione della mesh del tetraedro triangolato con triangolazione uno";
+	if (!PolygonalLibrary::ImportMesh(poliPlatonico, "Icosaedro")){
+		FAIL() << "errore nella creazione della mesh del icosaedro triangolato con triangolazione due";
 	}
 
 	PolygonalMesh poliTRI;
@@ -188,15 +189,19 @@ TEST(TestTriangolazioneUno, TestIcosaedrodro2)
 	EXPECT_EQ(proprietasolido, proprietasolidoattese);
 }
 
-TEST(TestDuale, Test1)
+TEST(TestDualeTriangolazioneUno, TestTetraedroD1)
 {
 	PolygonalMesh poliPlatonico;
 	if (!PolygonalLibrary::ImportMesh(poliPlatonico, "Tetraedro")){
 		FAIL() << "errore nella creazione della mesh del tetraedro triangolato con triangolazione uno";
 	}
 	
+	unsigned int q = 3;
+	PolygonalMesh poliTRI;
+	PolygonalLibrary::TriangolazioneUno(poliPlatonico, poliTRI, b, q);
+
 	PolygonalMesh poliDuale;
-	PolygonalLibrary::CreaDuale(poliPlatonico, poliDuale);
+	PolygonalLibrary::CreaDuale(poliTRI, poliDuale);
 	
 	unsigned int T = pow(b, 2);
 	unsigned int verticiattesi = 4*T;
@@ -207,15 +212,20 @@ TEST(TestDuale, Test1)
 }
 
 
-TEST(TestDuale, Test2)
+TEST(TestDualeTriangolazioneDue, TestTetraedroD2)
 {
 	PolygonalMesh poliPlatonico;
 	if (!PolygonalLibrary::ImportMesh(poliPlatonico, "Tetraedro")){
 		FAIL() << "errore nella creazione della mesh del tetraedro triangolato con triangolazione uno";
 	}
 	
+	unsigned int q = 3;
+	PolygonalMesh poliTRI;
+	PolygonalLibrary::TriangolazioneDue(poliPlatonico, poliTRI, b, q);
+
+
 	PolygonalMesh poliDuale;
-	PolygonalLibrary::CreaDuale(poliPlatonico, poliDuale);
+	PolygonalLibrary::CreaDuale(poliTRI, poliDuale);
 	
 	unsigned int V = 4;
 	unsigned int E = 6;
@@ -226,4 +236,159 @@ TEST(TestDuale, Test2)
 	
 	EXPECT_EQ(poliDuale.NumCell0Ds, verticiattesi);
 	EXPECT_EQ(poliDuale.NumCell2Ds, facceattese);
+}
+
+
+TEST(TestDijkstra, CamminoMinimoSemplice)
+{
+    unsigned int n = 4;
+    unsigned int Start = 0;
+    unsigned int End = 3;
+
+    vector<vector<unsigned int>> LA = {
+        {1, 2},    
+        {0, 3},    
+        {0, 3},    
+        {1, 2}     
+    };
+
+    MatrixXd MatricePesi = MatrixXd::Zero(n, n);
+    MatricePesi(0, 1) = 1;
+    MatricePesi(1, 0) = 1;
+    MatricePesi(0, 2) = 4;
+    MatricePesi(2, 0) = 4;
+    MatricePesi(1, 3) = 2;
+    MatricePesi(3, 1) = 2;
+    MatricePesi(2, 3) = 1;
+    MatricePesi(3, 2) = 1;
+
+    vector<unsigned int> path;
+    bool esito = Dijkstra(n, LA, Start, End, MatricePesi, path);
+
+    EXPECT_TRUE(esito);
+    ASSERT_EQ(path.size(), 3); 
+    EXPECT_EQ(path.back(), Start);
+    EXPECT_EQ(path.front(), End);
+
+    
+    reverse(path.begin(), path.end());
+    vector<unsigned int> expected = {0, 1, 3};
+    EXPECT_EQ(path, expected);
+}
+
+
+TEST(TestCamminoMinimo, ListaAdiacenzaGenerataCorrettamente)
+{
+
+
+    PolygonalMesh mesh;
+    mesh.NumCell0Ds = 4;
+    mesh.NumCell1Ds = 4;
+    mesh.Cell1DsExtrema.resize(2, 4);
+
+
+    mesh.Cell1DsExtrema(0, 0) = 0; mesh.Cell1DsExtrema(1, 0) = 1;
+    mesh.Cell1DsExtrema(0, 1) = 1; mesh.Cell1DsExtrema(1, 1) = 2;
+    mesh.Cell1DsExtrema(0, 2) = 2; mesh.Cell1DsExtrema(1, 2) = 3;
+    mesh.Cell1DsExtrema(0, 3) = 3; mesh.Cell1DsExtrema(1, 3) = 0;
+
+
+    vector<vector<unsigned int>> listaAdiacenza;
+    listaAdiacenza.reserve(mesh.NumCell0Ds);
+
+    for (unsigned int idVertice = 0; idVertice < mesh.NumCell0Ds; idVertice++) {
+        vector<unsigned int> vettoreAdiacenza;
+
+        for (unsigned int idAdiacente = 0; idAdiacente < mesh.Cell1DsExtrema.cols(); idAdiacente++) {
+            int idVerticeIntero = idVertice;
+            if (idVerticeIntero == mesh.Cell1DsExtrema(0, idAdiacente)) {
+                vettoreAdiacenza.push_back(mesh.Cell1DsExtrema(1, idAdiacente));
+            }
+            if (idVerticeIntero == mesh.Cell1DsExtrema(1, idAdiacente)) {
+                vettoreAdiacenza.push_back(mesh.Cell1DsExtrema(0, idAdiacente));
+            }
+        }
+        listaAdiacenza.push_back(vettoreAdiacenza);
+    }
+
+    vector<vector<unsigned int>> attesa = {
+        {1, 3}, 
+        {0, 2}, 
+        {1, 3}, 
+        {2, 0}  
+    };
+
+    EXPECT_EQ(listaAdiacenza, attesa);
+}
+
+TEST(TestDuplicati, LatoPresenteNonPresente)
+{
+
+    MatrixXi MatriceLati(2, 3);
+    MatriceLati << 0, 1, 2,
+                   1, 2, 3;
+
+    unsigned int index;
+
+ 
+    EXPECT_TRUE(TestDuplicati(MatriceLati, 0, 1, &index));
+    EXPECT_EQ(index, 0);
+
+
+    EXPECT_TRUE(TestDuplicati(MatriceLati, 1, 0, &index));
+    EXPECT_EQ(index, 0);
+
+
+    EXPECT_TRUE(TestDuplicati(MatriceLati, 2, 1, &index));
+    EXPECT_EQ(index, 1);
+
+
+    EXPECT_TRUE(TestDuplicati(MatriceLati, 3, 2, &index));
+    EXPECT_EQ(index, 2);
+
+
+    EXPECT_FALSE(TestDuplicati(MatriceLati, 0, 3, &index));
+
+
+    EXPECT_TRUE(TestDuplicati(MatriceLati, 1, 2, nullptr));
+}
+
+TEST(TestCreaBaricentro, BaricentroTriangolo)
+{
+
+    PolygonalMesh mesh;
+    mesh.NumCell0Ds = 4;  
+    mesh.Cell0DsCoordinates.resize(3, 4); 
+    mesh.Cell0DsCoordinates << 
+        0.0, 1.0, 0.0, 0.0,   
+        0.0, 0.0, 1.0, 0.0,   
+        0.0, 0.0, 0.0, 0.0;   
+
+
+    vector<unsigned int> vertici = {0, 1, 2};
+    unsigned int idBar = 3;
+
+    map<unsigned int, vector<unsigned int>> mapBaricentri;
+
+
+    bool risultato = CreaBaricentro(mesh, vertici, idBar, mapBaricentri);
+
+    EXPECT_TRUE(risultato);
+
+
+    Vector3d atteso = (Vector3d(0,0,0) + Vector3d(1,0,0) + Vector3d(0,1,0)) / 3.0;
+    Vector3d ottenuto(mesh.Cell0DsCoordinates(0, idBar),
+                      mesh.Cell0DsCoordinates(1, idBar),
+                      mesh.Cell0DsCoordinates(2, idBar));
+
+    EXPECT_NEAR(ottenuto(0), atteso(0), 1e-6);
+    EXPECT_NEAR(ottenuto(1), atteso(1), 1e-6);
+    EXPECT_NEAR(ottenuto(2), atteso(2), 1e-6);
+
+
+    EXPECT_TRUE(find(mesh.Cell0DsId.begin(), mesh.Cell0DsId.end(), idBar) != mesh.Cell0DsId.end());
+
+ 
+    ASSERT_TRUE(mapBaricentri.count(idBar));
+    EXPECT_EQ(mapBaricentri[idBar], vertici);
 }
