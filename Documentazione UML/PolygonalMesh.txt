@@ -1,0 +1,31 @@
+@startuml
+set separator :: 
+
+package PolygonalLibrary {
+
+  struct PolygonalMesh {
+    .. Cell0D ..
+    + int NumCell0Ds
+    + vector<int> Cell0DsId
+    + MatrixXd Cell0DsCoordinates
+    .. Cell1D ..
+    + int NumCell1Ds
+    + vector<int> Cell1DsId
+    + MatrixXi Cell1DsExtrema
+    .. Cell2D ..
+    + int NumCell2Ds
+    + vector<int> Cell2DsId
+    + vector<vector<int>> VettoreVertici
+    + vector<vector<int>> VettoreLati
+  }
+  
+
+}
+
+class "vector<T>" <<stl>> 
+class "MatrixXd" <<eigen>>
+class "MatrixXi" <<eigen>>
+
+PolygonalMesh ..> "vector<T>" : usa
+PolygonalMesh ..> "MatrixXd" : usa
+PolygonalMesh ..> "MatrixXi" : usa

@@ -1235,7 +1235,6 @@ bool TriangolazioneDue(const PolygonalMesh& mesh1, PolygonalMesh& meshTri, const
         
         // vettore con la direzione del lato
         Vector3d VettoreDirezione = Estremo2 - Estremo1;
-        //cout << "Vettore direzione " << VettoreDirezione(0) <<VettoreDirezione(1) <<VettoreDirezione(2) << endl;
         
         // trovo i punti in mezzo ai lati e li memorizzo
         for(unsigned int i = 0; i < b-1; i++){
@@ -1292,15 +1291,6 @@ bool TriangolazioneDue(const PolygonalMesh& mesh1, PolygonalMesh& meshTri, const
         }
 
         vecFacce.push_back(lati);
-        //cout << "id faccia" << i << endl;
-
-        /*for(unsigned int s = 0; s<lati.size(); s++){
-            for(unsigned int y = 0;y<lati[s].size();y++){
-                cout << lati[s][y] << " ";
-            }
-            cout << endl;
-        }
-        cout << endl;*/
 
         lati = {};
 
@@ -1355,7 +1345,6 @@ bool TriangolazioneDue(const PolygonalMesh& mesh1, PolygonalMesh& meshTri, const
         vector<unsigned int> base2 = vecFacce[idFaccia][0];
 
         // inverto i vettori per avere compatibilità
- 
         // costa O(b+1)
         if ( (lato1[0] != base[0]) & (lato1[0] != base[base.size()-1])){
               reverse( lato1.begin(),  lato1.end());

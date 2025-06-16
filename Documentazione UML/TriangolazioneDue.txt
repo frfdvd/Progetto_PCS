@@ -1,0 +1,83 @@
+@startuml
+start
+:Alloco lo spazio necessario;
+:Creo un oggetto di tipo mesh (mesh tmp);
+note left
+Per questa triangolazione sfrut-
+tiamo la triangolazione 1
+end note
+:Inserisco nella mesh 2 e in quella 
+tmp i punti del solido platonico;
+:Per ogni lato del solido platonico creo i punti
+interni ai lati e li inserisco in mesh 2 e mesh tmp;
+note right
+O(b)
+end note
+:Memorizzo per ogni faccia del poligono platonico i lati e gli id;
+note left
+O(b^2)
+end note
+:Itero sulle facce del poligono platonico;
+note left
+I prossimi cicli for sono O(b^6)
+end note
+:Aggiusto i vettori dei lati della faccia;
+repeat
+:Definisco i vettori base e tetto;
+note left
+Da qui in poi la triangolazione 
+di tipo I prosegue come descritto
+nella documentazione
+end note
+repeat
+switch()
+case(Base)
+:Creo e salvo il baricentro 
+relativo alla faccia della tri. I;
+note right
+Uso la funzione
+CreaBaricentri
+end note
+:Creo e salvo i lati tra il 
+baricentro e la faccia della tri. I;
+note right
+Uso la funzione
+AggiungiLati
+end note
+:Aggiungo i punti e i lati sul 
+bordo del poligono;
+note right
+Uso la funzione controlla 
+bordi per gestire eventuali
+duplicati
+end note
+:Collego i baricentri relativi
+a due facce adiacenti;
+note right
+Uso la funzione Collega 
+Baricentri
+end note
+case(Tetto)
+:Creo e salvo il baricentro 
+relativo alla faccia della tri. I;
+:Creo e salvo i lati tra il 
+baricentro e la faccia della tri. I;
+:Collego i baricentri relativi
+a due facce adiacenti;
+endswitch
+:Creo, salvo il baricentro, aggiungo i lati tra 
+il baricentro e i bordi e unisco i baricentri
+dell ultima faccia in punta;
+while(Ho finito di scorrere su base e tetto?) is (si)
+while(Sono finiti i punti del lato obliquo?) is (si)
+:Da VettoreVertci creo
+VettoreLati;
+note left
+O(b^4)
+end note
+:Proietto i punti sulla sfera;
+note left
+O(b^2)
+end note
+stop
+@enduml

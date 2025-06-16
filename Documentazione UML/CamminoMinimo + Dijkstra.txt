@@ -1,0 +1,47 @@
+@startuml
+title CamminoMinimo + Dijkstra
+
+start
+:Costruzione della lista di adiacenza;
+note left: O(b^2)
+:Costruzione della matrice di adiacenza; 
+note left: O(b^2)
+:Chiamata alla funzione Dijkstra;
+:Inizializzazione di pred, dist e 
+della coda con priorità;
+note left: O(b^2)
+repeat
+  :Estrazione coppia (u, p) dalla priority queue;
+  :Eliminazione (u, p) dalla coda;
+  note left
+  O(2*log(b))
+  end note
+  repeat
+    if (dist[w] > dist[u] + W(u,w)?) then (yes)
+    note left
+    sono al massimo
+    sei iterazioni
+    end note
+      :Aggiorna dist[w] e pred[w];
+      :Inserisci (w, dist[w]) nella coda;
+    endif
+  repeat while (ci sono altri vertici w adiacenti a u?) is (yes)
+repeat while (La coda è vuota?) is (no)
+:v = end;
+note left 
+Ricostruzione del 
+percorso minimo
+end note
+repeat 
+  :path.push_back(v);
+  :v = pred[v];
+repeat while (v != start?) is (yes)
+:Ricerca dei lati che compongono il cammino minimo;
+note left
+fine funzione 
+Dijkstra
+end note
+:Assegnazione proprietà "ShortestPath"
+a punti e lati del cammino minimo;
+stop
+@enduml
