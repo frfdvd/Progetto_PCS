@@ -29,3 +29,4 @@ class "MatrixXi" <<eigen>>
 PolygonalMesh ..> "vector<T>" : usa
 PolygonalMesh ..> "MatrixXd" : usa
 PolygonalMesh ..> "MatrixXi" : usa
+@enduml

@@ -1,4 +1,6 @@
 @startuml
+title TriangolazioneDue
+
 start
 :Alloco lo spazio necessario;
 :Creo un oggetto di tipo mesh (mesh tmp);
@@ -18,6 +20,7 @@ note left
 O(b^2)
 end note
 :Itero sulle facce del poligono platonico;
+repeat
 note left
 I prossimi cicli for sono O(b^6)
 end note
@@ -65,11 +68,12 @@ baricentro e la faccia della tri. I;
 :Collego i baricentri relativi
 a due facce adiacenti;
 endswitch
+repeat while(Ho finito di scorrere su base e tetto?) is (si)
+repeat while(Sono finiti i punti del lato obliquo?) is (si)
 :Creo, salvo il baricentro, aggiungo i lati tra 
 il baricentro e i bordi e unisco i baricentri
 dell ultima faccia in punta;
-while(Ho finito di scorrere su base e tetto?) is (si)
-while(Sono finiti i punti del lato obliquo?) is (si)
+repeat while(Sono finite le facce del solido platonico?) is (si)
 :Da VettoreVertci creo
 VettoreLati;
 note left

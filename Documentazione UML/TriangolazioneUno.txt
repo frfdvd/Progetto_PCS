@@ -1,4 +1,6 @@
 @startuml
+title TriangolazioneUno
+
 start
 :Alloco, per le strutture dati da usare, lo spazio necessario;
 :Inserisco nella mesh nuova i punti del poligono platonico;
@@ -35,13 +37,13 @@ repeat
       :Creo il punto sul tetto;
       :Collego i lati e creo la faccia;
     endswitch
-    while(Ho finito di scorrere su base e tetto?) is (si)
+    repeat while(Ho finito di scorrere su base e tetto?) is (si)
     :base = tetto;
   
-  while(Sono finiti i punti del lato obliquo?) is (si)
+  repeat while(Sono finiti i punti del lato obliquo?) is (si)
   :Inserisco i lati e la faccia del triangolo sulla punta;
 
-while(Sono state triangolate tutte le facce?) is (si)
+repeat while(Sono state triangolate tutte le facce?) is (si)
 :Dal VettoreVertici creo VettoreLati;
 note left
 O(b^4)

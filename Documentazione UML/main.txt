@@ -1,4 +1,6 @@
 @startuml
+title main
+
 start
 :Legge input {p,q,b,c} oppure {p,q,b,c,id1,id2};
 :controlla che len(input) = 5 or len(input) = 7;

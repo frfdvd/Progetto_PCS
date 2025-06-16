@@ -1,45 +1,45 @@
 @startuml
 start
+title Duale
 
 :Itero sui vertici;
 note left
 Costo O(b^4)
 end note
 repeat
-:Trovo chi sono le facce adiacenti iterando sulle facce;
-:Le inserisco in FaccePerVertice;
-:Itero sugli elementi di FaccePerVertice;
-:Trovo per ognuno una faccia con cui confina;
-:La inerisco in FaccePerVerticeOrdinate;
-:Rimuovo da FaccePerVertice la faccia appena selezionata;
-
-while(Sono finite le facce?) is (si)
+  :Trovo chi sono le facce adiacenti iterando sulle facce;
+  :Le inserisco in FaccePerVertice;
+  :Itero sugli elementi di FaccePerVertice;
+  :Trovo per ognuno una faccia con cui confina;
+  :La inerisco in FaccePerVerticeOrdinate;
+  :Rimuovo da FaccePerVertice la faccia appena selezionata;
+repeat while(Sono finite le facce?) is (si)
 :Alloco lo spazio necessario per i dati;
 :Itero sui vertici del poligono;
 
 repeat
-:Creo il baricentro della faccia;
-:Controllo che non esista già;
-note left
-Uso la funzione 
-TestDuplicatiPunti
-end note
-:Lo salvo;
-:Lo aggiungo a VettoreVertici;
-while(Ci sono ancora facce adiacenti?) is (si)
+  :Creo il baricentro della faccia;
+  :Controllo che non esista già;
+  note left
+  Uso la funzione 
+  TestDuplicatiPunti
+  end note
+  :Lo salvo;
+  :Lo aggiungo a VettoreVertici;
+repeat while(Ci sono ancora facce adiacenti?) is (si)
 
 repeat
-note left
-costo O(b^4)
-end note
-:Prendo a 2 a 2 i punti dentro a VettoreVertici;
-:Controllo che il lato non esista già;
-note left
-uso la funzione 
-TestDuplicati
-end note
-:Lo inserisco in Cell1DsExtrema e in VettoreLati;
-while(Ci sono ancora facce del duale?) is (si)
+  note left
+  costo O(b^4)
+  end note
+  :Prendo a 2 a 2 i punti dentro a VettoreVertici;
+  :Controllo che il lato non esista già;
+  note left
+  uso la funzione 
+  TestDuplicati
+  end note
+  :Lo inserisco in Cell1DsExtrema e in VettoreLati;
+repeat while(Ci sono ancora facce del duale?) is (si)
 :Proietto i punti sulla sfera;
 note left
 O(b^2)
