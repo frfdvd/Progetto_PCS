@@ -60,7 +60,7 @@ int main(int argc, char* argv[]){
         return 1;
     }
     if ( ( p == 3 && (q < 3 || q > 5)) || (q == 3 && (p < 3 || q > 5)) ) {
-        cerr << "i valori inseriti non sono validi" << endl;
+        cerr << "i valori di p o di q inseriti non sono validi" << endl;
         return 1;
     }
     if (b != c && (c != 0 && b!= 0)){
@@ -138,9 +138,10 @@ int main(int argc, char* argv[]){
                     valido = false;
                 }
 
-                cout << "CALCOLO DEL CAMMINO MINIMO IN CORSO" << endl;
-                cout << endl;
+                
                 if (valido == true){
+                    cout << "CALCOLO DEL CAMMINO MINIMO IN CORSO" << endl;
+                    cout << endl; 
                    if(!CamminoMinimo(meshTriangolata1, id1, id2, ParaviewPuntiTriangolati1, ParaviewSegmentiTriangolati1)){
                                     return false;
                                 }
@@ -190,9 +191,10 @@ int main(int argc, char* argv[]){
                     cerr << "Gli id non sono validi per il cammino minimo sul duale" << endl;
                     validoD = false;
                 }
-                cout << "CALCOLO DEL CAMMINO MINIMO IN CORSO" << endl;
-                cout << endl;
+                
                 if(validoD == true){
+                    cout << "CALCOLO DEL CAMMINO MINIMO IN CORSO" << endl;
+                    cout << endl;
                     if(!CamminoMinimo(meshDuale1, id1, id2, ParaviewPuntiDuale1, ParaviewSegmentiDuale1)){
                         return false;
                     }
@@ -235,9 +237,10 @@ int main(int argc, char* argv[]){
                     cerr << "Gli id non sono validi per il cammino minimo" << endl;
                     valido = false;
                 }
-                cout << "CALCOLO DEL CAMMINO MINIMO IN CORSO" << endl;
-                cout << endl;
+                
                 if (valido == true) {
+                    cout << "CALCOLO DEL CAMMINO MINIMO IN CORSO" << endl;
+                    cout << endl;
                     if(!CamminoMinimo(meshTriangolata2, id1, id2, ParaviewPuntiTriangolati2, ParaviewSegmentiTriangolati2)){
                     return false;
                     }
@@ -284,10 +287,10 @@ int main(int argc, char* argv[]){
                     cerr << "Gli id non sono validi per il cammino minimo" << endl;
                     validoD = false;
                 }
-                cout << "CALCOLO DEL CAMMINO MINIMO IN CORSO" << endl;
-                cout << endl;
-
+                
                 if (validoD == true){
+                    cout << "CALCOLO DEL CAMMINO MINIMO IN CORSO" << endl;
+                    cout << endl;
                     if(!CamminoMinimo(meshDuale2, id1, id2, ParaviewPuntiDuale2, ParaviewSegmentiDuale2)){
                     return false;
                     }

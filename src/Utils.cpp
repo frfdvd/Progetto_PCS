@@ -113,7 +113,6 @@ string RiconosciPoliedro(const unsigned int& q){
 bool ImportCell0Ds(PolygonalMesh& mesh, const string& Poliedro)
 {
     string NomeFile="./Cell0D"+Poliedro+".csv";
-    cout << NomeFile << endl;
     ifstream file(NomeFile);
 
     if(file.fail())
@@ -239,7 +238,6 @@ bool ImportCell1Ds(PolygonalMesh& mesh, const string& Poliedro)
 
 bool ImportCell2Ds(PolygonalMesh& mesh, const string& Poliedro){
     string NomeFile="./Cell2D"+Poliedro+".csv";
-    cout << NomeFile << endl;
     ifstream file(NomeFile);
 
     if(file.fail())
@@ -1013,7 +1011,7 @@ bool CamminoMinimo(const PolygonalMesh& mesh, const unsigned int& id1, const uns
             }
         } 
     }
-    cout << "il costo di tale percorso è " << lunghezzaPercorso << endl;
+    cout << "La lunghezza di tale percorso è " << lunghezzaPercorso << endl;
 
     ProprietaPercorsoMinimo.Label = "Percorso minimo";
     ProprietaPercorsoMinimo.Size = ProprietaLatiPercorso.size();
