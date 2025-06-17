@@ -85,7 +85,7 @@ bool StampasuFile(const PolygonalMesh& mesh){
         cerr << "Errore nell'apertura del file Cell3Ds.txt." << endl;
         return false;
     }
-    outFile3<<"id;NumVertices;Vertices;NumEdges;Edges;NumFaces;Faces"<<endl;
+    outFile3<<"id;NumVertices;NumEdges;NumFaces"<<endl;
     outFile3<<0<<";"<<mesh.NumCell0Ds<<";"<<mesh.NumCell1Ds<<";"<<mesh.NumCell2Ds;
 
     outFile3.close(); 
